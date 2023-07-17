@@ -7,7 +7,7 @@ Create Date: 2023-07-17 20:19:04.802893+09:00
 """
 from alembic import op
 import sqlalchemy as sa
-
+from datetime import datetime
 
 # revision identifiers, used by Alembic.
 revision = '94383e811530'
@@ -25,8 +25,10 @@ def upgrade() -> None:
         sa.Column("email", sa.String(), nullable=False, unique=True),
         sa.Column("name", sa.String(), nullable=False, unique=True),
         sa.Column("hashed_password", sa.String(), nullable=False),
-        sa.Column("created_at", sa.DateTime(), nullable=False),
-        sa.Column("updated_at", sa.DateTime(), nullable=False),
+        sa.Column("created_at", sa.DateTime(),
+                  default=datetime.now(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), default=datetime.now(),
+                  onupdate=datetime.now(), nullable=False),
     )
 
 
