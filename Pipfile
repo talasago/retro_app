@@ -9,6 +9,7 @@ mangum = "*"
 psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
+python-dateutil = "*"
 
 [dev-packages]
 autopep8 = "*"
