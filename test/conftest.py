@@ -18,27 +18,27 @@ from sqlalchemy import create_engine  # noqa: E402
 # TODO:関数名をdb_sessionにしたい
 @pytest.fixture(scope="session")
 def db() -> Session:
-    """データベースセッションのフィクスチャ。DBを削除→作成→テスト実行→DB接続セッション削除している"""
+    """データベースセッションのフィクスチャ。TGLを削除→作成→テスト実行→DB接続セッション削除している"""
 
     # NOTE:TBL削除→TBL作成→→テスト実行できるようにすることで、テストデータを毎回削除する手間を減らしている。
-    # ロジックはこちらのHPを参考にした
+    # ロジックはこちらのHPを参考にしたかった
     # https://nikaera.com/archives/pytest-sqlalchemy-alembic/
-
-    # TODO:環境変数とかにしたほうがいいかも
-    TEST_SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres_password@localhost:5432/postgres"
-
-    engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
-
-    # テーブルの作成
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
-
-    # NOTE:これマイグレートしてる意味あるのかな。よくわかってない。多分意味ない.
     # ホントはDBを消すべきなのだろうけど。`ERROR: cannot drop the currently open database`となって削除できない
+    # 現状はTBLの削除で誤魔化している
     # https://www.postgresql.jp/document/7.3/reference/sql-dropdatabase.htmlを見ると
     # >対象とするデータベースに接続している場合、このコマンドを実行することができません。とあるので、
     # 時的に別のデータベースに接続し、テスト用のデータベースをドロップすれば行けるのかもしれない。
     # 時間かかりそうなので一旦後回し。
+
+    # TODO:環境変数とかにしたほうがいいかも
+    TEST_SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres_password@localhost:5432/postgres"
+    engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
+
+    # テーブルの削除と作成
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+
+    # NOTE:これマイグレートしてる意味あるのかな。DB消してないから多分意味ない.
     migrate()
 
     db = SessionLocal()
