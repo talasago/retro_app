@@ -1,0 +1,4 @@
+[flake8]
+
+# シングルクォーテーションのみを許可する設定
+inline-quotes = single
