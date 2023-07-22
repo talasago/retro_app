@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class User(BaseModel):
+class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
     # TODO:あとでEmailStrに変更する
@@ -25,5 +25,5 @@ class User(BaseModel):
         orm_mode = True
 
 
-class UserCreate(User):
+class UserCreate(UserSchema):
     password: str

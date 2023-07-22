@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime
 
 
-class User(Base):
+class UserModel(Base):
     """SQLAlchemyのモデルクラス"""
 
     __tablename__ = 'users'
