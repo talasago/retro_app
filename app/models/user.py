@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy.dialects.postgresql import UUID
 from ..database import Base
+import uuid
+from datetime import datetime
 
 
 class User(Base):
@@ -7,17 +10,16 @@ class User(Base):
 
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    # TODO:uuidタイプと、デフォルト値を指定した方が良いかも
-    uuid = Column(String, nullable=False, unique=True)
+    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4,
+                  nullable=False, unique=True)
     email = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False, unique=True)
     hashed_password = Column(String, nullable=False)
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
-    # デフォルト値も指定した方が良いかも
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     # strにキャストされたときのformat定義、主にデバッグ用
     def __repr__(self):
-        # TODO:変更せねば
-        return f'<User({self.id}, {self.name})>'
+        return (f'<User({self.id}, {self.uuid}, {self.email}, {self.name},'
+                f'{self.created_at}, {self.updated_at})>')
