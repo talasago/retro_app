@@ -10,6 +10,7 @@ psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
 passlib = {version = "*", extras = ["bcrypt"]}
+email-validator = "*"
 
 [dev-packages]
 autopep8 = "*"
