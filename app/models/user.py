@@ -8,7 +8,7 @@ from datetime import datetime
 class User(Base):
     """SQLAlchemyのモデルクラス"""
 
-    __tablename__ = "users"
+    __tablename__ = 'users'
     id = Column(Integer, primary_key=True, autoincrement=True)
     uuid = Column(UUID(as_uuid=True), default=uuid.uuid4,
                   nullable=False, unique=True)

@@ -9,7 +9,7 @@ class UserRepository:
 
     def create_user(self, user_params: UserCreate) -> User:
         # TODO:パスワードの暗号化が必要
-        hashed_password = user_params.password + "notreallyhashed"
+        hashed_password = user_params.password + 'notreallyhashed'
         user_params = User(name=user_params.name, email=user_params.email,
                            hashed_password=hashed_password)
         self.db.add(user_params)

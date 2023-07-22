@@ -12,12 +12,12 @@ from app.repository.user_repository import UserRepository  # noqa: E402
 from app.schema.user import UserCreate  # noqa: E402
 
 
-@pytest.mark.usefixtures("db")
+@pytest.mark.usefixtures('db')
 class TestUserRepository:
     def test_create_user(self, db: Session):
         # テストデータの作成
         user_data = UserCreate(
-            name="John Doe", email="johndoe@example.com", password="password")
+            name='John Doe', email='johndoe@example.com', password='password')
 
         # UserRepositoryのインスタンスを作成
         user_repo = UserRepository(db)
