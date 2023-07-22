@@ -10,6 +10,7 @@ psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
 python-dateutil = "*"
+passlib = {version = "*", extras = ["bcrypt"]}
 
 [dev-packages]
 autopep8 = "*"
