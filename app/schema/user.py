@@ -3,16 +3,12 @@ from pydantic import BaseModel
 
 class User(BaseModel):
     """pydanticのモデルクラス"""
-    # id: int
-    # TODO:一旦strにする
-    # uuid: str
 
     # TODO:あとでEmailStrに変更する
     email: str
     name: str
-    # hashed_password: str
 
-    # ---TODO:以下バリデーションで実施したいこと----
+    # ---TODO:以下バリデーションで実施したいことの雑なメモ----
     # 登録時のバリデーションたち
     # nameが存在するかチェック
     # emailがすでに存在するかチェック
