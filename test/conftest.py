@@ -16,7 +16,7 @@ from sqlalchemy import create_engine  # noqa: E402
 
 # TODO:AutoUseをtrueにしたい
 # TODO:関数名をdb_sessionにしたい
-@pytest.fixture(scope="session")
+@pytest.fixture(scope='session')
 def db() -> Session:
     """データベースセッションのフィクスチャ。TGLを削除→作成→テスト実行→DB接続セッション削除している"""
 
@@ -31,7 +31,7 @@ def db() -> Session:
     # 時間かかりそうなので一旦後回し。
 
     # TODO:環境変数とかにしたほうがいいかも
-    TEST_SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres_password@localhost:5432/postgres"
+    TEST_SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:postgres_password@localhost:5432/postgres'
     engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
 
     # テーブルの削除と作成
@@ -51,5 +51,5 @@ def db() -> Session:
 
 def migrate() -> None:
     # マイグレーションの実行
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+    alembic_cfg = Config('alembic.ini')
+    command.upgrade(alembic_cfg, 'head')
