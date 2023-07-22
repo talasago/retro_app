@@ -8,7 +8,7 @@ class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_user(self, user_params: UserCreate) -> UserModel:
+    def create_user(self, user_params: UserCreate) -> None:
         hashed_password = PasswordHelper.generate_hashed_password(
             plain_pw=user_params.password)
         user_params = UserModel(name=user_params.name, email=user_params.email,
@@ -17,8 +17,5 @@ class UserRepository:
         self.db.add(user_params)
         self.db.commit()
         self.db.refresh(user_params)
-        return user_params  # TODO:何もリターンしなくていいと思う
 
-    # TODO:まだ使用していない関数
-    def get_user(self, user_id: int) -> UserModel:
-        return self.db.query(UserModel).get(user_id)
+        # NOTE:ユーザー登録APIを作る時に何を返すか考える
