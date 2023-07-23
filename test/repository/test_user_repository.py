@@ -22,9 +22,11 @@ class TestUserRepository:
         created_user: UserModel = db.query(UserModel) \
             .filter_by(email='johndoe@example.com').first()
 
-        assert created_user.name == user_data.name
-        assert created_user.email == user_data.email
-        assert pwd_context.verify('password', created_user.hashed_password)
+        assert created_user is not None
+        assert str(created_user.name) == user_data.name
+        assert str(created_user.email) == user_data.email
+        assert pwd_context.verify(
+            'password', str(created_user.hashed_password))
 
     @pytest.mark.skipif(True,
                         reason=('emailが重複していた時、エラーメッセージがFastAPI側で'
