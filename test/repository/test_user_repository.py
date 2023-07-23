@@ -25,3 +25,13 @@ class TestUserRepository:
         assert created_user.name == user_data.name
         assert created_user.email == user_data.email
         assert pwd_context.verify('password', created_user.hashed_password)
+
+    @pytest.mark.skipif(True,
+                        reason=('emailが重複していた時、エラーメッセージがFastAPI側で'
+                                'コントロールされていれば、このクラスで考慮する必要がないため'))
+    def test_create_user_duplicate_email(self, db: Session):
+        user_data = UserCreate(
+            name='hogee', email='johndoe@example.com', password='password')
+        sut = UserRepository(db)
+
+        sut.create_user(user_data)
