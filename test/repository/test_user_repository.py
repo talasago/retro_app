@@ -8,7 +8,7 @@ sys.path.append(app_path)
 import pytest  # noqa: E402
 from sqlalchemy.orm import Session   # noqa: E402
 from app.repository.user_repository import UserRepository  # noqa: E402
-from app.schema.user_schema import UserCreate  # noqa: E402
+from app.schemas.user_schema import UserCreate  # noqa: E402
 from passlib.context import CryptContext  # noqa: E402
 from app.models.user_model import UserModel  # noqa: E402
 
