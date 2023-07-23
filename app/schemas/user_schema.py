@@ -4,6 +4,10 @@ from pydantic import BaseModel, EmailStr
 class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
+    # NOTE:emailのバリデーションはコチラ
+    # https://github.com/JoshData/python-email-validator/blob/5abaa7b4ce6677e5a2217db2e52202a760de3c24/email_validator/validate_email.py#
+    # 最大文字列長とかもやってくれてそう。
+    # TODO:ただ、メッセージの日本語化はこちら側で実装しないといけないかも
     email: EmailStr
     name: str
 
