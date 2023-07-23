@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, status
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 from sqlalchemy.orm import Session
@@ -22,7 +22,11 @@ def get_db():
 async def signup_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     user_repo.create_user(user_params=user)
-    return JSONResponse(content={'message': 'ユーザー登録が成功しました。'})
+
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={'message': 'ユーザー登録が成功しました。'}
+    )
 
 
 handler = Mangum(app)
