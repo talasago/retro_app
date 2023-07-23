@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from ..models.user_model import UserModel
-from ..schema.user_schema import UserCreate
+from ..schemas.user_schema import UserCreate
 from ..helpers.password_helper import PasswordHelper
 
 
