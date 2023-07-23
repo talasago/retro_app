@@ -16,7 +16,7 @@ class TestUserFunction:
 
         response = client.post('/api/v1/signup/', json=user_data)
 
-        assert response.status_code == 200
+        assert response.status_code == 201
         assert response.json() == {
             'message': 'ユーザー登録が成功しました。'
         }
