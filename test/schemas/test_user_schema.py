@@ -4,7 +4,7 @@ from pydantic import ValidationError
 
 
 class TestUserSchema:
-    def test_valid_email(self):
+    def test_email_format_valid(self):
         user_data: dict = {
             'name': 'John Doe',
             'email': 'johndoe@example.com',
@@ -15,7 +15,7 @@ class TestUserSchema:
         assert user_params.name == 'John Doe'
         assert user_params.email == 'johndoe@example.com'
 
-    def test_invalid_email(self):
+    def test_email_format_invalid(self):
         user_data: dict = {
             'name': 'John Doe',
             'email': 'invalid_email',
