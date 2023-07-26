@@ -19,3 +19,7 @@ class UserRepository:
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
+
+    def is_email_exist(self, email: str):
+        return self.db.query(UserModel) \
+                      .filter(UserModel.email == email).count() > 0
