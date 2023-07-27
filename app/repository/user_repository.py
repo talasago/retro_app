@@ -13,6 +13,8 @@ class UserRepository:
         self.db = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
+        # ここで重複チェックしてもいいかも
+
         hashed_password = PasswordHelper.generate_hashed_password(
             plain_pw=user_params.password)
         user_params = UserModel(name=user_params.name, email=user_params.email,
@@ -20,6 +22,17 @@ class UserRepository:
 
         self.db.add(user_params)
         self.db.commit()
+        # ここで重複チェックしてもいいかも。こんな感じ
+        # except exc.IntegrityError as e:
+        #    assert isinstance(e.orig, UniqueViolation) # これでいいのか？UniqueViolationじゃない時にAssertionErrorになる
+        #    self.db.rollback()
+        #    if "email" in str(e):
+        #        message = "指定されたメールアドレスはすでに登録されています"
+        #    else
+        #        message = "指定された名前はすでに登録されています"
+        #        raise ValueError(message)
+        # https://qiita.com/tamaki_tech/items/e5bd41079413c0b21dec
+        # https://stackoverflow.com/questions/58740043/how-do-i-catch-a-psycopg2-errors-uniqueviolation-error-in-a-python-flask-app
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
