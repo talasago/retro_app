@@ -7,13 +7,13 @@ class TestUserSchema:
     def test_email_format_valid(self):
         user_data: dict = {
             'name': 'John Doe',
-            'email': 'johndoe@example.com',
+            'email': 'johndoe1@example.com',
         }
 
         user_params = sut(**user_data)
 
         assert user_params.name == 'John Doe'
-        assert user_params.email == 'johndoe@example.com'
+        assert user_params.email == 'johndoe1@example.com'
 
     def test_email_format_invalid(self):
         user_data: dict = {

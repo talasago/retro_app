@@ -1,14 +1,18 @@
 from sqlalchemy.orm import Session
 from ..models.user_model import UserModel
-from ..schemas.user_schema import UserCreate
 from ..helpers.password_helper import PasswordHelper
+
+# 型アノテーションだけのimport。こいつが無いと循環インポートで怒られてしまう。
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from ..schemas.user_schema import UserCreate
 
 
 class UserRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create_user(self, user_params: UserCreate) -> None:
+    def create_user(self, user_params: 'UserCreate') -> None:
         hashed_password = PasswordHelper.generate_hashed_password(
             plain_pw=user_params.password)
         user_params = UserModel(name=user_params.name, email=user_params.email,
