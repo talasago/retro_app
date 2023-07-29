@@ -1,7 +1,5 @@
 import pytest
-# FIXME:インポートとエイリアス名
-from app.schemas.user_schema import UserSchema as sut
-from app.schemas.user_schema import UserCreate as sut2
+from app.schemas.user_schema import UserSchema, UserCreate
 from pydantic import ValidationError
 
 # FIXME:バリデーションのエラーメッセージも確認した方が良い
@@ -15,7 +13,7 @@ class TestUserSchema:
             'email': 'johndoe1@example.com',
         }
 
-        user_params = sut(**user_data)
+        user_params = UserSchema(**user_data)
 
         assert user_params.name == 'John Doe'
         assert user_params.email == 'johndoe1@example.com'
@@ -27,7 +25,7 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut(**user_data)
+            user_params = UserSchema(**user_data)
 
             assert user_params is None
 
@@ -37,7 +35,7 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut(**user_data)
+            user_params = UserSchema(**user_data)
 
             assert user_params is None
 
@@ -47,7 +45,7 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut(**user_data)
+            user_params = UserSchema(**user_data)
 
             assert user_params is None
 
@@ -60,7 +58,7 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut2(**user_data)
+            user_params = UserCreate(**user_data)
 
             assert user_params is None
 
@@ -71,7 +69,7 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut2(**user_data)
+            user_params = UserCreate(**user_data)
 
             assert user_params is None
 
@@ -83,7 +81,7 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut2(**user_data)
+            user_params = UserCreate(**user_data)
 
             assert user_params is None
 
@@ -94,7 +92,7 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut2(**user_data)
+            user_params = UserCreate(**user_data)
 
             assert user_params is None
 
@@ -105,7 +103,7 @@ class TestUserCreate:
             'password': 'a' * 8
         }
 
-        user_params = sut(**user_data)
+        user_params = UserSchema(**user_data)
 
         assert user_params.name == 'John Doe'
         assert user_params.email == 'johndoe1@example.com'
@@ -115,7 +113,7 @@ class TestUserCreate:
             'email': 'johndoe1@example.com',
             'password': 'a' * 50
         }
-        user_params = sut(**user_data)
+        user_params = UserSchema(**user_data)
 
         assert user_params.name == 'John Doe'
         assert user_params.email == 'johndoe1@example.com'
@@ -126,7 +124,7 @@ class TestUserCreate:
             'email': 'johndoe1@example.com',
             'password': '1sA!?_+*\'"`#$%&-^\\@;:,./=~|[](){}<>'
         }
-        user_params = sut(**user_data)
+        user_params = UserSchema(**user_data)
 
         assert user_params.name == 'John Doe'
         assert user_params.email == 'johndoe1@example.com'
@@ -139,6 +137,6 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = sut2(**user_data)
+            user_params = UserCreate(**user_data)
 
             assert user_params is None
