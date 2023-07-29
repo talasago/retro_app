@@ -25,3 +25,23 @@ class TestUserSchema:
             user_params = sut(**user_data)
 
             assert user_params is None
+
+    def test_email_null(self):
+        user_data: dict = {
+            'name': 'email null',
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut(**user_data)
+
+            assert user_params is None
+
+        user_data: dict = {
+            'name': 'email null',
+            'email': None
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut(**user_data)
+
+            assert user_params is None
