@@ -56,7 +56,7 @@ class UserCreate(UserSchema):
 
     @field_validator('password')
     @classmethod
-    def check_password_format(cls, password: SecretStr):
+    def check_password_format(cls, password: SecretStr) -> str:
         reveal_password: str = password.get_secret_value()
         if not re.match(UserCreate.PASSWARD_REGEX, reveal_password):
             raise ValueError(
