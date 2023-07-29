@@ -49,6 +49,48 @@ class TestUserSchema:
 
             assert user_params is None
 
+    def test_name_invalid_max_len(self):
+        user_data: dict = {
+            'name': 'あ' * 51,
+            'email': 'johndoe1@example.com',
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = UserSchema(**user_data)
+
+            assert user_params is None
+
+    def test_name_valid_max_len(self):
+        user_data: dict = {
+            'name': '  ' + 'あ' * 24 + ' 　' + 'あ' * 24 + '　　',
+            'email': 'johndoe1@example.com',
+        }
+
+        user_params = UserSchema(**user_data)
+
+        assert user_params.name == 'あ' * 24 + ' 　' + 'あ' * 24
+        assert user_params.email == 'johndoe1@example.com'
+
+    def test_name_null(self):
+        user_data: dict = {
+           'name': None,
+           'email': 'johndoe1@example.com',
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = UserSchema(**user_data)
+
+            assert user_params is None
+
+        user_data: dict = {
+           'email': 'johndoe1@example.com',
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = UserSchema(**user_data)
+
+            assert user_params is None
+
 
 class TestUserCreate:
     def test_password_null(self):

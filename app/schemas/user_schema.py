@@ -1,7 +1,7 @@
 from __future__ import annotations
 import re
 from typing import ClassVar
-from pydantic import BaseModel, EmailStr, field_validator, SecretStr
+from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
 from ..repository.user_repository import UserRepository
 from ..database import SessionLocal
 
@@ -9,21 +9,25 @@ from ..database import SessionLocal
 class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
+    email: EmailStr
+    name: str = Field(max_length=50)
+
+    # emailについて
     # NOTE:emailのバリデーションはコチラ
     # https://github.com/JoshData/python-email-validator/blob/5abaa7b4ce6677e5a2217db2e52202a760de3c24/email_validator/validate_email.py#
     # 最大文字列長とかもやってくれてそう。
     # TODO:ただ、メッセージの日本語化はこちら側で実装しないといけないかも
-    email: EmailStr
-    name: str
 
-    # ---TODO:以下バリデーションで実施したいことの雑なメモ----
-    # 登録時のバリデーションたち
-    # nameは50文字。でも50文字とどうやってカウントする？サロゲートペアとか。
-    # nameは半角スペース or 全角スペースだけは不許可にする
+    # nameについて
+    # WARNING: サロゲートペアとか絵文字とかのカウントは考慮してない。
+    # FIXME: 制御文字は許可したくないかも
+    # TODO:バックスラッシュと円記号は片方だけの許可でいい気がする
 
-    # uuidは存在していても、もう一度採番する
-    # nameはどんな文字でも基本許可する。でも制御文字は許可したくない。
-    # バックスラッシュと円記号は片方だけの許可でいい気がする
+    @field_validator('name', mode='before')  # type: ignore
+    @classmethod
+    def name_strip(cls, name: str) -> str | None:
+        # 半角スペースも全角スペースも削除する
+        return None if name is None else name.strip().strip('　')
 
     # emailがすでに存在していたら、「入力されたメールアドレスは既に使用されています。別のメールアドレスを入力してください。」
     # nameがすでに存在したら、「入力された名前は既に使用されています。別の名前を入力してください。」
