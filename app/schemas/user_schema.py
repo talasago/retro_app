@@ -1,5 +1,6 @@
 from __future__ import annotations
 import re
+from typing import ClassVar
 from pydantic import BaseModel, EmailStr, field_validator, SecretStr
 from ..repository.user_repository import UserRepository
 from ..database import SessionLocal
@@ -45,6 +46,8 @@ class UserSchema(BaseModel):
 
 class UserCreate(UserSchema):
     password: SecretStr
+    PASSWARD_REGEX: ClassVar[str] = \
+        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
 
     # NOTE:半角英数字記号をそれぞれ1種類以上含む8文字以上50文字じゃないと登録できないようにしようと考えたが、
     # それだとユーザー登録ハードルが高くなるのでやめた
@@ -55,8 +58,7 @@ class UserCreate(UserSchema):
     @classmethod
     def check_password_format(cls, password: SecretStr):
         reveal_password: str = password.get_secret_value()
-        regex_pattern = r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
-        if not re.match(regex_pattern, reveal_password):
+        if not re.match(UserCreate.PASSWARD_REGEX, reveal_password):
             raise ValueError(
                 'パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。')
         return reveal_password
