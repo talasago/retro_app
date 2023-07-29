@@ -16,7 +16,7 @@ class UserRepository:
         # ここで重複チェックしてもいいかも
 
         hashed_password = PasswordHelper.generate_hashed_password(
-            plain_pw=user_params.password)
+            plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
                                 hashed_password=hashed_password)
 

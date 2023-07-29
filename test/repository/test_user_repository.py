@@ -12,7 +12,9 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 class TestUserRepository:
     def test_create_user(self, db: Session):
         user_data = UserCreate(
-            name='John Doe', email='johndoe@example.com', password='password')
+            name='John Doe',
+            email='johndoe@example.com',
+            password='password')  # type: ignore
         sut = UserRepository(db)
 
         sut.create_user(user_data)
@@ -20,7 +22,7 @@ class TestUserRepository:
         # ユーザーが正しく作成されたか検証
         # TODO:日付のassertが欲しい。日本時間かどうか。
         created_user: UserModel = db.query(UserModel) \
-            .filter_by(email='johndoe@example.com').first()
+            .filter_by(email='johndoe@example.com').first()  # type: ignore
 
         assert created_user is not None
         assert str(created_user.name) == user_data.name
