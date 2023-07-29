@@ -1,4 +1,6 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+from psycopg2 import errors as psycopg2_errors
 from ..models.user_model import UserModel
 from ..helpers.password_helper import PasswordHelper
 
@@ -22,7 +24,20 @@ class UserRepository:
                                 hashed_password=hashed_password)
 
         self.db.add(user_params)
-        self.db.commit()
+        try:
+            self.db.commit()
+        except IntegrityError as e:
+            self.db.rollback()
+            # HACK: 条件が複雑なんよ。そしてネストが多い。
+            if isinstance(e.orig, psycopg2_errors.UniqueViolation):
+                error_massage = self.__generate_error_message(e)
+                if error_massage is None:
+                    raise e
+                # TODO:独自のエラークラスにしたい
+                raise ValueError(error_massage)
+            else:
+                raise e
+
         # ここで重複チェックしてもいいかも。こんな感じ
         # except exc.IntegrityError as e:
         #    assert isinstance(e.orig, UniqueViolation) # これでいいのか？UniqueViolationじゃない時にAssertionErrorになる
@@ -37,3 +52,9 @@ class UserRepository:
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
+
+    def __generate_error_message(self, error: IntegrityError) -> str | None:
+        message = None
+        if 'email' in str(error):
+            message = '指定されたメールアドレスはすでに登録されています。'
+        return message
