@@ -1,6 +1,11 @@
 import pytest
+# FIXME:インポートとエイリアス名
 from app.schemas.user_schema import UserSchema as sut
+from app.schemas.user_schema import UserCreate as sut2
 from pydantic import ValidationError
+
+# FIXME:バリデーションのエラーメッセージも確認した方が良い
+# ValidationErrorが返ってきているのはわかるが、なぜそうなったかの確認が足りない
 
 
 class TestUserSchema:
@@ -43,5 +48,97 @@ class TestUserSchema:
 
         with pytest.raises(ValidationError):
             user_params = sut(**user_data)
+
+            assert user_params is None
+
+
+class TestUserCreate:
+    def test_password_null(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut2(**user_data)
+
+            assert user_params is None
+
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': None
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut2(**user_data)
+
+            assert user_params is None
+
+    def test_password_invalid_length(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': 'a' * 7
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut2(**user_data)
+
+            assert user_params is None
+
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': 'a' * 51
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut2(**user_data)
+
+            assert user_params is None
+
+    def test_password_valid_length(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': 'a' * 8
+        }
+
+        user_params = sut(**user_data)
+
+        assert user_params.name == 'John Doe'
+        assert user_params.email == 'johndoe1@example.com'
+
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': 'a' * 50
+        }
+        user_params = sut(**user_data)
+
+        assert user_params.name == 'John Doe'
+        assert user_params.email == 'johndoe1@example.com'
+
+    def test_password_valid_format(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': '1sA!?_+*\'"`#$%&-^\\@;:,./=~|[](){}<>'
+        }
+        user_params = sut(**user_data)
+
+        assert user_params.name == 'John Doe'
+        assert user_params.email == 'johndoe1@example.com'
+
+    def test_password_invalid_format(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'johndoe1@example.com',
+            'password': 'ＰＡＳＳＷＯＲＤ'
+        }
+
+        with pytest.raises(ValidationError):
+            user_params = sut2(**user_data)
 
             assert user_params is None
