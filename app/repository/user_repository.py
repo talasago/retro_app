@@ -15,6 +15,7 @@ class UserRepository:
     def create_user(self, user_params: 'UserCreate') -> None:
         # ここで重複チェックしてもいいかも
 
+        # REVIEW:user_params.passwordだと、マスクされたパスワードな気がする。。。
         hashed_password = PasswordHelper.generate_hashed_password(
             plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
