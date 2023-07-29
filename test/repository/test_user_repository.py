@@ -29,3 +29,16 @@ class TestUserRepository:
         assert str(created_user.email) == user_data.email
         assert pwd_context.verify(
             'password', str(created_user.hashed_password))
+
+    def test_email_uniqueness(self, db: Session):
+        # ユーザーを作っておく。TODO:後で共通化する
+        user_data = UserCreate(
+            name='John Doe',
+            email='johndoe@example.com',
+            password='password')  # type: ignore
+        sut = UserRepository(db)
+
+        with pytest.raises(ValueError) as e:
+            sut.create_user(user_data)
+
+        assert str(e.value) == '指定されたメールアドレスはすでに登録されています。'
