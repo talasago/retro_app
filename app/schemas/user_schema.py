@@ -2,8 +2,6 @@ from __future__ import annotations
 import re
 from typing import ClassVar
 from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
-from ..repository.user_repository import UserRepository
-from ..database import SessionLocal
 
 
 class UserSchema(BaseModel):
@@ -33,16 +31,6 @@ class UserSchema(BaseModel):
     # nameがすでに存在したら、「入力された名前は既に使用されています。別の名前を入力してください。」
     # これらは別の順番のバリデーションで良い？それとも同時が良い？同時だと実装コストかかりそう。でもDBアクセスは1回で終わりそう。DBへの検索結果を変数とかに入れとく？
     # https://docs.pydantic.dev/latest/usage/validators/ この辺の内容をやると思う
-
-    # REVIEW: ユーザー登録APIから、正しくバリデーションされるかどうかの確認はやった方が良い。動くか自信ない。
-    @field_validator('email')  # type: ignore
-    @classmethod
-    def check_email_uniqueness(cls, email: str):
-        # FIXME:新しくセッションをここで作るべきではない。API叩くときとここで2回セッション貼っている。API叩いた時のセッションをここでも使えるようにした方が絶対良い。
-        user_repo = UserRepository(SessionLocal())
-        if user_repo.is_email_exist(email=email):
-            raise ValueError('入力されたメールアドレスは既に使用されています。別のメールアドレスを入力してください。')
-        return email
 
     class Config:
         orm_mode = True
