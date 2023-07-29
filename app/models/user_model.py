@@ -19,13 +19,6 @@ class UserModel(Base):
     created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
     updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
-    # @classmethod or staticmethod
-    # def is_email_check() -> bool:
-        # SQLを投げて、存在すればtrueを返す
-    # modelのテストはコンポーネント結合。DB二アクセスするから。
-    # だとしたらSessionをどこに置く問題が出てくる
-
-
     # strにキャストされたときのformat定義、主にデバッグ用
     def __repr__(self):
         return (f'<User({self.id}, {self.uuid}, {self.email}, {self.name},'
