@@ -28,32 +28,19 @@ class UserRepository:
             self.db.commit()
         except IntegrityError as e:
             self.db.rollback()
-            # HACK: 条件が複雑なんよ。そしてネストが多い。
-            if isinstance(e.orig, psycopg2_errors.UniqueViolation):
-                error_massage = self.__generate_error_message(e)
-                if error_massage is None:
-                    raise e
+
+            error_massage = self.__generate_unique_error_message_for_user(e)
+            if isinstance(e.orig, psycopg2_errors.UniqueViolation) \
+               and error_massage is not None:
                 # TODO:独自のエラークラスにしたい
                 raise ValueError(error_massage)
-            else:
-                raise e
-
-        # ここで重複チェックしてもいいかも。こんな感じ
-        # except exc.IntegrityError as e:
-        #    assert isinstance(e.orig, UniqueViolation) # これでいいのか？UniqueViolationじゃない時にAssertionErrorになる
-        #    self.db.rollback()
-        #    if "email" in str(e):
-        #        message = "指定されたメールアドレスはすでに登録されています"
-        #    else
-        #        message = "指定された名前はすでに登録されています"
-        #        raise ValueError(message)
-        # https://qiita.com/tamaki_tech/items/e5bd41079413c0b21dec
-        # https://stackoverflow.com/questions/58740043/how-do-i-catch-a-psycopg2-errors-uniqueviolation-error-in-a-python-flask-app
+            raise e
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
 
-    def __generate_error_message(self, error: IntegrityError) -> str | None:
+    def __generate_unique_error_message_for_user(
+            self, error: IntegrityError) -> str | None:
         message = None
         if 'email' in str(error):
             message = '指定されたメールアドレスはすでに登録されています。'
