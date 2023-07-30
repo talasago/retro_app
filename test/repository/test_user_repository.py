@@ -41,15 +41,31 @@ class TestUserRepository:
     def test_email_uniqueness(self, db: Session, create_user):
         # 予めユーザーを作っておく。
         user_data: dict = {
-            'name': 'resisted user',
-            'email': 'resisted_user@example.com',
+            'name': 'resisted email',
+            'email': 'resisted_email@example.com',
             'password': 'password'
         }
         create_user(db=db, **user_data)
         # emailだけが重複になるようにパラメタ修正
-        user_data['name'] = 'resisted user1'
+        user_data['name'] = 'resisted email1'
 
         with pytest.raises(ValueError) as e:
             create_user(db=db, **user_data)
 
         assert str(e.value) == '指定されたメールアドレスはすでに登録されています。'
+
+    def test_name_uniqueness(self, db: Session, create_user):
+        # 予めユーザーを作っておく。
+        user_data: dict = {
+            'name': 'resisted name',
+            'email': 'resisted_name@example.com',
+            'password': 'password'
+        }
+        create_user(db=db, **user_data)
+        # nameだけが重複になるようにパラメタ修正
+        user_data['email'] = 'resisted_name1@example.com'
+
+        with pytest.raises(ValueError) as e:
+            create_user(db=db, **user_data)
+
+        assert str(e.value) == '指定された名前はすでに登録されています。'

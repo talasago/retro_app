@@ -42,6 +42,8 @@ class UserRepository:
     def __generate_unique_error_message_for_user(
             self, error: IntegrityError) -> str | None:
         message = None
-        if 'email' in str(error):
+        if 'users_email_key' in str(error._message):
             message = '指定されたメールアドレスはすでに登録されています。'
+        elif 'users_name_key' in str(error._message):
+            message = '指定された名前はすでに登録されています。'
         return message
