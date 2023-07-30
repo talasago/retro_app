@@ -4,6 +4,7 @@ from app.repository.user_repository import UserRepository
 from app.schemas.user_schema import UserCreate
 from passlib.context import CryptContext
 from app.models.user_model import UserModel
+from app.errors.retro_app_error import RetroAppColmunUniqueError
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -49,7 +50,7 @@ class TestUserRepository:
         # emailだけが重複になるようにパラメタ修正
         user_data['name'] = 'resisted email1'
 
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(RetroAppColmunUniqueError) as e:
             create_user(db=db, **user_data)
 
         assert str(e.value) == '指定されたメールアドレスはすでに登録されています。'
@@ -65,7 +66,7 @@ class TestUserRepository:
         # nameだけが重複になるようにパラメタ修正
         user_data['email'] = 'resisted_name1@example.com'
 
-        with pytest.raises(ValueError) as e:
+        with pytest.raises(RetroAppColmunUniqueError) as e:
             create_user(db=db, **user_data)
 
         assert str(e.value) == '指定された名前はすでに登録されています。'
