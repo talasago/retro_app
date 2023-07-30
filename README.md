@@ -16,7 +16,7 @@
   - パラメタのバリデーション管理
 
 # ディレクトリ構成
-後で書く。
+後
 
 # ローカル環境構築(バックエンド)
 
@@ -64,7 +64,8 @@ $ pip install pipenv
 $ pipenv sync
 # Pipfileのライブラリがローカルにインストールされる
 ``` 
-`Pipfile`に存在するライブラリを実行する際は、`pipenv run ${実行するライブラリ名}` または `pipenv shell`→`${実行するライブラリ名}`としてください。
+`Pipfile`に存在するライブラリを実行する際は、`pipenv run ${実行するライブラリ名}` または `pipenv shell`→`${実行するライブラリ名}`としてください。(どちらでも構いません)
+このドキュメントでは、`Pipfile`に存在するライブラリを実行する際は`pipenv shell`が実行されている前提で記載しています。
 
 #### PostgreSQLのドライバー
 `$ pipenv sync`時にPostgresのドライバーが無くて怒られるかもしれない。その時は以下のコマンドを恐らく使えばいいはず。
@@ -74,18 +75,19 @@ $ brew install postgresql
 ```
 
 ### テスト実行
-`$ pipenv run pytest` または `$ pipenv shell`→`$ pytest`を実行すると、pytestが実行されます。
+`$ pytest`を実行すると、pytestが実行されます。
 
 ### テーブル定義の反映
 初回実行 または テーブルに変更があった(`database/versions`にファイルが追加・更新された)場合、ローカル環境にテーブル定義を反映させるために以下のコマンドを実行してください
 ```
-$ pipenv run alembic upgrade head` 
-# または
-$ pipenv shell
 $ alembic upgrade head
 ```
 
-# テーブルを新規で追加するときの方法
-- TODO:詳細を書く
-  - 先にSQLalchemyのモデルを作成した後に、almebicのマイグレーションファイルを作成したほうが良さそう
-  
+# Tips
+## テーブルを新規で追加するときは
+1. SQLAlchemyのモデルファイルを作成する
+  - 例) `app/models/user.py`
+2. alembicのマイグレーションファイルを作成する
+  - `$ alembic revision --autogenerate -m "${メッセージ}"`
+3. `database/versions/`配下に作成されたマイグレーションファイルを修正する
+4. `alembic upgrade head`を実行すると、ローカルのDBにテーブル定義が反映される
