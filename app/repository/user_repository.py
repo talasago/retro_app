@@ -3,6 +3,7 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
 from ..models.user_model import UserModel
 from ..helpers.password_helper import PasswordHelper
+from ..errors.retro_app_error import RetroAppColmunUniqueError
 
 # 型アノテーションだけのimport。こいつが無いと循環インポートで怒られてしまう。
 from typing import TYPE_CHECKING
@@ -29,21 +30,20 @@ class UserRepository:
         except IntegrityError as e:
             self.db.rollback()
 
-            error_massage = self.__generate_unique_error_message_for_user(e)
+            col_name = self.__get_column_name_of_unique_error(e)
             if isinstance(e.orig, psycopg2_errors.UniqueViolation) \
-               and error_massage is not None:
-                # TODO:独自のエラークラスにしたい
-                raise ValueError(error_massage)
+               and col_name is not None:
+                raise RetroAppColmunUniqueError(col_name)
             raise e
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
 
-    def __generate_unique_error_message_for_user(
+    def __get_column_name_of_unique_error(
             self, error: IntegrityError) -> str | None:
-        message = None
+        col_name = None
         if 'users_email_key' in str(error._message):
-            message = '指定されたメールアドレスはすでに登録されています。'
+            col_name = 'メールアドレス'
         elif 'users_name_key' in str(error._message):
-            message = '指定された名前はすでに登録されています。'
-        return message
+            col_name = '名前'
+        return col_name
