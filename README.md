@@ -9,14 +9,36 @@
 - Mangum
   - FastAPIをLambdaで使いやすくする
 - SQLAlchemy
-  - ORマッパー
+  - O/Rマッパー
 - alembic
   - DBのテーブル定義の変更履歴を管理
 - pydantic
   - パラメタのバリデーション管理
 
 # ディレクトリ構成
-後
+```
+├── Pipfile => pythonのライブラリを管理
+├── Pipfile.lock => pythonのライブラリを管理
+├── app/ => デプロイするコード。
+│   ├── database.py => databaseへの接続情報を管理
+│   ├── errors/ => カスタムエラークラスを管理
+│   ├── functions/ => Lambdaで実行されるエントリポイントとしてのコードを管理
+│   ├── helpers/ => 共通化したコードを管理
+│   ├── models/ => SQLAlchemy用のコードを管理。基本的に1テーブルに1ファイル作成する。
+│   ├── repository/ => データベースへの更新処理や登録処理など、データベースとのやり取りを行うコード。
+│   └── schemas/ => pydantic用のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
+├── database/ => alembic用
+│   └── versions => テーブル定義の変更履歴を管理
+├── debug/ => 検証のための一時コード。デプロイしない。
+├── docker-compose.yml => ローカル実行用
+├── test/ => テストコード
+│   ├── conftest.py => テスト実行時に必ず呼ばれる親ファイルみたいなもの
+│   ├── functions/ => app/functionsのテスト
+│   ├── helpers/ => app/helpersのテスト
+│   ├── repository/ => app/repositoryのテスト
+│   └── schemas/ => app/schemasのテスト
+└── tools/ => 便利なツール。デプロイしない。
+```
 
 # ローカル環境構築(バックエンド)
 
@@ -34,7 +56,7 @@ $ docker-compose up
 https://github.com/pyenv/pyenv#windows
 
 以下は参考コマンド※windowsのWSL2で実行したコマンド
-```
+```bash
 $ git clone https://github.com/pyenv/pyenv.git ~/.pyenv
 $ cd ~/.pyenv && src/configure && make -C src
 
@@ -58,7 +80,7 @@ $ which python
 ```
 
 ### pipenv
-```
+```bash
 $ pip install --upgrade pip
 $ pip install pipenv
 $ pipenv sync
@@ -79,7 +101,7 @@ $ brew install postgresql
 
 ### テーブル定義の反映
 初回実行 または テーブルに変更があった(`database/versions`にファイルが追加・更新された)場合、ローカル環境にテーブル定義を反映させるために以下のコマンドを実行してください
-```
+```bash
 $ alembic upgrade head
 ```
 
@@ -91,3 +113,22 @@ $ alembic upgrade head
   - `$ alembic revision --autogenerate -m "${メッセージ}"`
 3. `database/versions/`配下に作成されたマイグレーションファイルを修正する
 4. `alembic upgrade head`を実行すると、ローカルのDBにテーブル定義が反映される
+
+## テスト戦略
+随時追加予定
+### 単体テスト
+- pytestで実施
+- helpers/とschemas/に対して実行するテスト
+  - DBに接続せずに実施できるため一番早い
+
+### コンポーネント結合テスト
+- pytestで実施
+  - repository/とfunctionsに対して実行するテスト
+    - DBアクセスが必要なのでやや遅い
+    - ※DBアクセスは外部依存となるためコンポーネント結合テストに位置付け
+
+### システム結合テスト
+(TBD)AWSに接続してWebAPIを叩くテスト
+
+### システムテスト
+(TBD)画面上で実施するテスト
