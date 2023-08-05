@@ -114,6 +114,30 @@ $ alembic upgrade head
 3. `database/versions/`配下に作成されたマイグレーションファイルを修正する
 4. `alembic upgrade head`を実行すると、ローカルのDBにテーブル定義が反映される
 
+## LinterとFomatter
+**PRを出すときは、LinterとFomatterを実行してからレビュー依頼を投げてほしいです。**綺麗なコードにすることで内部品質を高め、可読性が高く理解しやすいコードにしていきたいためです。
+改修した範囲でエラーが出たものは、全部対応していただきたいのです。が、現状は強制しません。(ローカルだけでなくCI/CDでも実行すべきため)
+いずれLinterに沿っていないコードは、CI/CDでリジェクトするようにしたいと思っています。
+
+LinterはPylanceやFlake8、FormatterはAutopep8を使用しています。
+※Pylanceは現状VSCodeだけ使用可能になっています。(VSCode限定にしないためにはpipをインストールすれば良いと思うけどやれていない)
+
+
+### 使い方
+```bash
+$ autopep8 app/* -r --in-place
+```
+
+
+```bash
+$  flake8 app/*.py app/*/*.py
+```
+
+## 開発用のエディタ
+- 何でも良いですが、VSCodeをお勧めします。
+  - `.vscode/`にVSCode用の設定ファイルがあります。VSCodeを使用している場合は自動で適用されます。
+  - Linter(PylanceやFlake8)でのエラーがVSCode上に表示されるようになります。
+
 ## テスト戦略
 随時追加予定
 ### 単体テスト
