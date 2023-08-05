@@ -18,8 +18,8 @@ def get_db():
 
 
 # ユーザー登録のエンドポイント
-@app.post('/api/v1/signup/', response_model=UserCreate)
-async def signup_user(user: UserCreate, db: Session = Depends(get_db)):
+@app.post('/api/v1/sign_up/', response_model=UserCreate)
+def signup_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     user_repo.create_user(user_params=user)
 

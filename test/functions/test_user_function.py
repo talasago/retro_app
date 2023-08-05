@@ -14,7 +14,7 @@ class TestUserFunction:
             'password': 'testpassword'
         }
 
-        response = client.post('/api/v1/signup/', json=user_data)
+        response = client.post('/api/v1/sign_up/', json=user_data)
 
         assert response.status_code == 201
         assert response.json() == {
