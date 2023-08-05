@@ -20,3 +20,5 @@ class TestUserFunction:
         assert response.json() == {
             'message': 'ユーザー登録が成功しました。'
         }
+
+# TODO:異常系のテストを追加する
