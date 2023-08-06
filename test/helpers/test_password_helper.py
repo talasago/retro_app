@@ -1,11 +1,4 @@
-# appディレクトリの実行パスを追加
-# TODO:テストコードのファイル毎に書くのはめんどいので共通化したい気持ち
-import sys
-import os
-app_path = os.path.join(os.path.dirname(__file__), '../..')
-sys.path.append(app_path)
-
-from app.helpers.password_helper import PasswordHelper as sut  # noqa: E402
+from app.helpers.password_helper import PasswordHelper as sut
 
 
 class TestPasswordHelper:
