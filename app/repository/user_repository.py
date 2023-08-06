@@ -2,7 +2,6 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
 from ..models.user_model import UserModel
-from ..schemas.user_schema import UserCreate
 from ..helpers.password_helper import PasswordHelper
 from ..errors.retro_app_error import RetroAppColmunUniqueError
 
