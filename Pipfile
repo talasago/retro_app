@@ -10,7 +10,6 @@ psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
 python-dateutil = "*"
-uvicorn = {version = "*", extras = ["standard"]}
 
 [dev-packages]
 autopep8 = "*"
