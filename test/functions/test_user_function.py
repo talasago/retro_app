@@ -24,12 +24,12 @@ class TestUserFunction:
 
     def test_sign_in(self):
         user_data: dict = {
-            'email': 'testuser@example.com',
-            'name': 'Test User',
+            'username': 'testuser@example.com',
             'password': 'testpassword'
         }
 
-        response = client.post('/api/v1/token/', json=user_data)
+        # XXX: なぜdataなのかわかってない。jsonじゃなくていいのか？
+        response = client.post('/api/v1/token/', data=user_data)
 
         assert response.status_code == 200
         assert response.json() == {

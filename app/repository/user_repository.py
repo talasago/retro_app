@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
@@ -38,6 +39,11 @@ class UserRepository:
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
+
+    def get_user_by_email(self, email: str) -> UserModel | None:
+        return self.db.execute(
+            select(UserModel).where(UserModel.email == email)
+        ).scalars().first()  # type: ignore
 
     def __get_column_name_of_unique_error(
             self, error: IntegrityError) -> str | None:
