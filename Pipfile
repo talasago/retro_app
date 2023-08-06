@@ -11,6 +11,7 @@ sqlalchemy = "*"
 alembic = "*"
 passlib = {version = "*", extras = ["bcrypt"]}
 email-validator = "*"
+python-multipart = "*"
 
 [dev-packages]
 autopep8 = "*"
