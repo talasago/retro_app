@@ -18,6 +18,7 @@ def get_db():
 
 
 # ユーザー登録のエンドポイント
+# FIXME:response_modelが間違ってる
 @app.post('/api/v1/sign_up/', response_model=UserCreate)
 def signup_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
@@ -30,6 +31,7 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
 
 
 # ログインのエンドポイント
+# FIXME:response_model追加
 @app.post('/api/v1/token/')
 def sign_in():
     return JSONResponse(
