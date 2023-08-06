@@ -29,4 +29,12 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
     )
 
 
+# ログインのエンドポイント
+@app.post('/api/v1/token/')
+def sign_in():
+    return JSONResponse(
+        content={'message': 'ログインしました'}
+    )
+
+
 handler = Mangum(app)
