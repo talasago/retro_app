@@ -20,5 +20,19 @@ class TestUserFunction:
         assert response.json() == {
             'message': 'ユーザー登録が成功しました。'
         }
+        # TODO:異常系のテストを追加する
 
-# TODO:異常系のテストを追加する
+    def test_sign_in(self):
+        user_data: dict = {
+            'email': 'testuser@example.com',
+            'name': 'Test User',
+            'password': 'testpassword'
+        }
+
+        response = client.post('/api/v1/token/', json=user_data)
+
+        assert response.status_code == 200
+        assert response.json() == {
+            'message': 'ログインしました'
+            # TODO:アクセストークンとリフレッシュトークン、uidとusernameを返す
+        }
