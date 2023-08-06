@@ -9,13 +9,14 @@ mangum = "*"
 psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
-python-dateutil = "*"
+passlib = {version = "*", extras = ["bcrypt"]}
 
 [dev-packages]
 autopep8 = "*"
 flake8 = "*"
 flake8-quotes = "*"
 uvicorn = {version = "*", extras = ["standard"]}
+pytest = "*"
 
 [requires]
 python_version = "3.10"
