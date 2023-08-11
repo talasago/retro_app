@@ -7,11 +7,14 @@ from ..database import SessionLocal
 from ..schemas.user_schema import UserCreate
 from ..repository.user_repository import UserRepository
 from ..helpers.password_helper import PasswordHelper
+from jose import jwt
+from datetime import datetime, timedelta
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..models.user_model import UserModel
+    from uuid import UUID
 
 app = FastAPI()
 
@@ -42,13 +45,13 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.post('/api/v1/token/')
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             db: Session = Depends(get_db)):
-    """トークン発行"""
-    # NOTE:usernameとあるが、実際はemail。OAuthの仕様によりusernameという名前になっているらしい。
-    authenticate(db, form_data.username, form_data.password)
-    # TODO:トークン作成
+    """ログインして、トークン発行する"""
+    # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
+    user = authenticate(db, form_data.username, form_data.password)
+    token = create_token(user.uuid)
 
     return JSONResponse(
-        content={'message': 'ログインしました'}
+        content={'message': 'ログインしました', **token}
     )
 
 
@@ -68,3 +71,37 @@ def authenticate(db: Session, email: str, password: str):
         # TODO:カスタムエラークラスにする
         raise HTTPException(status_code=401, detail='パスワード不一致')
     return user
+
+
+# JWT関連の設定
+# FIXME:シークレットキーは機密情報なので、本番実行時には環境変数など別の場所に記載する。
+SECRET_KEY = 'secret_key'
+ALGORITHM = 'HS256'
+ACCESS_TOKEN_EXPIRE_MINUTES = 10
+REFRESH_TOKEN_EXPIRE_DAYS = 7
+
+
+def create_token(user_uuid: 'UUID') -> dict:
+    """アクセストークンとリフレッシュトークンを返す"""
+    # REVIEW: リフレッシュトークンだけ更新するときもこのメソッドを通るのでよいのか？アクセストークンが変わりそうな気がするが
+
+    # ペイロード作成
+    access_payload = {
+        'token_type': 'access_token',
+        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        'uid': str(user_uuid),
+    }
+    refresh_payload = {
+        'token_type': 'refresh_token',
+        'exp': datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+        'uid': str(user_uuid),
+    }
+
+    access_token = jwt.encode(claims=access_payload,
+                              key=SECRET_KEY, algorithm=ALGORITHM)
+    refresh_token = jwt.encode(
+        claims=refresh_payload, key=SECRET_KEY, algorithm=ALGORITHM)
+
+    # TODO: DBにリフレッシュトークンを保存
+    return {'access_token': access_token, 'refresh_token': refresh_token,
+            'token_type': 'bearer'}
