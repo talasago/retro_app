@@ -60,10 +60,10 @@ handler = Mangum(app)
 
 # HACK:以下のコードはサービスクラス or ヘルパークラスに移動すること
 # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
-def authenticate(db: Session, email: str, password: str):
+def authenticate(db: Session, email: str, password: str) -> 'UserModel':
     """パスワード認証し、userを返却"""
     user_repo = UserRepository(db)
-    user: UserModel = user_repo.get_user_by_email(email=email)
+    user: 'UserModel' = user_repo.get_user_by_email(email=email)
     # TODO:emailで検索した結果0件の場合の考慮が必要。get_user_by_email()内でErrorにするのか？それとも別案？
 
     if not PasswordHelper.is_password_matching(plain_pw=password,
