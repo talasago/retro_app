@@ -5,7 +5,7 @@ from ..models.user_model import UserModel
 from ..helpers.password_helper import PasswordHelper
 from ..errors.retro_app_error import RetroAppColmunUniqueError
 
-# 型アノテーションだけのimport。こいつが無いと循環インポートで怒られてしまう。
+# 型アノテーションだけのimport。これで本番実行時は無駄なimportが発生しないはず。
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..schemas.user_schema import UserCreate
@@ -16,9 +16,6 @@ class UserRepository:
         self.db = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
-        # ここで重複チェックしてもいいかも
-
-        # REVIEW:user_params.passwordだと、マスクされたパスワードな気がする。。。
         hashed_password = PasswordHelper.generate_hashed_password(
             plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
@@ -31,6 +28,9 @@ class UserRepository:
             self.db.rollback()
 
             col_name = self.__get_column_name_of_unique_error(e)
+            # NOTE:重複エラーだけはバリデーションをかけずに登録時のエラーで判断とした。
+            # バリデーションにするなら、INSERT前にSELECTを投げることになり、SQLを2回実行するコストを考えると
+            # 登録時のエラーで良いと判断したため。
             if isinstance(e.orig, psycopg2_errors.UniqueViolation) \
                and col_name is not None:
                 raise RetroAppColmunUniqueError(col_name)

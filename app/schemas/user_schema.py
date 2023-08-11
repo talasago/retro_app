@@ -27,11 +27,6 @@ class UserSchema(BaseModel):
         # 半角スペースも全角スペースも削除する
         return None if name is None else name.strip().strip('　')
 
-    # emailがすでに存在していたら、「入力されたメールアドレスは既に使用されています。別のメールアドレスを入力してください。」
-    # nameがすでに存在したら、「入力された名前は既に使用されています。別の名前を入力してください。」
-    # これらは別の順番のバリデーションで良い？それとも同時が良い？同時だと実装コストかかりそう。でもDBアクセスは1回で終わりそう。DBへの検索結果を変数とかに入れとく？
-    # https://docs.pydantic.dev/latest/usage/validators/ この辺の内容をやると思う
-
     class Config:
         orm_mode = True
 
