@@ -88,7 +88,7 @@ def create_token(user_uuid: 'UUID') -> dict:
     # ペイロード作成
     access_payload = {
         'token_type': 'access_token',
-        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),  # noqa: E501
         'uid': str(user_uuid),
     }
     refresh_payload = {
@@ -99,9 +99,10 @@ def create_token(user_uuid: 'UUID') -> dict:
 
     access_token = jwt.encode(claims=access_payload,
                               key=SECRET_KEY, algorithm=ALGORITHM)
-    refresh_token = jwt.encode(
-        claims=refresh_payload, key=SECRET_KEY, algorithm=ALGORITHM)
+    refresh_token = jwt.encode(claims=refresh_payload,
+                               key=SECRET_KEY, algorithm=ALGORITHM)
 
     # TODO: DBにリフレッシュトークンを保存
+
     return {'access_token': access_token, 'refresh_token': refresh_token,
             'token_type': 'bearer'}
