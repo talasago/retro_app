@@ -43,7 +43,8 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
 
 # ログインのエンドポイント
 # FIXME:response_model追加
-@app.post('/api/v1/token')
+# NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
+@app.post('/token')
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             db: Session = Depends(get_db)):
     """ログインして、トークン発行する"""
