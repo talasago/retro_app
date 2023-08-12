@@ -86,6 +86,9 @@ def create_token(user_uuid: 'UUID') -> dict:
     # REVIEW: リフレッシュトークンだけ更新するときもこのメソッドを通るのでよいのか？アクセストークンが変わりそうな気がするが
 
     # ペイロード作成
+    # NOTE: uidには、uuidを使用する。
+    # uuidを使用する：悪意の第三者がtokenを復号できた場合、uidにemailを設定すると個人情報が、
+    # uidにidを指定するとユーザー数がわかってしまいセキュリティ上良くないため。
     access_payload = {
         'token_type': 'access_token',
         'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),  # noqa: E501
