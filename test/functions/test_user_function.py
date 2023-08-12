@@ -22,6 +22,7 @@ class TestUserFunction:
         }
         # TODO:異常系のテストを追加する
 
+    # FIXME:テストの順番に依存がある
     def test_sign_in(self):
         user_data: dict = {
             'username': 'testuser@example.com',
@@ -37,9 +38,7 @@ class TestUserFunction:
         assert res_body['refresh_token'] is not None
         assert res_body['message'] == 'ログインしました'
         assert res_body['token_type'] == 'bearer'
-
-        # uidは多分必要なさそう
-        # assert response.json()['name'] is not None
+        assert res_body['name'] == 'Test User'
 
     # リフレッシュトークン取得のテスト観点
     # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
