@@ -29,7 +29,7 @@ def get_db():
 
 # ユーザー登録のエンドポイント
 # FIXME:response_modelが間違ってる
-@app.post('/api/v1/sign_up/', response_model=UserCreate)
+@app.post('/api/v1/sign_up', response_model=UserCreate)
 def signup_user(user: UserCreate, db: Session = Depends(get_db)):
     user_repo = UserRepository(db)
     user_repo.create_user(user_params=user)
@@ -42,7 +42,7 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
 
 # ログインのエンドポイント
 # FIXME:response_model追加
-@app.post('/api/v1/token/')
+@app.post('/api/v1/token')
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             db: Session = Depends(get_db)):
     """ログインして、トークン発行する"""
