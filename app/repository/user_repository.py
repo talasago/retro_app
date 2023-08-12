@@ -10,6 +10,7 @@ from ..errors.retro_app_error import RetroAppColmunUniqueError
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from ..schemas.user_schema import UserCreate
+    from uuid import UUID
 
 
 class UserRepository:
@@ -43,6 +44,12 @@ class UserRepository:
     def get_user_by_email(self, email: str) -> UserModel | None:
         return self.db.execute(
             select(UserModel).where(UserModel.email == email)
+        ).scalars().first()
+
+    # HACK: id以外の検索メソッドはfind_byにする
+    def find_by_uuid(self, uuid: 'UUID') -> UserModel | None:
+        return self.db.execute(
+            select(UserModel).where(UserModel.uuid == uuid)
         ).scalars().first()
 
     def __get_column_name_of_unique_error(

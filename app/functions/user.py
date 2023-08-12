@@ -7,6 +7,7 @@ from ..database import SessionLocal
 from ..schemas.user_schema import UserCreate
 from ..repository.user_repository import UserRepository
 from ..helpers.password_helper import PasswordHelper
+from ..services.user_service import get_current_user
 from jose import jwt
 from datetime import datetime, timedelta
 
@@ -51,7 +52,20 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
     token = create_token(user.uuid)
 
     return JSONResponse(
+        # FIXME:ステータスコードの指定忘れてた
         content={'message': 'ログインしました', 'name': user.name,  **token}
+    )
+
+
+# ログアウトのエンドポイント
+# TODO:非同期処理でも良いかもしれない
+# FIXME:response_model追加
+@app.post('/api/v1/logout')
+def logout(current_user: 'UserModel' = Depends(get_current_user)):
+    # TODO:リフレッシュトークンを無効化
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={'message': 'ログアウトしました'}
     )
 
 

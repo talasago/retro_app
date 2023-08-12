@@ -1,6 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.functions.user import app
+from jose import jwt
+from datetime import datetime
 
 client = TestClient(app)
 
@@ -23,7 +25,7 @@ class TestUserFunction:
         # TODO:異常系のテストを追加する
 
     # FIXME:テストの順番に依存がある
-    def test_sign_in(self):
+    def test_login(self):
         user_data: dict = {
             'username': 'testuser@example.com',
             'password': 'testpassword'
@@ -43,6 +45,53 @@ class TestUserFunction:
         assert res_body['token_type'] == 'bearer'
         assert res_body['name'] == 'Test User'
 
+    # FIXME:テストの順番に依存がある
+    def test_logout(self):
+        user_data: dict = {
+            'username': 'testuser@example.com',
+            'password': 'testpassword'
+        }
+
+        response = client.post(
+            '/api/v1/token',
+            headers={
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'},
+            data=user_data
+        )
+        access_token = response.json()['access_token']
+        # TODO:ここまで前処理。前処理はhelperに共通化する
+
+        response = client.post(
+            '/api/v1/logout',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'},
+        )
+        assert response.status_code == 200
+        assert response.json() == {
+            'message': 'ログアウトしました'
+        }
+
+    def test_logout_invalid_token(self):
+        payload = {
+            'token_type': 'dummy',
+            'exp': datetime.utcnow(),
+            'uid': 'dummy',
+        }
+
+        # FIXME:SECRET_KEYを環境変数化
+        access_token = jwt.encode(claims=payload,
+                                  key='secret_key', algorithm='HS256')
+
+        response = client.post(
+            '/api/v1/logout',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'},
+        )
+        assert response.status_code == 401
+
     # ログアウトのテスト観点
     # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
     # ・ログイン状態で実施すると、処理が成功すること
@@ -51,7 +100,6 @@ class TestUserFunction:
 
     # TODO:アクセストークンのテストが必要
     # - 10分後にアクセスするとエラーとなること
-    # - 10分以内なら有効化していること（ログアウトのテストで賄う）
 
     # リフレッシュトークン取得のテスト観点
     # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
@@ -72,7 +120,7 @@ class TestUserFunction:
                 'Content-Type': 'application/x-www-form-urlencoded'},
             data=user_data
         )
-        refresh_token = response.json()["refresh_token"]
+        refresh_token = response.json()['refresh_token']
         # ここまで前処理。前処理はhelperに共通化する
 
         response = client.post(
