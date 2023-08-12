@@ -43,7 +43,7 @@ class UserRepository:
     def get_user_by_email(self, email: str) -> UserModel | None:
         return self.db.execute(
             select(UserModel).where(UserModel.email == email)
-        ).scalars().first()  # type: ignore
+        ).scalars().first()
 
     def __get_column_name_of_unique_error(
             self, error: IntegrityError) -> str | None:
