@@ -39,7 +39,7 @@ class AuthService:
             raise HTTPException(status_code=401, detail='トークンタイプ不一致')
 
         # DBからユーザーを取得
-        user = self.__user_repo.find_by_uuid(payload['uid'])
+        user = self.__user_repo.find_by('uuid', payload['uid'])
         # TODO:ユーザーが0件だった時の考慮が必要
 
         return user
@@ -61,7 +61,7 @@ class AuthService:
     def authenticate(self, email: str, password: str) -> 'UserModel':
         """パスワード認証し、userを返す"""
 
-        user: 'UserModel' = self.__user_repo.get_user_by_email(email=email)
+        user: 'UserModel' = self.__user_repo.find_by('email', value=email)
         # TODO:emailで検索した結果0件の場合の考慮が必要。get_user_by_email()内でErrorにするのか？それとも別案？
 
         if not PasswordHelper.is_password_matching(plain_pw=password,
