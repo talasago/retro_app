@@ -43,5 +43,42 @@ class TestUserFunction:
         assert res_body['token_type'] == 'bearer'
         assert res_body['name'] == 'Test User'
 
+    # ログアウトのテスト観点
+    # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
+    # ・ログイン状態で実施すると、処理が成功すること
+    #     内部的にはトークンを無効化する。revoke_token
+    # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
+
+    # TODO:アクセストークンのテストが必要
+    # - 10分後にアクセスするとエラーとなること
+    # - 10分以内なら有効化していること（ログアウトのテストで賄う）
+
     # リフレッシュトークン取得のテスト観点
     # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
+    #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
+    # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
+    # 1週間後にアクセスするとエラーとなること
+    @pytest.mark.skipif(True, reason='まだ実装前')
+    def test_refresh_token(self):
+        user_data: dict = {
+            'username': 'testuser@example.com',
+            'password': 'testpassword'
+        }
+
+        response = client.post(
+            '/api/v1/token',
+            headers={
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'},
+            data=user_data
+        )
+        refresh_token = response.json()["refresh_token"]
+        # ここまで前処理。前処理はhelperに共通化する
+
+        response = client.post(
+            '/api/v1/refresh_token',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {refresh_token}'},
+        )
+        # トークンが再発行されていること
