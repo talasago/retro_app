@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
 from ..database import Base
-import uuid
+import uuid as _uuid
 from datetime import datetime
 
 
@@ -9,15 +10,20 @@ class UserModel(Base):
     """SQLAlchemyのモデルクラス"""
 
     __tablename__ = 'users'
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    uuid = Column(UUID(as_uuid=True), default=uuid.uuid4,
-                  nullable=False, unique=True)
-    email = Column(String, nullable=False, unique=True)
-    name = Column(String, nullable=False, unique=True)
-    hashed_password = Column(String, nullable=False)
+    id: Mapped[int] = mapped_column(
+        Integer, primary_key=True, autoincrement=True)
+    uuid: Mapped[_uuid.UUID] = mapped_column(UUID(as_uuid=True),
+                                             default=_uuid.uuid4,
+                                             nullable=False,
+                                             unique=True)
+    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
-    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow())
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, default=datetime.utcnow())
 
     # strにキャストされたときのformat定義、主にデバッグ用
     def __repr__(self):
