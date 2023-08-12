@@ -29,10 +29,13 @@ class TestUserFunction:
             'password': 'testpassword'
         }
 
-        # XXX: なぜdataなのかわかってない。jsonじゃなくていいのか？
-        response = client.post('/api/v1/token', data=user_data)
-        res_body = response.json()
+        response = client.post('/api/v1/token',
+                               headers={
+                                   'accept': 'application/json',
+                                   'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
+                               data=user_data)
 
+        res_body = response.json()
         assert response.status_code == 200
         assert res_body['access_token'] is not None
         assert res_body['refresh_token'] is not None
