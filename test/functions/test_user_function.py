@@ -31,7 +31,7 @@ class TestUserFunction:
             'password': 'testpassword'
         }
 
-        response = client.post('/api/v1/token',
+        response = client.post('token',
                                headers={
                                    'accept': 'application/json',
                                    'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
@@ -53,7 +53,7 @@ class TestUserFunction:
         }
 
         response = client.post(
-            '/api/v1/token',
+            '/token',
             headers={
                 'accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded'},
@@ -120,13 +120,19 @@ class TestUserFunction:
                 'Content-Type': 'application/x-www-form-urlencoded'},
             data=user_data
         )
+        access_token = response.json()['accress_token']
         refresh_token = response.json()['refresh_token']
         # ここまで前処理。前処理はhelperに共通化する
 
         response = client.post(
-            '/api/v1/refresh_token',
+            '/refresh_token',
             headers={
                 'accept': 'application/json',
                 'Authorization': f'Bearer {refresh_token}'},
         )
+
         # トークンが再発行されていること
+        res_body = response.json()
+        assert response.status_code == 200
+        assert res_body['refresh_token'] != refresh_token
+        assert res_body['access_token'] != access_token
