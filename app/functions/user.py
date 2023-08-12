@@ -3,14 +3,13 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from sqlalchemy.orm import Session
-from ..database import SessionLocal
 from ..schemas.user_schema import UserCreate
 from ..repository.user_repository import UserRepository
 from ..helpers.password_helper import PasswordHelper
-from ..services.user_service import get_current_user
 from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
+from .dependencies import get_current_user, get_db
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -18,14 +17,6 @@ if TYPE_CHECKING:
     from uuid import UUID
 
 app = FastAPI()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 # ユーザー登録のエンドポイント
@@ -71,6 +62,7 @@ def refresh_token(current_user: 'UserModel' = Depends(get_current_user)):
 @app.post('/api/v1/logout')
 def logout(current_user: 'UserModel' = Depends(get_current_user)):
     # TODO:リフレッシュトークンを無効化
+
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={'message': 'ログアウトしました'}
