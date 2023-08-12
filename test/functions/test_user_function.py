@@ -14,7 +14,7 @@ class TestUserFunction:
             'password': 'testpassword'
         }
 
-        response = client.post('/api/v1/sign_up/', json=user_data)
+        response = client.post('/api/v1/sign_up', json=user_data)
 
         assert response.status_code == 201
         assert response.json() == {
@@ -30,7 +30,7 @@ class TestUserFunction:
         }
 
         # XXX: なぜdataなのかわかってない。jsonじゃなくていいのか？
-        response = client.post('/api/v1/token/', data=user_data)
+        response = client.post('/api/v1/token', data=user_data)
         res_body = response.json()
 
         assert response.status_code == 200
