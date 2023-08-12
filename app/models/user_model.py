@@ -8,6 +8,7 @@ from datetime import datetime
 
 class UserModel(Base):
     """SQLAlchemyのモデルクラス"""
+    UNIQUE_COLUMNS = ['id', 'uuid', 'email', 'name']
 
     __tablename__ = 'users'
     id: Mapped[int] = mapped_column(
