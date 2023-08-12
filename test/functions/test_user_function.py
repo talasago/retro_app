@@ -106,7 +106,6 @@ class TestUserFunction:
     #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
     # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
     # 1週間後にアクセスするとエラーとなること
-    @pytest.mark.skipif(True, reason='まだ実装前')
     def test_refresh_token(self):
         user_data: dict = {
             'username': 'testuser@example.com',
@@ -114,13 +113,13 @@ class TestUserFunction:
         }
 
         response = client.post(
-            '/api/v1/token',
+            '/token',
             headers={
                 'accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded'},
             data=user_data
         )
-        access_token = response.json()['accress_token']
+        access_token = response.json()['access_token']
         refresh_token = response.json()['refresh_token']
         # ここまで前処理。前処理はhelperに共通化する
 
@@ -134,5 +133,5 @@ class TestUserFunction:
         # トークンが再発行されていること
         res_body = response.json()
         assert response.status_code == 200
-        assert res_body['refresh_token'] != refresh_token
         assert res_body['access_token'] != access_token
+        assert res_body['refresh_token'] != refresh_token

@@ -10,7 +10,7 @@ from ..helpers.password_helper import PasswordHelper
 from ..services.user_service import get_current_user
 from jose import jwt
 from datetime import datetime, timedelta
-
+from uuid import uuid4
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -50,12 +50,19 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
     """ログインして、トークン発行する"""
     # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
     user = authenticate(db, form_data.username, form_data.password)
-    token = create_token(user.uuid)
+    token = create_tokens(user.uuid)
 
     return JSONResponse(
         # FIXME:ステータスコードの指定忘れてた
         content={'message': 'ログインしました', 'name': user.name,  **token}
     )
+
+
+# FIXME:response_model追加
+@app.post('/refresh_token')
+def refresh_token(current_user: 'UserModel' = Depends(get_current_user)):
+    """リフレッシュトークンでトークンを再取得"""
+    return create_tokens(current_user.uuid)
 
 
 # ログアウトのエンドポイント
@@ -96,7 +103,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
 
-def create_token(user_uuid: 'UUID') -> dict:
+def create_tokens(user_uuid: 'UUID') -> dict:
     """アクセストークンとリフレッシュトークンを返す"""
     # REVIEW: リフレッシュトークンだけ更新するときもこのメソッドを通るのでよいのか？アクセストークンが変わりそうな気がするが
 
@@ -108,11 +115,13 @@ def create_token(user_uuid: 'UUID') -> dict:
         'token_type': 'access_token',
         'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),  # noqa: E501
         'uid': str(user_uuid),
+        'jti': str(uuid4())
     }
     refresh_payload = {
         'token_type': 'refresh_token',
         'exp': datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
         'uid': str(user_uuid),
+        'jti': str(uuid4())
     }
 
     access_token = jwt.encode(claims=access_payload,
