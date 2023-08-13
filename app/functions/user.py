@@ -1,3 +1,4 @@
+"""WebAPIのエントリポイント。プレゼンテーション層。"""
 from typing import TYPE_CHECKING
 from fastapi import FastAPI, Depends, status
 from fastapi.responses import JSONResponse
