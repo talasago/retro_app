@@ -45,7 +45,7 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={'message': 'ログインしました', 'name': user.name,  **tokens}
+        content={'message': 'ログインしました', 'name': user.name, **tokens}
     )
 
 
