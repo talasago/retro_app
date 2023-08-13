@@ -39,11 +39,12 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             auth_service: 'AuthService' = Depends(get_auth_service)):
     """ログインして、トークン発行する"""
     # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
-    user = auth_service.authenticate(form_data.username, form_data.password)
-    tokens = auth_service.generate_tokens(user.uuid)
+    user = auth_service.authenticate(
+        email=form_data.username, password=form_data.password)
+    tokens = auth_service.generate_tokens(user_uuid=user.uuid)
 
     return JSONResponse(
-        # FIXME:ステータスコードの指定忘れてた
+        status_code=status.HTTP_200_OK,
         content={'message': 'ログインしました', 'name': user.name,  **tokens}
     )
 
@@ -54,8 +55,13 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
                   token: str = Depends(oauth2_scheme)):
     """リフレッシュトークンでトークンを再取得"""
     current_user: 'UserModel' = \
-        auth_service.get_current_user_from_refresh_token(token)
-    return auth_service.generate_tokens(current_user.uuid)
+        auth_service.get_current_user_from_refresh_token(token=token)
+    tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content={**tokens}
+    )
 
 
 # ログアウトのエンドポイント
