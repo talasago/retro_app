@@ -24,6 +24,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
 class AuthService:
+    """認証に関わるビジネスロジックを司る"""
     def __init__(self, user_repo: 'UserRepository') -> None:
         self.__user_repo: 'UserRepository' = user_repo
 
