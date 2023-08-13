@@ -70,3 +70,22 @@ class TestUserRepository:
             create_user(db=db, **user_data)
 
         assert str(e.value) == '指定された名前はすでに登録されています。'
+
+    def test_update_user_valid(self, db: Session, create_user):
+        # 予めユーザーを作っておく。
+        user_data: dict = {
+            'name': 'for update name',
+            'email': 'for_update_@example.com',
+            'password': 'password'
+        }
+        create_user(db=db, **user_data)
+
+        user_repo = UserRepository(db)
+        user: UserModel = user_repo.find_by('email', user_data['email'])
+
+        assert user.refresh_token is None
+        user.refresh_token = 'refresh_token'
+        user_repo.update_user(user)
+
+        user_after_update: UserModel = user_repo.find_by('email', user_data['email'])
+        assert user_after_update.refresh_token == 'refresh_token'
