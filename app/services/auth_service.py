@@ -45,17 +45,16 @@ class AuthService:
 
         return user
 
-    def get_current_user_from_refresh_token(self, token: str) -> 'UserModel':
+    def get_current_user_from_refresh_token(self, refresh_token: str) -> 'UserModel':
         """refresh_tokenからユーザーを取得"""
 
         user: 'UserModel' = self.get_current_user(
-            token=token, expect_token_type='refresh_token')
+            token=refresh_token, expect_token_type='refresh_token')
 
-        # TODO:後で実装
         # リフレッシュトークンの場合、受け取ったものとDBに保存されているものが一致するか確認
-        # if payload['token_type'] == 'refresh_token' and user.refresh_token != token:
-        #    print(user.refresh_token, '¥n', token)
-        #    raise HTTPException(status_code=401, detail='リフレッシュトークン不一致')
+        if user.refresh_token != refresh_token:
+            # TODO:カスタムエラークラスにする
+            raise HTTPException(status_code=401, detail='リフレッシュトークン不一致')
         return user
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要

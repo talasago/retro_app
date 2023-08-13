@@ -135,3 +135,38 @@ class TestUserFunction:
         assert response.status_code == 200
         assert res_body['access_token'] != access_token
         assert res_body['refresh_token'] != refresh_token
+
+    def test_refresh_token_invalid_param(self):
+        """1回目のリフレッシュトークンは無効になること"""
+        user_data: dict = {
+            'username': 'testuser@example.com',
+            'password': 'testpassword'
+        }
+
+        response = client.post(
+            '/token',
+            headers={
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'},
+            data=user_data
+        )
+        assert response.status_code == 200
+        refresh_token_1st = response.json()['refresh_token']
+
+        response = client.post(
+            '/refresh_token',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {refresh_token_1st}'},
+        )
+        refresh_token_2nd = response.json()['refresh_token']
+        assert response.status_code == 200
+        assert refresh_token_2nd != refresh_token_1st
+
+        response = client.post(
+            '/refresh_token',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {refresh_token_1st}'},
+        )
+        assert response.status_code == 401
