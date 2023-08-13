@@ -48,7 +48,7 @@ class AuthService:
         """refresh_tokenからユーザーを取得"""
 
         user: 'UserModel' = self.get_current_user(
-                token=token, expect_token_type='refresh_token')
+            token=token, expect_token_type='refresh_token')
 
         # TODO:後で実装
         # リフレッシュトークンの場合、受け取ったものとDBに保存されているものが一致するか確認
