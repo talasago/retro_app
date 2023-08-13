@@ -2,7 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 from app.functions.user import app
 from jose import jwt
-from datetime import datetime
+from datetime import datetime, timedelta
+from app.schemas.token_schema import TokenPayload
+
 
 client = TestClient(app)
 
@@ -74,14 +76,14 @@ class TestUserFunction:
         }
 
     def test_logout_invalid_token(self):
-        payload = {
-            'token_type': 'dummy',
-            'exp': datetime.utcnow(),
-            'uid': 'dummy',
-        }
-
+        payload = TokenPayload(
+            token_type='dummy',
+            exp=datetime.utcnow() + timedelta(days=1),
+            uid='dummy',
+            jti='dummy'
+        )
         # FIXME:SECRET_KEYを環境変数化
-        access_token = jwt.encode(claims=payload,
+        access_token = jwt.encode(claims=payload.model_dump(),
                                   key='secret_key', algorithm='HS256')
 
         response = client.post(
