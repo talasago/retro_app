@@ -4,6 +4,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
 from ..helpers.password_helper import PasswordHelper
+from ..schemas.token_schema import TokenPayload
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
@@ -25,6 +26,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 class AuthService:
     """認証に関わるビジネスロジックを司る"""
+
     def __init__(self, user_repo: 'UserRepository') -> None:
         self.__user_repo: 'UserRepository' = user_repo
 
@@ -33,14 +35,14 @@ class AuthService:
         """access_tokenからユーザーを取得"""
         # トークンをデコードしてペイロードを取得
         # TODO:例外処理
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
 
-        if payload['token_type'] != expect_token_type:
+        if payload.token_type != expect_token_type:
             # TODO:カスタムエラークラスにする
             raise HTTPException(status_code=401, detail='トークンタイプ不一致')
 
         # DBからユーザーを取得
-        user = self.__user_repo.find_by('uuid', payload['uid'])
+        user = self.__user_repo.find_by('uuid', payload.uid)
         # TODO:ユーザーが0件だった時の考慮が必要
 
         return user
@@ -76,22 +78,24 @@ class AuthService:
         # NOTE: uidには、uuidを使用する。
         # uuidを使用する：悪意の第三者がtokenを復号できた場合、uidにemailを設定すると個人情報が、
         # uidにidを指定するとユーザー数がわかってしまいセキュリティ上良くないため。
-        access_payload = {
-            'token_type': 'access_token',
-            'exp': datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),  # noqa: E501
-            'uid': str(user_uuid),
-            'jti': str(uuid4())
-        }
-        refresh_payload = {
-            'token_type': 'refresh_token',
-            'exp': datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),  # noqa E501
-            'uid': str(user_uuid),
-            'jti': str(uuid4())
-        }
 
-        access_token: str = jwt.encode(claims=access_payload,
+        access_payload = TokenPayload(
+            token_type='access_token',
+            exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            uid=str(user_uuid),
+            jti=str(uuid4())
+        )
+
+        refresh_payload = TokenPayload(
+            token_type='refresh_token',
+            exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+            uid=str(user_uuid),
+            jti=str(uuid4())
+        )
+
+        access_token: str = jwt.encode(claims=access_payload.model_dump(),
                                        key=SECRET_KEY, algorithm=ALGORITHM)
-        refresh_token: str = jwt.encode(claims=refresh_payload,
+        refresh_token: str = jwt.encode(claims=refresh_payload.model_dump(),
                                         key=SECRET_KEY, algorithm=ALGORITHM)
 
         return {'access_token': access_token, 'refresh_token': refresh_token,
