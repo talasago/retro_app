@@ -94,8 +94,10 @@ class AuthService:
         refresh_token: str = jwt.encode(claims=refresh_payload,
                                         key=SECRET_KEY, algorithm=ALGORITHM)
 
-        # TODO: DBにリフレッシュトークンを保存
-        # ここでDBの状態が変わるって、メソッド名から見て推測できるか...？別メソッドにした方が良いかもしれない。
-
         return {'access_token': access_token, 'refresh_token': refresh_token,
                 'token_type': 'bearer'}
+
+    def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
+        """リフレッシュトークンをusersテーブルに保存する"""
+        user.refresh_token = refresh_token
+        self.__user_repo.update_user(user)

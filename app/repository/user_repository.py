@@ -1,7 +1,8 @@
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
+from datetime import datetime
 from typing import Union
 from ..models.user_model import UserModel
 from ..helpers.password_helper import PasswordHelper
@@ -16,6 +17,7 @@ if TYPE_CHECKING:
 
 class UserRepository:
     def __init__(self, db: Session):
+        # FIXME:プライベート変数が正しい
         self.db = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
@@ -26,7 +28,6 @@ class UserRepository:
             plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
                                 hashed_password=hashed_password)
-
         self.db.add(user_params)
         try:
             self.db.commit()
@@ -41,6 +42,21 @@ class UserRepository:
         self.db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
+
+    # TODO:insertとupdateはsave()とかに変更する
+    def update_user(self, user: UserModel) -> None:
+        # HACK:モデル側にto_dictを実装する。
+        # TODO:仮実装。今はまだrefresh_tokenしか更新できない
+        user.updated_at = datetime.utcnow()
+
+        stmt = (
+            update(UserModel)
+            .where(UserModel.id == user.id)
+            .values(refresh_token=user.refresh_token, updated_at=user.updated_at)
+        )
+        self.db.execute(stmt)
+        self.db.commit()
+        return
 
     def find_by(self, column: str,
                 value: Union[str, 'UUID', int]) -> UserModel | None:
