@@ -45,16 +45,8 @@ class UserRepository:
 
     # TODO:insertとupdateはsave()とかに変更する
     def update_user(self, user: UserModel) -> None:
-        # HACK:モデル側にto_dictを実装する。
-        # TODO:仮実装。今はまだrefresh_tokenしか更新できない
         user.updated_at = datetime.utcnow()
-
-        stmt = (
-            update(UserModel)
-            .where(UserModel.id == user.id)
-            .values(refresh_token=user.refresh_token, updated_at=user.updated_at)
-        )
-        self.db.execute(stmt)
+        self.db.merge(user)
         self.db.commit()
         return
 
