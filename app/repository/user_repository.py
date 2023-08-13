@@ -17,8 +17,7 @@ if TYPE_CHECKING:
 
 class UserRepository:
     def __init__(self, db: Session):
-        # FIXME:プライベート変数が正しい
-        self.db = db
+        self.__db = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
         # ここで重複チェックしてもいいかも
@@ -28,26 +27,26 @@ class UserRepository:
             plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
                                 hashed_password=hashed_password)
-        self.db.add(user_params)
+        self.__db.add(user_params)
         try:
-            self.db.commit()
+            self.__db.commit()
         except IntegrityError as e:
-            self.db.rollback()
+            self.__db.rollback()
 
             col_name = self.__get_column_name_of_unique_error(e)
             if isinstance(e.orig, psycopg2_errors.UniqueViolation) \
                and col_name is not None:
                 raise RetroAppColmunUniqueError(col_name)
             raise e
-        self.db.refresh(user_params)
+        self.__db.refresh(user_params)
 
         # NOTE:ユーザー登録APIを作る時に何を返すか考える
 
     # TODO:insertとupdateはsave()とかに変更する
     def update_user(self, user: UserModel) -> None:
         user.updated_at = datetime.utcnow()
-        self.db.merge(user)
-        self.db.commit()
+        self.__db.merge(user)
+        self.__db.commit()
         return
 
     def find_by(self, column: str,
@@ -57,7 +56,7 @@ class UserRepository:
             # TODO: カスタムエラークラス
             raise ValueError('Invalid column for search')
 
-        return self.db.execute(
+        return self.__db.execute(
             select(UserModel).where(getattr(UserModel, column) == value)
         ).scalars().first()
 
