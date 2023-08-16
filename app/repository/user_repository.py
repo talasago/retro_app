@@ -53,7 +53,7 @@ class UserRepository:
     def find_by(self, column: str,
                 value: Union[str, 'UUID', int]) -> UserModel | None:
         # NOTE:コストがかかるので、ユニーク以外の列は検索を不許可とする
-        if column not in UserModel.UNIQUE_COLUMNS:
+        if column not in UserModel.INDEXED_COLUMNS:
             # TODO: カスタムエラークラス
             raise ValueError('Invalid column for search')
 
