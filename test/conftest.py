@@ -7,7 +7,7 @@ sys.path.append(pj_root_path)
 
 
 import pytest  # noqa: E402
-from sqlalchemy.orm import Session  # noqa: E402
+from sqlalchemy.orm.session import Session  # noqa: E402
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
 from app.database import SessionLocal, Base  # noqa: E402
@@ -23,7 +23,8 @@ def db() -> Session:
     # NOTE:TBL削除→TBL作成→→テスト実行できるようにすることで、テストデータを毎回削除する手間を減らしている。
     # ロジックはこちらのHPを参考にしたかった
     # https://nikaera.com/archives/pytest-sqlalchemy-alembic/
-    # ホントはDBを消すべきなのだろうけど。`ERROR: cannot drop the currently open database`となって削除できない
+    # ホントはDBを消すべきなのだろうけど。`ERROR: cannot drop the currently open database`となって
+    # 削除できない
     # 現状はTBLの削除で誤魔化している
     # https://www.postgresql.jp/document/7.3/reference/sql-dropdatabase.htmlを見ると
     # >対象とするデータベースに接続している場合、このコマンドを実行することができません。とあるので、
@@ -43,7 +44,7 @@ def db() -> Session:
 
     db = SessionLocal()
     try:
-        yield db
+        yield db  # type: ignore
     finally:
         db.close()
         engine.dispose()
