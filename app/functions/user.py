@@ -38,7 +38,7 @@ def signup_user(user: UserCreate, db: Session = Depends(get_db)):
 @app.post('/token')
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             auth_service: 'AuthService' = Depends(get_auth_service)):
-    """ログインして、トークン発行する"""
+    """ログインして、トークンを発行する"""
     # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
     user = auth_service.authenticate(
         email=form_data.username, password=form_data.password)
