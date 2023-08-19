@@ -9,7 +9,6 @@ from ..errors.retro_app_error import RetroAppColmunUniqueError
 # 型アノテーションだけのimport。これで本番実行時は無駄なimportが発生しないはず。
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
-    from ..schemas.user_schema import UserCreate
     from uuid import UUID
 
 
@@ -17,10 +16,17 @@ class UserRepository:
     def __init__(self, db: Session):
         self.__db: Session = db
 
-    def create_user(self, user_params: 'UserCreate') -> None:
-        user_params = UserModel(name=user_params.name, email=user_params.email,
-                                password=user_params.password)
-        self.__db.add(user_params)
+    # TODO:insertとupdateはsave()とかに変更する
+    def update_user(self, user: UserModel) -> None:
+        # TODO:エラーハンドリング
+        self.__db.merge(user)
+        self.__db.commit()
+        return
+
+    def save(self, user: UserModel) -> None:
+        # idがあるかどうかで既存のレコードかどうか判断する
+        self.__db.merge(user) if user.id else self.__db.add(user)
+
         try:
             self.__db.commit()
         except IntegrityError as e:
@@ -34,14 +40,7 @@ class UserRepository:
                and col_name is not None:
                 raise RetroAppColmunUniqueError(col_name)
             raise e
-        self.__db.refresh(user_params)
-
-    # TODO:insertとupdateはsave()とかに変更する
-    def update_user(self, user: UserModel) -> None:
-        # TODO:エラーハンドリング
-        self.__db.merge(user)
-        self.__db.commit()
-        return
+        self.__db.refresh(user)
 
     def find_by(self, column: str,
                 value: Union[str, 'UUID', int]) -> UserModel | None:
