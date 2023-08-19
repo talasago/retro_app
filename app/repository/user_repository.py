@@ -2,7 +2,6 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
-from datetime import datetime
 from typing import Union
 from ..models.user_model import UserModel
 from ..errors.retro_app_error import RetroAppColmunUniqueError
@@ -16,7 +15,7 @@ if TYPE_CHECKING:
 
 class UserRepository:
     def __init__(self, db: Session):
-        self.__db = db
+        self.__db: Session = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
         user_params = UserModel(name=user_params.name, email=user_params.email,
@@ -36,8 +35,6 @@ class UserRepository:
                 raise RetroAppColmunUniqueError(col_name)
             raise e
         self.__db.refresh(user_params)
-
-        # NOTE:ユーザー登録APIを作る時に何を返すか考える
 
     # TODO:insertとupdateはsave()とかに変更する
     def update_user(self, user: UserModel) -> None:
