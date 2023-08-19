@@ -107,3 +107,7 @@ class AuthService:
         """リフレッシュトークンをusersテーブルに保存する"""
         user.refresh_token = refresh_token
         self.__user_repo.update_user(user)
+
+    def delete_refresh_token(self, user: 'UserModel') -> None:
+        user.refresh_token = None
+        self.__user_repo.update_user(user)
