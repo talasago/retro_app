@@ -1,7 +1,6 @@
 import pytest
 from sqlalchemy.orm import Session
 from app.repository.user_repository import UserRepository
-from app.schemas.user_schema import UserCreate
 from passlib.context import CryptContext
 from app.models.user_model import UserModel
 from app.errors.retro_app_error import RetroAppColmunUniqueError
@@ -11,12 +10,10 @@ pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 @pytest.fixture
 def create_user():
-    def _method(db: Session, name: str, email: str,
-                password: str) -> None:
-        user_data = UserCreate(name=name, email=email,
-                               password=password)  # type: ignore
+    def _method(db: Session, **user_params) -> None:
         user_repo = UserRepository(db)
-        user_repo.create_user(user_data)
+        user = UserModel(**user_params)
+        user_repo.save(user)
 
     return _method
 
@@ -40,7 +37,7 @@ class TestUserRepository:
             'password', str(created_user.hashed_password))
 
     def test_email_uniqueness(self, db: Session, create_user):
-        # 予めユーザーを作っておく。
+        # 予め新規ユーザーを作っておく。
         user_data: dict = {
             'name': 'resisted email',
             'email': 'resisted_email@example.com',
@@ -56,7 +53,7 @@ class TestUserRepository:
         assert str(e.value) == '指定されたメールアドレスはすでに登録されています。'
 
     def test_name_uniqueness(self, db: Session, create_user):
-        # 予めユーザーを作っておく。
+        # 予め新規ユーザーを作っておく。
         user_data: dict = {
             'name': 'resisted name',
             'email': 'resisted_name@example.com',
