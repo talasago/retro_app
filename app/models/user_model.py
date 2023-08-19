@@ -28,7 +28,7 @@ class UserModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow())
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow())
+        DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow())
 
     @property
     def password(self) -> None:
