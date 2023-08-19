@@ -71,9 +71,15 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
 # TODO:非同期処理でも良いかもしれない
 # FIXME:response_model追加
 @app.post('/api/v1/logout')
-def logout(current_user: 'UserModel' = Depends(get_current_user)):
-    # TODO:リフレッシュトークンを無効化
+def logout(current_user: 'UserModel' = Depends(get_current_user),
+           auth_service: 'AuthService' = Depends(get_auth_service)):
+    """リフレッシュトークンを無効化する"""
 
+    # NOTE:アクセストークンの無効化は、セキュリティ的に対応した方が良いかもしれないが、絶対必要な処理ではないため一旦対応しない。
+    # アクセストークンを無効化するなら、アクセストークンのブロックリストを管理する必要がある。
+    # ログアウト時と、リフレッシュトークン発行時にaccess_tokenの有効期限が切れていない場合にブロックリストに入れる必要あり。
+
+    auth_service.delete_refresh_token(current_user)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
         content={'message': 'ログアウトしました'}

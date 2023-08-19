@@ -3,7 +3,14 @@ from fastapi.testclient import TestClient
 from app.functions.user import app
 from jose import jwt
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 from app.schemas.token_schema import TokenPayload
+from app.models.user_model import UserModel
+from sqlalchemy import select
+
+# 型アノテーションだけのimport
+if TYPE_CHECKING:
+    from sqlalchemy.orm.session import Session
 
 
 client = TestClient(app)
@@ -25,6 +32,7 @@ class TestUserFunction:
             'message': 'ユーザー登録が成功しました。'
         }
         # TODO:異常系のテストを追加する
+        # DBに保存されているかの観点が必要。
 
     # FIXME:テストの順番に依存がある
     def test_login(self):
@@ -48,7 +56,7 @@ class TestUserFunction:
         assert res_body['name'] == 'Test User'
 
     # FIXME:テストの順番に依存がある
-    def test_logout(self):
+    def test_logout(self, db: 'Session'):
         user_data: dict = {
             'username': 'testuser@example.com',
             'password': 'testpassword'
@@ -74,6 +82,12 @@ class TestUserFunction:
         assert response.json() == {
             'message': 'ログアウトしました'
         }
+
+        user: UserModel = db.execute(
+            select(UserModel).where(UserModel.email == user_data['username'])
+        ).scalars().first()
+        assert user  # Noneではないことの確認
+        assert user.refresh_token is None
 
     def test_logout_invalid_token(self):
         payload = TokenPayload(
