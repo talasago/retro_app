@@ -42,7 +42,8 @@ class AuthService:
 
         # DBからユーザーを取得
         user = self.__user_repo.find_by('uuid', payload.uid)
-        # TODO:ユーザーが0件だった時の考慮が必要
+        # TODO:ユーザーが0件だった時の考慮が必要。
+        # ただし一律エラーには出来ない。ログインしててもしていなくても良い機能を今後作るため
 
         return user
 
@@ -52,7 +53,7 @@ class AuthService:
         user: 'UserModel' = self.get_current_user(
             token=refresh_token, expect_token_type='refresh_token')
 
-        # リフレッシュトークンの場合、受け取ったものとDBに保存されているものが一致するか確認
+        # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
             # TODO:カスタムエラークラスにする
             raise HTTPException(status_code=401, detail='リフレッシュトークン不一致')
@@ -60,7 +61,7 @@ class AuthService:
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
     def authenticate(self, email: str, password: str) -> 'UserModel':
-        """パスワード認証し、userを返す"""
+        """認証(emailとpasswordが一致するかどうか)し、認証できたuserを返す"""
 
         user: 'UserModel' = self.__user_repo.find_by('email', value=email)
         # TODO:emailで検索した結果0件の場合の考慮が必要。get_user_by_email()内でErrorにするのか？それとも別案？
@@ -103,4 +104,8 @@ class AuthService:
     def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
         """リフレッシュトークンをusersテーブルに保存する"""
         user.refresh_token = refresh_token
+        self.__user_repo.update_user(user)
+
+    def delete_refresh_token(self, user: 'UserModel') -> None:
+        user.refresh_token = None
         self.__user_repo.update_user(user)
