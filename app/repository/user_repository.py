@@ -41,7 +41,6 @@ class UserRepository:
 
     # TODO:insertとupdateはsave()とかに変更する
     def update_user(self, user: UserModel) -> None:
-        user.updated_at = datetime.utcnow()
         # TODO:エラーハンドリング
         self.__db.merge(user)
         self.__db.commit()

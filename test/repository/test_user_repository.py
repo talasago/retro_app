@@ -99,3 +99,4 @@ class TestUserRepository:
         assert user_after_update.email == 'afterupdate@email'
         assert user_after_update.hashed_password == 'hashed_password'
         assert user_after_update.refresh_token == 'refresh_token'
+        assert user_after_update.updated_at > user_after_update.created_at
