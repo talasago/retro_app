@@ -85,7 +85,7 @@ class TestUserRepository:
         user.hashed_password = 'hashed_password'
         user.refresh_token = 'refresh_token'
 
-        user_repo.update_user(user)
+        user_repo.save(user)
 
         # expireしないと、コミットしてなくても、新しい値を取得してしまうため
         db.expire(user)

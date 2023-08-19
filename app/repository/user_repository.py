@@ -16,13 +16,6 @@ class UserRepository:
     def __init__(self, db: Session):
         self.__db: Session = db
 
-    # TODO:insertとupdateはsave()とかに変更する
-    def update_user(self, user: UserModel) -> None:
-        # TODO:エラーハンドリング
-        self.__db.merge(user)
-        self.__db.commit()
-        return
-
     def save(self, user: UserModel) -> None:
         # idがあるかどうかで既存のレコードかどうか判断する
         self.__db.merge(user) if user.id else self.__db.add(user)

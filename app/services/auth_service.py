@@ -104,8 +104,8 @@ class AuthService:
     def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
         """リフレッシュトークンをusersテーブルに保存する"""
         user.refresh_token = refresh_token
-        self.__user_repo.update_user(user)
+        self.__user_repo.save(user)
 
     def delete_refresh_token(self, user: 'UserModel') -> None:
         user.refresh_token = None
-        self.__user_repo.update_user(user)
+        self.__user_repo.save(user)
