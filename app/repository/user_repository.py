@@ -5,7 +5,6 @@ from psycopg2 import errors as psycopg2_errors
 from datetime import datetime
 from typing import Union
 from ..models.user_model import UserModel
-from ..helpers.password_helper import PasswordHelper
 from ..errors.retro_app_error import RetroAppColmunUniqueError
 
 # 型アノテーションだけのimport。これで本番実行時は無駄なimportが発生しないはず。
@@ -20,10 +19,8 @@ class UserRepository:
         self.__db = db
 
     def create_user(self, user_params: 'UserCreate') -> None:
-        hashed_password = PasswordHelper.generate_hashed_password(
-            plain_pw=user_params.password)  # type: ignore
         user_params = UserModel(name=user_params.name, email=user_params.email,
-                                hashed_password=hashed_password)
+                                password=user_params.password)
         self.__db.add(user_params)
         try:
             self.__db.commit()

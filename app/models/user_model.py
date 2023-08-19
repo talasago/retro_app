@@ -4,6 +4,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ..database import Base
 import uuid as _uuid
 from datetime import datetime
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 class UserModel(Base):
@@ -26,6 +29,19 @@ class UserModel(Base):
         DateTime, nullable=False, default=datetime.utcnow())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow())
+
+    @property
+    def password(self) -> None:
+        # NOTE: passwordを返さない理由：パスワードを返す必要が無い && セキュリティ的にも返したくない
+        pass
+
+    @password.setter
+    def password(self, plain_password: str) -> None:
+        self.hashed_password = pwd_context.hash(plain_password)
+
+    def is_password_matching(self, plain_password: str) -> bool:
+        # TODO: self.hashed_passwordがNoneだったらfalseを返す。
+        return pwd_context.verify(plain_password, self.hashed_password)
 
     # strにキャストされたときのformat定義、主にデバッグ用
     def __repr__(self):
