@@ -1,6 +1,6 @@
-from sqlalchemy import Integer, String, DateTime
+from sqlalchemy import Integer, String, DateTime, event
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, LoaderCallableStatus
 from ..database import Base
 import uuid as _uuid
 from datetime import datetime
@@ -47,3 +47,15 @@ class UserModel(Base):
     def __repr__(self):
         return (f'<User({self.id}, {self.uuid}, {self.email}, {self.name},'
                 f'{self.created_at}, {self.updated_at})>')
+
+
+@event.listens_for(UserModel.uuid, 'set')
+def disable_uuid_column_update(target, value, oldvalue, initiator):
+    """
+    現状uuidは変更する必要が無いため、変更を許可しない。
+    今後ユーザー情報変更機能追加時は変更を許可した方が良い。
+    """
+
+    # インスタンス生成時は必ずoldvalueが空になるため、その時は例外を発生させない
+    if oldvalue != LoaderCallableStatus.NO_VALUE and value != oldvalue:
+        raise TypeError('UserModel.uuidの変更は許可していません')
