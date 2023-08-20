@@ -1,3 +1,5 @@
+import pytest
+from uuid import uuid4
 from app.models.user_model import UserModel
 
 
@@ -34,3 +36,16 @@ class TestUserModel:
 
     # TODO:引数がstrじゃない時のテストを追加したい。その時はエラーにしたい。passlib側で実装されてるかもだが。
     # TestPasswordHelperのバリデーションはpydantic使った方が楽なのだろうか？
+
+    def test_set_attr_uuid(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'invalid_email',
+            'password': 'Passw0rd#123',
+            'uuid': uuid4(),
+        }
+        user = UserModel(**user_data)
+
+        with pytest.raises(TypeError) as e:
+            user.uuid = uuid4()
+        assert str(e.value) == 'UserModel.uuidの変更は許可していません'
