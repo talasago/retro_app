@@ -16,6 +16,15 @@ if TYPE_CHECKING:
 client = TestClient(app)
 
 
+@pytest.fixture
+def add_user_api():
+    def _method(user_data) -> None:
+        response = client.post('/api/v1/sign_up', json=user_data)
+        assert response.status_code == 201
+
+    return _method
+
+
 @pytest.mark.usefixtures('db')
 class TestUserFunction:
     def test_register_user(self):
@@ -34,26 +43,33 @@ class TestUserFunction:
         # TODO:異常系のテストを追加する
         # DBに保存されているかの観点が必要。
 
-    # FIXME:テストの順番に依存がある
-    def test_login(self):
-        user_data: dict = {
-            'username': 'testuser@example.com',
-            'password': 'testpassword'
-        }
+    class TestLogin:
+        def test_login_200(self, add_user_api):
+            user_data: dict = {
+                'email': 'testuser1@example.com',
+                'name': 'Test User1',
+                'password': 'testpassword'
+            }
+            add_user_api(user_data)
 
-        response = client.post('token',
-                               headers={
-                                   'accept': 'application/json',
-                                   'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
-                               data=user_data)
+            user_data: dict = {
+                'username': 'testuser@example.com',
+                'password': 'testpassword'
+            }
 
-        res_body = response.json()
-        assert response.status_code == 200
-        assert res_body['access_token'] is not None
-        assert res_body['refresh_token'] is not None
-        assert res_body['message'] == 'ログインしました'
-        assert res_body['token_type'] == 'bearer'
-        assert res_body['name'] == 'Test User'
+            response = client.post('token',
+                                   headers={
+                                       'accept': 'application/json',
+                                       'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
+                                   data=user_data)
+
+            res_body = response.json()
+            assert response.status_code == 200
+            assert res_body['access_token'] is not None
+            assert res_body['refresh_token'] is not None
+            assert res_body['message'] == 'ログインしました'
+            assert res_body['token_type'] == 'bearer'
+            assert res_body['name'] == 'Test User'
 
     # FIXME:テストの順番に依存がある
     def test_logout(self, db: 'Session'):
