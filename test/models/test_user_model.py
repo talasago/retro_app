@@ -53,3 +53,20 @@ class TestUserModel:
 
         with pytest.raises(AttributeError):
             UserModel(**user_data)
+
+    def test_set_id_expect_error(self):
+        user_data: dict = {
+            'name': 'John Doe',
+            'email': 'invalid_email',
+            'password': 'Passw0rd#123',
+        }
+        user = UserModel(**user_data)
+
+        with pytest.raises(AttributeError):
+            user.id = 100  # type: ignore
+
+    def test_init_id_expect_error(self):
+        user_data: dict = {'id': 10}
+
+        with pytest.raises(AttributeError):
+            UserModel(**user_data)

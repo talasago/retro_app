@@ -14,7 +14,7 @@ class UserModel(Base):
     INDEXED_COLUMNS: tuple = ('id', 'uuid', 'email', 'name')
 
     __tablename__ = 'users'
-    id: Mapped[int] = mapped_column(
+    __id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True)
     __uuid: Mapped[_uuid.UUID] = mapped_column(UUID(as_uuid=True),
                                                default=_uuid.uuid4,
@@ -39,6 +39,13 @@ class UserModel(Base):
     def password(self, plain_password: str) -> None:
         self.hashed_password = pwd_context.hash(plain_password)
 
+    # idは更新させたくないため、変更を許可しない。
+    @property
+    def id(self):
+        return self.__id
+
+    # 現状uuidは変更する必要が無いため、変更を許可しない。
+    # 今後ユーザー情報変更機能追加時は変更を許可した方が良い。
     @property
     def uuid(self):
         return self.__uuid
