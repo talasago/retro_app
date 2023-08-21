@@ -21,6 +21,9 @@ class UserRepository:
         self.__db.merge(user) if user.id else self.__db.add(user)
 
         try:
+            # FIXME:repository毎にcommit持たせるのはまずい。
+            # ので、他Repositoryを作るタイミングでトランザクション管理は要検討。
+            # userがコミットOKでも別テーブルのコミットがNGだったらロールバックできない。
             self.__db.commit()
         except IntegrityError as e:
             self.__db.rollback()
