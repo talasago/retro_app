@@ -14,12 +14,12 @@ class UserModel(Base):
     INDEXED_COLUMNS: tuple = ('id', 'uuid', 'email', 'name')
 
     __tablename__ = 'users'
-    __id: Mapped[int] = mapped_column(
+    id: Mapped[int] = mapped_column(
         Integer, primary_key=True, autoincrement=True)
-    __uuid: Mapped[_uuid.UUID] = mapped_column(UUID(as_uuid=True),
-                                               default=_uuid.uuid4,
-                                               nullable=False,
-                                               unique=True)
+    uuid: Mapped[_uuid.UUID] = mapped_column(UUID(as_uuid=True),
+                                             default=_uuid.uuid4,
+                                             nullable=False,
+                                             unique=True)
     email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
@@ -39,17 +39,6 @@ class UserModel(Base):
     def password(self, plain_password: str) -> None:
         self.hashed_password = pwd_context.hash(plain_password)
 
-    # idは更新させたくないため、変更を許可しない。
-    @property
-    def id(self):
-        return self.__id
-
-    # 現状uuidは変更する必要が無いため、変更を許可しない。
-    # 今後ユーザー情報変更機能追加時は変更を許可した方が良い。
-    @property
-    def uuid(self):
-        return self.__uuid
-
     def is_password_matching(self, plain_password: str) -> bool:
         # TODO: self.hashed_passwordがNoneだったらfalseを返す。
         return pwd_context.verify(plain_password, self.hashed_password)
@@ -58,3 +47,15 @@ class UserModel(Base):
     def __repr__(self):
         return (f'<User({self.id}, {self.uuid}, {self.email}, {self.name},'
                 f'{self.created_at}, {self.updated_at})>')
+
+
+@event.listens_for(UserModel.uuid, 'set')
+def disable_uuid_column_update(target, value, oldvalue, initiator):
+    """
+    現状uuidは変更する必要が無いため、変更を許可しない。
+    今後ユーザー情報変更機能追加時は変更を許可した方が良い。
+    """
+
+    # インスタンス生成時は必ずoldvalueが空になるため、その時は例外を発生させない
+    if oldvalue != LoaderCallableStatus.NO_VALUE and value != oldvalue:
+        raise TypeError('UserModel.uuidの変更は許可していません')
