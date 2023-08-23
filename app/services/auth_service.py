@@ -31,7 +31,7 @@ class AuthService:
 
     def get_current_user(self, token: str,
                          expect_token_type='access_token') -> 'UserModel':
-        """access_tokenからユーザーを取得"""
+        """tokenからユーザーを取得"""
         # トークンをデコードしてペイロードを取得
         # TODO:例外処理
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
