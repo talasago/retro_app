@@ -25,6 +25,24 @@ def add_user_api():
     return _method
 
 
+# TODO:helperに移動する
+@pytest.fixture
+def login_api():
+    def _method(login_param: dict) -> tuple:
+        response = client.post(
+            '/token',
+            headers={
+                'accept': 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded'},
+            data=login_param
+        )
+        assert response.status_code == 200
+        res_body = response.json()
+        return res_body['access_token'], res_body['refresh_token']
+
+    return _method
+
+
 @pytest.mark.usefixtures('db')
 class TestUserFunction:
     def test_register_user(self):
@@ -71,58 +89,56 @@ class TestUserFunction:
             assert res_body['token_type'] == 'bearer'
             assert res_body['name'] == 'Test User'
 
-    # FIXME:テストの順番に依存がある
-    def test_logout(self, db: 'Session'):
-        user_data: dict = {
-            'username': 'testuser@example.com',
-            'password': 'testpassword'
-        }
+    class TestLogout:
+        def test_logout_200(self, db: 'Session', add_user_api, login_api):
+            user_data: dict = {
+                'email': 'testuserlogout@example.com',
+                'name': 'Test Userlogout',
+                'password': 'testpassword'
+            }
+            add_user_api(user_data)
 
-        response = client.post(
-            '/token',
-            headers={
-                'accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'},
-            data=user_data
-        )
-        access_token = response.json()['access_token']
-        # TODO:ここまで前処理。前処理はhelperに共通化する
+            login_param: dict = {
+                'username': user_data['email'],
+                'password': user_data['password'],
+            }
+            access_token, _ = login_api(login_param)
 
-        response = client.post(
-            '/api/v1/logout',
-            headers={
-                'accept': 'application/json',
-                'Authorization': f'Bearer {access_token}'},
-        )
-        assert response.status_code == 200
-        assert response.json() == {
-            'message': 'ログアウトしました'
-        }
+            response = client.post(
+                '/api/v1/logout',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {access_token}'},
+            )
+            assert response.status_code == 200
+            assert response.json() == {
+                'message': 'ログアウトしました'
+            }
 
-        user: UserModel = db.execute(
-            select(UserModel).where(UserModel.email == user_data['username'])
-        ).scalars().first()
-        assert user  # Noneではないことの確認
-        assert user.refresh_token is None
+            user: UserModel = db.execute(
+                select(UserModel).where(UserModel.email == user_data['email'])
+            ).scalars().first()
+            assert user  # Noneではないことの確認
+            assert user.refresh_token is None
 
-    def test_logout_invalid_token(self):
-        payload = TokenPayload(
-            token_type='dummy',
-            exp=datetime.utcnow() + timedelta(days=1),
-            uid='dummy',
-            jti='dummy'
-        )
-        # FIXME:SECRET_KEYを環境変数化
-        access_token = jwt.encode(claims=payload.model_dump(),
-                                  key='secret_key', algorithm='HS256')
+        def test_logout_invalid_token(self):
+            payload = TokenPayload(
+                token_type='dummy',
+                exp=datetime.utcnow() + timedelta(days=1),
+                uid='dummy',
+                jti='dummy'
+            )
+            # FIXME:SECRET_KEYを環境変数化
+            access_token = jwt.encode(claims=payload.model_dump(),
+                                      key='secret_key', algorithm='HS256')
 
-        response = client.post(
-            '/api/v1/logout',
-            headers={
-                'accept': 'application/json',
-                'Authorization': f'Bearer {access_token}'},
-        )
-        assert response.status_code == 401
+            response = client.post(
+                '/api/v1/logout',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {access_token}'},
+            )
+            assert response.status_code == 401
 
     # ログアウトのテスト観点
     # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
