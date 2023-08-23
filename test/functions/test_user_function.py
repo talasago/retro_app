@@ -25,7 +25,7 @@ def add_user_api():
     return _method
 
 
-# TODO:helperに移動する
+# TODO:function用のhelperに移動する
 @pytest.fixture
 def login_api():
     def _method(login_param: dict) -> tuple:
@@ -60,6 +60,7 @@ class TestUserFunction:
         }
         # TODO:異常系のテストを追加する
         # DBに保存されているかの観点が必要。
+        # パスワードのバリデーションがすり抜けている気がする...
 
     class TestLogin:
         def test_login_200(self, add_user_api):
@@ -154,67 +155,78 @@ class TestUserFunction:
     #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
     # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
     # 1週間後にアクセスするとエラーとなること
-    def test_refresh_token(self):
-        user_data: dict = {
-            'username': 'testuser@example.com',
-            'password': 'testpassword'
-        }
+    # リフレッシュトークンが異常な値の時
 
-        response = client.post(
-            '/token',
-            headers={
-                'accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'},
-            data=user_data
-        )
-        access_token = response.json()['access_token']
-        refresh_token = response.json()['refresh_token']
-        # ここまで前処理。前処理はhelperに共通化する
+    class TestRefreshToken:
+        def test_refresh_token_200(self, add_user_api, login_api):
+            user_data: dict = {
+                'email': 'testrefresh_token@example.com',
+                'name': 'Test Userrefresh_token',
+                'password': 'QG+UJxEdf,T5'
+            }
+            add_user_api(user_data)
 
-        response = client.post(
-            '/refresh_token',
-            headers={
-                'accept': 'application/json',
-                'Authorization': f'Bearer {refresh_token}'},
-        )
+            login_param: dict = {
+                'username': user_data['email'],
+                'password': user_data['password'],
+            }
+            access_token, refresh_token = login_api(login_param)
 
-        # トークンが再発行されていること
-        res_body = response.json()
-        assert response.status_code == 200
-        assert res_body['access_token'] != access_token
-        assert res_body['refresh_token'] != refresh_token
+            response = client.post(
+                '/refresh_token',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {refresh_token}'},
+            )
 
-    def test_refresh_token_invalid_param(self):
-        """1回目のリフレッシュトークンは無効になること"""
-        user_data: dict = {
-            'username': 'testuser@example.com',
-            'password': 'testpassword'
-        }
+            # トークンが再発行されていること
+            res_body = response.json()
+            assert response.status_code == 200
+            assert res_body['access_token'] != access_token
+            assert res_body['refresh_token'] != refresh_token
 
-        response = client.post(
-            '/token',
-            headers={
-                'accept': 'application/json',
-                'Content-Type': 'application/x-www-form-urlencoded'},
-            data=user_data
-        )
-        assert response.status_code == 200
-        refresh_token_1st = response.json()['refresh_token']
+        # TODO:メソッド名変更
+        def test_refresh_token_invalid_param(self, add_user_api, login_api):
+            """新しくリフレッシュトークンが発行されたら、
+            それより前に発行されたリフレッシュトークンは無効になること"""
+            user_data: dict = {
+                'email': 'testrefresh_token_invalid_param@example.com',
+                'name': 'Test testrefresh_token_invalid_param',
+                'password': 'QG+UJxEdf,T5'
+            }
+            add_user_api(user_data)
 
-        response = client.post(
-            '/refresh_token',
-            headers={
-                'accept': 'application/json',
-                'Authorization': f'Bearer {refresh_token_1st}'},
-        )
-        refresh_token_2nd = response.json()['refresh_token']
-        assert response.status_code == 200
-        assert refresh_token_2nd != refresh_token_1st
+            login_param: dict = {
+                'username': user_data['email'],
+                'password': user_data['password'],
+            }
+            _, refresh_token_1st = login_api(login_param)
 
-        response = client.post(
-            '/refresh_token',
-            headers={
-                'accept': 'application/json',
-                'Authorization': f'Bearer {refresh_token_1st}'},
-        )
-        assert response.status_code == 401
+            # リフレッシュトークンAPI実行1回目
+            response = client.post(
+                '/refresh_token',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {refresh_token_1st}'},
+            )
+            refresh_token_2nd = response.json()['refresh_token']
+            assert response.status_code == 200
+            assert refresh_token_2nd != refresh_token_1st
+
+            # リフレッシュトークンAPI実行2回目
+            response = client.post(
+                '/refresh_token',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {refresh_token_1st}'},
+            )
+            assert response.status_code == 401
+
+            # リフレッシュトークンAPI実行3回目
+            response = client.post(
+                '/refresh_token',
+                headers={
+                    'accept': 'application/json',
+                    'Authorization': f'Bearer {refresh_token_2nd}'},
+            )
+            assert response.status_code == 200
