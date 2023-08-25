@@ -34,10 +34,8 @@
 ├── docker-compose.yml => ローカル実行用
 ├── test/ => テストコード
 │   ├── conftest.py => テスト実行時に必ず呼ばれる親ファイルみたいなもの
-│   ├── functions/ => app/functionsのテスト
-│   ├── helpers/ => app/helpersのテスト
-│   ├── repository/ => app/repositoryのテスト
-│   └── schemas/ => app/schemasのテスト
+│   ├── feature/ => テストデータを管理
+│   └── それ以外のディレクトリ => app/配下と同じレイヤーのテストを管理
 └── tools/ => 便利なツール。デプロイしない。
 ```
 
@@ -143,12 +141,14 @@ $  flake8 app/*.py app/*/*.py
 随時追加予定
 ### 単体テスト
 - pytestで実施
-- helpers/とschemas/に対して実行するテスト
+- services/とschemas/とmodels/に対して実行するテスト
   - DBに接続せずに実施できるため一番早い
+  - services/はビジネスロジックだけをテストしたいため、DBとの接続はモック化してください
+  - TODO:詳細を書く
 
 ### コンポーネント結合テスト
 - pytestで実施
-  - repository/とfunctionsに対して実行するテスト
+  - repository/とfunctions/に対して実行するテスト
     - DBアクセスが必要なのでやや遅い
     - ※DBアクセスは外部依存となるためコンポーネント結合テストに位置付け
 
