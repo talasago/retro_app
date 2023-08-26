@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from app.models.user_model import UserModel
 
 
-# TODO:UserRepositoryを引数で受け取るのではなく、fixtureで定義したuser_repoを呼び出せ無いものか
 def create_test_user(user_repo: 'UserRepository', email: str | None = None,
                      password: str | None = None, name: str | None = None) -> 'UserModel':
     test_user_param = {}
