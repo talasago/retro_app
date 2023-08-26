@@ -1,5 +1,5 @@
 from factory import Factory, Sequence
-from ..models.test_user_model import UserModel
+from app.models.user_model import UserModel
 
 
 class UserFactory(Factory):
