@@ -1,28 +1,33 @@
 import pytest
-from unittest.mock import Mock
 from app.repository.user_repository import UserRepository
 from app.services.auth_service import AuthService
 from uuid import UUID
+from tests.test_helpers.create_test_user import create_test_user
+
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from sqlalchemy.orm import Session
+    from app.models.user_model import UserModel
 
 
 @pytest.fixture()
-def auth_service() -> AuthService:
-    return AuthService(Mock(spec=UserRepository))
+def auth_service(db: 'Session') -> AuthService:
+    return AuthService(UserRepository(db))
 
 
-@pytest.mark.usefixtures('auth_service')
-class TestAuthService:
+class TestAuthService():
     class TestGetCurrentUser:
         # テスト観点
         # expect_token_typeが規定の値ではない
         # expect_token_typeとPayloadのtypeが一致しない
         # uuidで検索してユーザーが存在しない
-        @pytest.mark.skip
-        def test_hoge(self):
-            # tokenを準備する
-            # - どのようなトークン？generate_tokenを呼び出す
-            # UserRepositoryをモック化するfind_by()
-            pass
+        def test_valid(self, auth_service: AuthService, user_repo):
+            test_user: 'UserModel' = create_test_user(user_repo)
+            tokens = auth_service.generate_tokens(test_user.uuid)
+
+            current_user: 'UserModel' = auth_service.get_current_user(tokens['access_token'])
+
+            assert current_user.id == test_user.id
 
     class TestGenerateToken:
         # テスト観点
