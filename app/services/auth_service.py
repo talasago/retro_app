@@ -98,6 +98,7 @@ class AuthService:
         refresh_token: str = jwt.encode(claims=refresh_payload.model_dump(),
                                         key=SECRET_KEY, algorithm=ALGORITHM)
 
+        # これをpydanticの型にしてもいいかも？レスポンスモデルで使用できるなら。
         return {'access_token': access_token, 'refresh_token': refresh_token,
                 'token_type': 'bearer'}
 
