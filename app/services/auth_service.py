@@ -3,6 +3,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
 from ..schemas.token_schema import TokenPayload, TokenType
+from ..errors.retro_app_error import RetroAppValueError
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
 
 # JWT関連の設定
 # FIXME:シークレットキーは機密情報なので、本番実行時には環境変数など別の場所に記載する。
+# アルゴリズムも環境変数化しておこう
 SECRET_KEY = 'secret_key'
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 10
@@ -37,8 +39,7 @@ class AuthService:
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
 
         if payload.token_type != expect_token_type:
-            # TODO:カスタムエラークラスにする
-            raise HTTPException(status_code=401, detail='トークンタイプ不一致')
+            raise RetroAppValueError('トークンタイプ不一致')
 
         # DBからユーザーを取得
         user = self.__user_repo.find_by('uuid', payload.uid)
