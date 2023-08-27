@@ -10,4 +10,11 @@ class RetroAppColmunUniqueError(RetroAppBaseError):
         super().__init__(message)
         self.message = message
 
+
+class RetroAppValueError(RetroAppBaseError):
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
+
+
 # TODO:HTTPステータスコードを含めたエラークラスを作ってもいいのでは。

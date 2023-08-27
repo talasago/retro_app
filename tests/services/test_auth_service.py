@@ -1,8 +1,12 @@
 import pytest
 from app.repository.user_repository import UserRepository
 from app.services.auth_service import AuthService
-from uuid import UUID
+from uuid import UUID, uuid4
+from jose import jwt
+from datetime import datetime, timedelta
 from tests.test_helpers.create_test_user import create_test_user
+from app.errors.retro_app_error import RetroAppValueError
+from app.schemas.token_schema import TokenPayload
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -40,6 +44,24 @@ class TestAuthService():
                     auth_service.get_current_user(token=tokens['access_token'],
                                                   expect_token_type='hoge')
                 assert str(e.value) == 'Invalid expect_token_type: hoge'
+
+        class TestWhenInvalidTokenInPayloadToken:
+            def test_raise_error(self, auth_service: AuthService, user_repo):
+                """デコードしたペイロードのTokenTypeとexpect_token_typeが一致していない場合、例外を返す"""
+                test_user: 'UserModel' = create_test_user(user_repo)
+
+                access_payload = TokenPayload(
+                    token_type='refresh_token',
+                    exp=datetime.utcnow() + timedelta(minutes=100),
+                    uid=str(test_user.uuid),
+                    jti=str(uuid4())
+                )
+                access_token: str = jwt.encode(claims=access_payload.model_dump(),
+                                               key='secret_key', algorithm='HS256')
+
+                with pytest.raises(RetroAppValueError) as e:
+                    auth_service.get_current_user(token=access_token)
+                assert str(e.value) == 'トークンタイプ不一致'
 
     class TestGenerateToken:
         # テスト観点

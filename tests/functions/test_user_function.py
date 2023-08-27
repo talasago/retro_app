@@ -139,7 +139,9 @@ class TestUserFunction:
                     'accept': 'application/json',
                     'Authorization': f'Bearer {access_token}'},
             )
+            res_body = response.json()
             assert response.status_code == 401
+            assert res_body['detail'] == 'トークンタイプ不一致'
 
     # ログアウトのテスト観点
     # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
