@@ -22,6 +22,7 @@ class TestAuthService():
         # expect_token_typeとPayloadのtypeが一致しない
         # uuidで検索してユーザーが存在しない
         def test_valid(self, auth_service: AuthService, user_repo):
+            """access_tokenをデコードしたuuidがユーザーと一致した場合、そのユーザーを返す"""
             test_user: 'UserModel' = create_test_user(user_repo)
             tokens = auth_service.generate_tokens(test_user.uuid)
 
@@ -33,6 +34,7 @@ class TestAuthService():
         # テスト観点
         # encodeが失敗したとき(?)
         def test_valid(self, auth_service: AuthService):
+            """uuidが有効な値の場合、access_tokenとrefresh_tokenを返す"""
             test_uuid: UUID = UUID('a49b19ec-ed16-4416-81ea-b6a9d029baef')
             tokens = auth_service.generate_tokens(test_uuid)
 
