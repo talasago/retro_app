@@ -82,3 +82,21 @@ class TestAuthService():
                     auth_service.generate_tokens(None)  # type: ignore
 
                 assert str(e.value) == 'user_uuid must be other than None'
+
+    class TestAuthenticate:
+        # テスト観点
+        # ユーザーが存在しない
+        # パスワードが一致しない
+        # どちらもフロントには同じエラー内容を返すこと。セキュリティのため
+        class TestWhenValidParam:
+            def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
+                """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
+                user_params = {
+                    'email': 'authenticate_user@example.com',
+                    'password': 'qwsedfrtgyhujikolp;@:!234'
+                }
+                test_user: 'UserModel' = create_test_user(user_repo, **user_params)
+                authenticated_user = auth_service.authenticate(**user_params)
+
+                assert authenticated_user == test_user
+                assert authenticated_user.email == user_params['email']
