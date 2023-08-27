@@ -18,7 +18,6 @@ def auth_service(db: 'Session') -> AuthService:
 class TestAuthService():
     class TestGetCurrentUser:
         # テスト観点
-        # expect_token_typeが規定の値ではない
         # expect_token_typeとPayloadのtypeが一致しない
         # uuidで検索してユーザーが存在しない
         def test_valid(self, auth_service: AuthService, user_repo):
@@ -29,6 +28,18 @@ class TestAuthService():
             current_user: 'UserModel' = auth_service.get_current_user(tokens['access_token'])
 
             assert current_user.id == test_user.id
+
+        class TestWhenInvalidTokenType:
+            def test_raise_error(self, auth_service: AuthService, user_repo):
+                """expect_token_typeが既定の値ではない場合例外を返す"""
+                test_user: 'UserModel' = create_test_user(user_repo)
+
+                tokens = auth_service.generate_tokens(test_user.uuid)
+
+                with pytest.raises(ValueError) as e:
+                    auth_service.get_current_user(token=tokens['access_token'],
+                                                  expect_token_type='hoge')
+                assert str(e.value) == 'Invalid expect_token_type: hoge'
 
     class TestGenerateToken:
         # テスト観点

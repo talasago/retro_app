@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
-from ..schemas.token_schema import TokenPayload
+from ..schemas.token_schema import TokenPayload, TokenType
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
@@ -32,6 +32,9 @@ class AuthService:
     def get_current_user(self, token: str,
                          expect_token_type='access_token') -> 'UserModel':
         """tokenからユーザーを取得"""
+        if expect_token_type not in TokenType.__members__.keys():
+            raise ValueError(f'Invalid expect_token_type: {expect_token_type}')
+
         # トークンをデコードしてペイロードを取得
         # TODO:例外処理
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
