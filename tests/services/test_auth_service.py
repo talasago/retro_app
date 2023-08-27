@@ -31,7 +31,6 @@ class TestAuthService():
 
     class TestGenerateToken:
         # テスト観点
-        # Noneを渡したとき
         # encodeが失敗したとき(?)
         def test_valid(self, auth_service: AuthService):
             test_uuid: UUID = UUID('a49b19ec-ed16-4416-81ea-b6a9d029baef')
@@ -40,3 +39,11 @@ class TestAuthService():
             assert tokens['access_token']
             assert tokens['refresh_token']
             assert tokens['token_type'] == 'bearer'
+
+        class TestWhenUUIDIsNone:
+            def test_raise_error(self, auth_service: AuthService):
+                """uuidがNoneの場合は例外を返す"""
+                with pytest.raises(TypeError) as e:
+                    auth_service.generate_tokens(None)  # type: ignore
+
+                assert str(e.value) == 'user_uuid must be other than None'
