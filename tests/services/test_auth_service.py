@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from jose import jwt
 from datetime import datetime, timedelta
 from tests.test_helpers.create_test_user import create_test_user
-from app.errors.retro_app_error import RetroAppValueError
+from app.errors.retro_app_error import RetroAppValueError, RetroAppRecordNotFoundError
 from app.schemas.token_schema import TokenPayload
 
 from typing import TYPE_CHECKING
@@ -63,6 +63,22 @@ class TestAuthService():
                     auth_service.get_current_user(token=access_token)
                 assert str(e.value) == 'トークンタイプ不一致'
 
+        class TestWhenNotExistUserUUID:
+            def test_raise_error(self, auth_service: AuthService, user_repo):
+                """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
+                access_payload = TokenPayload(
+                    token_type='access_token',
+                    exp=datetime.utcnow() + timedelta(minutes=100),
+                    uid=str(uuid4()),
+                    jti=str(uuid4())
+                )
+                access_token: str = jwt.encode(claims=access_payload.model_dump(),
+                                               key='secret_key', algorithm='HS256')
+
+                with pytest.raises(RetroAppRecordNotFoundError) as e:
+                    auth_service.get_current_user(token=access_token)
+                assert str(e.value) == '条件に合致するレコードは存在しません。'
+
     class TestGenerateToken:
         # テスト観点
         # encodeが失敗したとき(?)
@@ -85,9 +101,10 @@ class TestAuthService():
 
     class TestAuthenticate:
         # テスト観点
+        # parameterがNoneの場合
         # ユーザーが存在しない
         # パスワードが一致しない
-        # どちらもフロントには同じエラー内容を返すこと。セキュリティのため
+        # どちらもフロントには同じエラー内容を返すこと。セキュリティのため。これはAPIのテストかな
         class TestWhenValidParam:
             def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
                 """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
@@ -100,3 +117,16 @@ class TestAuthService():
 
                 assert authenticated_user == test_user
                 assert authenticated_user.email == user_params['email']
+
+        class TestWhenNotExistEmail:
+            def test_raise_exception(self, auth_service: AuthService):
+                """メールアドレスが存在しない場合、エラーを返す"""
+                user_params = {
+                    'email': 'not_exsist_mail@example.com',
+                    'password': 'qwsedfrtgyhujikolp;@:!234'
+                }
+
+                with pytest.raises(RetroAppRecordNotFoundError) as e:
+                    auth_service.authenticate(**user_params)
+
+                assert str(e.value) == '条件に合致するレコードは存在しません。'

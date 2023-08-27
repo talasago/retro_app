@@ -43,8 +43,7 @@ class AuthService:
 
         # DBからユーザーを取得
         user = self.__user_repo.find_by('uuid', payload.uid)
-        # TODO:ユーザーが0件だった時の考慮が必要。
-        # ただし一律エラーには出来ない。ログインしててもしていなくても良い機能を今後作るため
+        # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
 
         return user
 
@@ -66,7 +65,6 @@ class AuthService:
         """認証(emailとpasswordが一致するかどうか)し、認証できたuserを返す"""
 
         user: 'UserModel' = self.__user_repo.find_by('email', value=email)
-        # TODO:emailで検索した結果0件の場合の考慮が必要。get_user_by_email()内でErrorにするのか？それとも別案？
 
         if not user.is_password_matching(plain_password=password):
             # TODO:カスタムエラークラスにする
