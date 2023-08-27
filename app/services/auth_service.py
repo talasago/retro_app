@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -19,8 +18,6 @@ SECRET_KEY = 'secret_key'
 ALGORITHM = 'HS256'
 ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_DAYS = 7
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
 class AuthService:
