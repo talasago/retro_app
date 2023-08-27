@@ -50,6 +50,7 @@ class AuthService:
     def get_current_user_from_refresh_token(self, refresh_token: str) -> 'UserModel':
         """refresh_tokenからユーザーを取得"""
 
+        # TODO:ユーザーが0件だった時の考慮が必要。
         user: 'UserModel' = self.get_current_user(
             token=refresh_token, expect_token_type='refresh_token')
 
@@ -73,6 +74,9 @@ class AuthService:
 
     def generate_tokens(self, user_uuid: 'UUID') -> dict[str, str]:
         """アクセストークンとリフレッシュトークンを返す"""
+        if user_uuid is None:
+            raise TypeError('user_uuid must be other than None')
+
         # ペイロード作成
         # NOTE: uidには、uuidを使用する。
         # uuidを使用する理由：悪意の第三者がtokenを復号できた場合を想定し、以下の懸念がありそれに対応するため。
