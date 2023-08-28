@@ -42,6 +42,10 @@ class UserRepository:
                 value: Union[str, 'UUID', int],
                 raise_exception=True) -> UserModel | None:
         """条件に合致するレコードを検索して返す"""
+
+        if raise_exception is None:
+            raise TypeError('raise_exception must be True or False')
+
         # FIXME:現状複数条件に対応できていない。今後対応するなら、引数はdictの方が良さそう。
         # NOTE:コストがかかるので、ユニーク以外の列は検索を不許可とする
         if column not in UserModel.INDEXED_COLUMNS:

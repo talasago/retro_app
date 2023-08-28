@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.repository.user_repository import UserRepository
 from passlib.context import CryptContext
 from app.models.user_model import UserModel
-from app.errors.retro_app_error import RetroAppColmunUniqueError
+from app.errors.retro_app_error import RetroAppColmunUniqueError, RetroAppRecordNotFoundError
 from tests.test_helpers.create_test_user import create_test_user
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -111,3 +111,21 @@ class TestUserRepository:
 
             searched_user_by_uuid: UserModel = user_repo.find_by('uuid', test_users[2].uuid)
             assert searched_user_by_uuid == test_users[2]
+
+        class TestWhenRecordIsNone:
+            class TestWhenRaiseOptionIsTrue:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    with pytest.raises(RetroAppRecordNotFoundError):
+                        user_repo.find_by(column='email', value='not_exsist_user')
+
+            class TestWhenRaiseOptionIsFalse:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    result = user_repo.find_by(column='email', value='not_exsist_user', raise_exception=False)
+                    assert result is None
+
+            class TestWhenRaiseOptionIsNone:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    with pytest.raises(TypeError) as e:
+                        user_repo.find_by(column='email', value='not_exsist_user', raise_exception=None)  # type: ignore
+
+                    assert str(e.value) == 'raise_exception must be True or False'
