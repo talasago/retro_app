@@ -47,7 +47,7 @@ class UserRepository:
             raise TypeError('raise_exception must be True or False')
 
         # FIXME:現状複数条件に対応できていない。今後対応するなら、引数はdictの方が良さそう。
-        # NOTE:コストがかかるので、ユニーク以外の列は検索を不許可とする
+        # NOTE:コストがかかるので、インデックスが無いの列は検索を不許可とする
         if column not in UserModel.INDEXED_COLUMNS:
             # TODO: カスタムエラークラス
             raise ValueError('Invalid column for search')
