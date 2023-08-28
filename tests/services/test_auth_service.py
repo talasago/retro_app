@@ -5,8 +5,10 @@ from uuid import UUID, uuid4
 from jose import jwt
 from datetime import datetime, timedelta
 from tests.test_helpers.create_test_user import create_test_user
-from app.errors.retro_app_error import RetroAppValueError, RetroAppRecordNotFoundError
 from app.schemas.token_schema import TokenPayload
+from app.errors.retro_app_error import (RetroAppValueError,
+                                        RetroAppRecordNotFoundError,
+                                        RetroAppAuthenticationError)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -130,3 +132,13 @@ class TestAuthService():
                     auth_service.authenticate(**user_params)
 
                 assert str(e.value) == '条件に合致するレコードは存在しません。'
+
+        class TestWhenUnmatchPassword:
+            def test_raise_exception(self, auth_service: AuthService, user_repo):
+                """パスワードが一致しない場合、エラーを返す"""
+                test_user: 'UserModel' = create_test_user(user_repo)
+
+                with pytest.raises(RetroAppAuthenticationError) as e:
+                    auth_service.authenticate(email=test_user.email, password='hoge')
+
+                assert str(e.value) == 'パスワードが一致しません。'

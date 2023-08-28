@@ -24,4 +24,11 @@ class RetroAppRecordNotFoundError(RetroAppBaseError):
         self.message = message
         self.model_name = model_name
 
+
+class RetroAppAuthenticationError(RetroAppBaseError):
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
+
+
 # TODO:HTTPステータスコードを含めたエラークラスを作ってもいいのでは。
