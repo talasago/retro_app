@@ -3,7 +3,7 @@ from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
 from ..schemas.token_schema import TokenPayload, TokenType
-from ..errors.retro_app_error import RetroAppValueError
+from ..errors.retro_app_error import RetroAppValueError, RetroAppAuthenticationError
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
@@ -66,9 +66,8 @@ class AuthService:
 
         user: 'UserModel' = self.__user_repo.find_by('email', value=email)
 
-        if not user.is_password_matching(plain_password=password):
-            # TODO:カスタムエラークラスにする
-            raise HTTPException(status_code=401, detail='パスワード不一致')
+        if not user.is_password_matching(plain_password=password):  # type: ignore
+            raise RetroAppAuthenticationError(message='パスワードが一致しません。')
         return user
 
     def generate_tokens(self, user_uuid: 'UUID') -> dict[str, str]:
