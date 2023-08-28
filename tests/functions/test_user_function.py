@@ -63,6 +63,7 @@ class TestUserFunction:
         # パスワードのバリデーションがすり抜けている気がする...
 
     class TestLogin:
+        # TODO:このクラス用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
         def test_login_200(self, add_user_api):
             user_data: dict = {
                 'email': 'testuser1@example.com',
@@ -89,6 +90,49 @@ class TestUserFunction:
             assert res_body['message'] == 'ログインしました'
             assert res_body['token_type'] == 'bearer'
             assert res_body['name'] == 'Test User'
+
+        class TestWhenNotExistEmail:
+            def test_401(self):
+                user_data: dict = {
+                    'username': 'APITestWhenNotExistEmail@example.com',
+                    'password': 'testpassword'
+                }
+
+                response = client.post('token',
+                                       headers={
+                                           'accept': 'application/json',
+                                           'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
+                                       data=user_data)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'メールアドレスまたはパスワードが間違っています。'
+                assert response.headers['WWW-Authenticate'] == 'Bearer'
+
+        class TestWhenUnmatchPassword:
+            def test_401(self, add_user_api):
+                user_data: dict = {
+                    'email': 'apiTestWhenUnmatchPassword@example.com',
+                    'name': 'apiTestWhenUnmatchPassword',
+                    'password': 'testpassword'
+                }
+                add_user_api(user_data)
+
+                user_data: dict = {
+                    'username': 'apiTestWhenUnmatchPassword@example.com',
+                    'password': 'hogehoge'
+                }
+
+                response = client.post('token',
+                                       headers={
+                                           'accept': 'application/json',
+                                           'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
+                                       data=user_data)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'メールアドレスまたはパスワードが間違っています。'
+                assert response.headers['WWW-Authenticate'] == 'Bearer'
 
     class TestLogout:
         def test_logout_200(self, db: 'Session', add_user_api, login_api):
