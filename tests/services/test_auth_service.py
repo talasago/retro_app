@@ -45,7 +45,8 @@ class TestAuthService():
             test_user: 'UserModel' = create_test_user(user_repo)
             tokens = auth_service.generate_tokens(test_user.uuid)
 
-            current_user: 'UserModel' = auth_service.get_current_user(tokens['access_token'])
+            current_user: 'UserModel' = auth_service.get_current_user(
+                tokens['access_token'])
 
             assert current_user.id == test_user.id
 
@@ -75,7 +76,8 @@ class TestAuthService():
         class TestWhenNotExistUserUUID:
             def test_raise_error(self, auth_service: AuthService, generate_test_token):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
-                access_token = generate_test_token(token_type=TokenType.access_token)
+                access_token = generate_test_token(
+                    token_type=TokenType.access_token)
 
                 with pytest.raises(RetroAppRecordNotFoundError) as e:
                     auth_service.get_current_user(token=access_token)
@@ -87,12 +89,22 @@ class TestAuthService():
         # リフレッシュトークンが存在しない
         class TestWhenValidParam:
             @pytest.mark.smoke
-            @pytest.mark.skip
-            def test_hoge(self, auth_service: AuthService, user_repo, generate_test_token):
+            def test_return_current_user(self, auth_service: AuthService,
+                                         user_repo, generate_test_token):
                 test_user: 'UserModel' = create_test_user(user_repo)
-                token = generate_test_token(token_type=TokenType.refresh_token,
-                                            user_uuid=test_user.uuid)
-                pass
+                refresh_token: str = generate_test_token(
+                    token_type=TokenType.refresh_token,
+                    user_uuid=test_user.uuid
+                )
+                test_user.refresh_token = refresh_token
+                user_repo.save(test_user)
+
+                current_user: 'UserModel' = auth_service.get_current_user_from_refresh_token(  # noqa: E501
+                    refresh_token=refresh_token
+                )
+
+                assert current_user.id == test_user.id
+                assert current_user.refresh_token == refresh_token
 
     class TestGenerateToken:
         # テスト観点
@@ -126,7 +138,8 @@ class TestAuthService():
                     'email': 'authenticate_user@example.com',
                     'password': 'qwsedfrtgyhujikolp;@:!234'
                 }
-                test_user: 'UserModel' = create_test_user(user_repo, **user_params)
+                test_user: 'UserModel' = create_test_user(
+                    user_repo, **user_params)
                 authenticated_user = auth_service.authenticate(**user_params)
 
                 assert authenticated_user == test_user
@@ -151,6 +164,7 @@ class TestAuthService():
                 test_user: 'UserModel' = create_test_user(user_repo)
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
-                    auth_service.authenticate(email=test_user.email, password='hoge')
+                    auth_service.authenticate(
+                        email=test_user.email, password='hoge')
 
                 assert str(e.value) == 'パスワードが一致しません。'
