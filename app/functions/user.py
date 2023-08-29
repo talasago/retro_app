@@ -76,7 +76,6 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
 
 
 # ログアウトのエンドポイント
-# TODO:非同期処理でも良いかもしれない
 # FIXME:response_model追加
 @app.post('/api/v1/logout')
 def logout(current_user: 'UserModel' = Depends(get_current_user),
