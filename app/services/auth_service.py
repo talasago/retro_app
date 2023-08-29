@@ -87,14 +87,14 @@ class AuthService:
         # uidにidを指定したら => ユーザー数がわかってしまう
 
         access_payload = TokenPayload(
-            token_type='access_token',
+            token_type=TokenType.access_token,
             exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             uid=str(user_uuid),
             jti=str(uuid4())
         )
 
         refresh_payload = TokenPayload(
-            token_type='refresh_token',
+            token_type=TokenType.refresh_token,
             exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             uid=str(user_uuid),
             jti=str(uuid4())
