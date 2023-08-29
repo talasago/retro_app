@@ -2,7 +2,3 @@
 
 # シングルクォーテーションのみを許可する設定
 inline-quotes = single
-
-# alembicのマイグレーションファイルは、文字が長くなりがちだが、そちらの方が見やすいため除外
-ignore = E501
-exclude = database/versions/*
