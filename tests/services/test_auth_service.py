@@ -23,9 +23,6 @@ def auth_service(db: 'Session') -> AuthService:
 
 class TestAuthService():
     class TestGetCurrentUser:
-        # テスト観点
-        # expect_token_typeとPayloadのtypeが一致しない
-        # uuidで検索してユーザーが存在しない
         def test_valid(self, auth_service: AuthService, user_repo):
             """access_tokenをデコードしたuuidがユーザーと一致した場合、そのユーザーを返す"""
             test_user: 'UserModel' = create_test_user(user_repo)
@@ -66,7 +63,7 @@ class TestAuthService():
                 assert str(e.value) == 'トークンタイプ不一致'
 
         class TestWhenNotExistUserUUID:
-            def test_raise_error(self, auth_service: AuthService, user_repo):
+            def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
                 access_payload = TokenPayload(
                     token_type='access_token',
@@ -104,9 +101,6 @@ class TestAuthService():
     class TestAuthenticate:
         # テスト観点
         # parameterがNoneの場合
-        # ユーザーが存在しない
-        # パスワードが一致しない
-        # どちらもフロントには同じエラー内容を返すこと。セキュリティのため。これはAPIのテストかな
         class TestWhenValidParam:
             def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
                 """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
