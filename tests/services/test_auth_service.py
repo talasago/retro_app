@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 from jose import jwt
 from datetime import datetime, timedelta
 from tests.test_helpers.create_test_user import create_test_user
-from app.schemas.token_schema import TokenPayload
+from app.schemas.token_schema import TokenPayload, TokenType
 from app.errors.retro_app_error import (RetroAppValueError,
                                         RetroAppRecordNotFoundError,
                                         RetroAppAuthenticationError)
@@ -23,6 +23,7 @@ def auth_service(db: 'Session') -> AuthService:
 
 class TestAuthService():
     class TestGetCurrentUser:
+        @pytest.mark.smoke
         def test_valid(self, auth_service: AuthService, user_repo):
             """access_tokenをデコードしたuuidがユーザーと一致した場合、そのユーザーを返す"""
             test_user: 'UserModel' = create_test_user(user_repo)
@@ -50,7 +51,7 @@ class TestAuthService():
                 test_user: 'UserModel' = create_test_user(user_repo)
 
                 access_payload = TokenPayload(
-                    token_type='refresh_token',
+                    token_type=TokenType.refresh_token,
                     exp=datetime.utcnow() + timedelta(minutes=100),
                     uid=str(test_user.uuid),
                     jti=str(uuid4())
@@ -66,7 +67,7 @@ class TestAuthService():
             def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
                 access_payload = TokenPayload(
-                    token_type='access_token',
+                    token_type=TokenType.access_token,
                     exp=datetime.utcnow() + timedelta(minutes=100),
                     uid=str(uuid4()),
                     jti=str(uuid4())
@@ -81,6 +82,7 @@ class TestAuthService():
     class TestGenerateToken:
         # テスト観点
         # encodeが失敗したとき(?)
+        @pytest.mark.smoke
         def test_valid(self, auth_service: AuthService):
             """uuidが有効な値の場合、access_tokenとrefresh_tokenを返す"""
             test_uuid: UUID = UUID('a49b19ec-ed16-4416-81ea-b6a9d029baef')
@@ -102,6 +104,7 @@ class TestAuthService():
         # テスト観点
         # parameterがNoneの場合
         class TestWhenValidParam:
+            @pytest.mark.smoke
             def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
                 """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
                 user_params = {
