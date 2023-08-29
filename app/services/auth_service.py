@@ -44,8 +44,11 @@ class AuthService:
             raise RetroAppValueError('トークンタイプ不一致')
 
         # DBからユーザーを取得
-        user = self.__user_repo.find_by('uuid', payload.uid)
-        # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
+        try:
+            # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
+            user = self.__user_repo.find_by('uuid', payload.uid)
+        except RetroAppRecordNotFoundError as e:
+            raise e
 
         return user
 
