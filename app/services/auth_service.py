@@ -55,9 +55,11 @@ class AuthService:
     def get_current_user_from_refresh_token(self, refresh_token: str) -> 'UserModel':
         """refresh_tokenからユーザーを取得"""
 
-        # TODO:ユーザーが0件だった時の考慮が必要。
-        user: 'UserModel' = self.get_current_user(
-            token=refresh_token, expect_token_type='refresh_token')
+        try:
+            user: 'UserModel' = self.get_current_user(
+                token=refresh_token, expect_token_type='refresh_token')
+        except RetroAppRecordNotFoundError as e:
+            raise e
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
