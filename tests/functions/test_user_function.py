@@ -10,6 +10,7 @@ from tests.test_helpers.token import generate_test_token
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
+    from httpx import Response
 
 
 client = TestClient(app)
@@ -39,6 +40,19 @@ def login_api():
         res_body = response.json()
         return res_body['access_token'], res_body['refresh_token']
 
+    return _method
+
+
+@pytest.fixture(scope='session')
+def refresh_token_api():
+    def _method(refresh_token: str) -> 'Response':
+        response: 'Response' = client.post(
+            '/refresh_token',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {refresh_token}'},
+        )
+        return response
     return _method
 
 
@@ -195,7 +209,8 @@ class TestUserFunction:
     # リフレッシュトークンが異常な値の時
 
     class TestRefreshToken:
-        def test_refresh_token_200(self, add_user_api, login_api):
+        def test_refresh_token_200(self, add_user_api, login_api,
+                                   refresh_token_api):
             user_data: dict = {
                 'email': 'testrefresh_token@example.com',
                 'name': 'Test Userrefresh_token',
@@ -209,12 +224,7 @@ class TestUserFunction:
             }
             access_token, refresh_token = login_api(login_param)
 
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token}'},
-            )
+            response = refresh_token_api(refresh_token)
 
             # トークンが再発行されていること
             res_body = response.json()
@@ -223,7 +233,8 @@ class TestUserFunction:
             assert res_body['refresh_token'] != refresh_token
 
         # TODO:メソッド名変更
-        def test_refresh_token_invalid_param(self, add_user_api, login_api):
+        def test_refresh_token_invalid_param(self, add_user_api, login_api,
+                                             refresh_token_api):
             """新しくリフレッシュトークンが発行されたら、
             それより前に発行されたリフレッシュトークンは無効になること"""
             user_data: dict = {
@@ -240,43 +251,24 @@ class TestUserFunction:
             _, refresh_token_1st = login_api(login_param)
 
             # リフレッシュトークンAPI実行1回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_1st}'},
-            )
+            response = refresh_token_api(refresh_token_1st)
             refresh_token_2nd = response.json()['refresh_token']
             assert response.status_code == 200
             assert refresh_token_2nd != refresh_token_1st
 
             # リフレッシュトークンAPI実行2回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_1st}'},
-            )
+            response = response = refresh_token_api(refresh_token_1st)
             assert response.status_code == 401
 
             # リフレッシュトークンAPI実行3回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_2nd}'},
-            )
+            response = response = refresh_token_api(refresh_token_2nd)
             assert response.status_code == 200
 
         class WhenNotExistUser:
-            def test_401(self):
-                refresh_token: str = generate_test_token(TokenType.refresh_token)
-                response = client.post(
-                    '/refresh_token',
-                    headers={
-                        'accept': 'application/json',
-                        'Authorization': f'Bearer {refresh_token}'},
-                )
+            def test_401(self, refresh_token_api):
+                refresh_token: str = \
+                    generate_test_token(TokenType.refresh_token)
+                response = response = refresh_token_api(refresh_token)
 
                 assert response.status_code == 401
                 assert response.json() == {
