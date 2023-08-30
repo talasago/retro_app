@@ -1,10 +1,8 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.functions.user import app
-from jose import jwt
-from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
-from app.schemas.token_schema import TokenPayload, TokenType
+from app.schemas.token_schema import TokenType
 from app.models.user_model import UserModel
 from sqlalchemy import select
 from tests.test_helpers.token import generate_test_token
@@ -168,21 +166,13 @@ class TestUserFunction:
             assert user.refresh_token is None
 
         def test_logout_invalid_token(self):
-            payload = TokenPayload(
-                token_type='dummy',
-                exp=datetime.utcnow() + timedelta(days=1),
-                uid='dummy',
-                jti='dummy'
-            )
-            # FIXME:SECRET_KEYを環境変数化
-            access_token = jwt.encode(claims=payload.model_dump(),
-                                      key='secret_key', algorithm='HS256')
+            token: str = generate_test_token('dummy', 'dummy')
 
             response = client.post(
                 '/api/v1/logout',
                 headers={
                     'accept': 'application/json',
-                    'Authorization': f'Bearer {access_token}'},
+                    'Authorization': f'Bearer {token}'},
             )
             res_body = response.json()
             assert response.status_code == 401
