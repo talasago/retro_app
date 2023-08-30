@@ -1,11 +1,10 @@
 import pytest
 from app.repository.user_repository import UserRepository
 from app.services.auth_service import AuthService
-from uuid import UUID, uuid4
-from jose import jwt
-from datetime import datetime, timedelta
+from uuid import UUID
 from tests.test_helpers.create_test_user import create_test_user
-from app.schemas.token_schema import TokenPayload, TokenType
+from tests.test_helpers.token import generate_test_token
+from app.schemas.token_schema import TokenType
 from app.errors.retro_app_error import (RetroAppValueError,
                                         RetroAppRecordNotFoundError,
                                         RetroAppAuthenticationError)
@@ -19,22 +18,6 @@ if TYPE_CHECKING:
 @pytest.fixture()
 def auth_service(db: 'Session') -> AuthService:
     return AuthService(UserRepository(db))
-
-
-@pytest.fixture(scope='session')
-def generate_test_token():
-    def _method(token_type: TokenType, user_uuid=uuid4()) -> str:
-        tpken_payload = TokenPayload(
-            token_type=token_type,
-            exp=datetime.utcnow() + timedelta(minutes=100),
-            uid=str(user_uuid),
-            jti=str(uuid4())
-        )
-        token: str = jwt.encode(claims=tpken_payload.model_dump(),
-                                key='secret_key', algorithm='HS256')
-
-        return token
-    return _method
 
 
 class TestAuthService():
@@ -63,7 +46,7 @@ class TestAuthService():
                 assert str(e.value) == 'Invalid expect_token_type: hoge'
 
         class TestWhenInvalidTokenInPayloadToken:
-            def test_raise_error(self, auth_service: AuthService, user_repo, generate_test_token):
+            def test_raise_error(self, auth_service: AuthService, user_repo):
                 """デコードしたペイロードのTokenTypeとexpect_token_typeが一致していない場合、例外を返す"""
                 test_user: 'UserModel' = create_test_user(user_repo)
                 refresh_token = generate_test_token(token_type=TokenType.refresh_token,
@@ -74,7 +57,7 @@ class TestAuthService():
                 assert str(e.value) == 'トークンタイプ不一致'
 
         class TestWhenNotExistUserUUID:
-            def test_raise_error(self, auth_service: AuthService, generate_test_token):
+            def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
                 access_token = generate_test_token(
                     token_type=TokenType.access_token)
@@ -91,7 +74,7 @@ class TestAuthService():
         class TestWhenValidParam:
             @pytest.mark.smoke
             def test_return_current_user(self, auth_service: AuthService,
-                                         user_repo, generate_test_token):
+                                         user_repo):
                 test_user: 'UserModel' = create_test_user(user_repo)
                 refresh_token: str = generate_test_token(
                     token_type=TokenType.refresh_token,
@@ -108,8 +91,7 @@ class TestAuthService():
                 assert current_user.refresh_token == refresh_token
 
         class TestWhenNotExistUserUUID:
-            def test_raise_exception(self, auth_service: AuthService,
-                                     generate_test_token):
+            def test_raise_exception(self, auth_service: AuthService):
                 refresh_token = generate_test_token(
                     token_type=TokenType.refresh_token)
 
