@@ -4,9 +4,10 @@ from app.functions.user import app
 from jose import jwt
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
-from app.schemas.token_schema import TokenPayload
+from app.schemas.token_schema import TokenPayload, TokenType
 from app.models.user_model import UserModel
 from sqlalchemy import select
+from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
@@ -276,3 +277,19 @@ class TestUserFunction:
                     'Authorization': f'Bearer {refresh_token_2nd}'},
             )
             assert response.status_code == 200
+
+        class WhenNotExistUser:
+            def test_401(self):
+                refresh_token: str = generate_test_token(TokenType.refresh_token)
+                response = client.post(
+                    '/refresh_token',
+                    headers={
+                        'accept': 'application/json',
+                        'Authorization': f'Bearer {refresh_token}'},
+                )
+
+                assert response.status_code == 401
+                assert response.json() == {
+                    'detail': '再度ログインしてください。',
+                    'WWW-Authenticate': 'Bearer'
+                }

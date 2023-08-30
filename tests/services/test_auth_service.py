@@ -87,6 +87,7 @@ class TestAuthService():
         # テスト観点
         # ユーザーが存在しない
         # リフレッシュトークンが存在しない
+        # アクセストークンを渡している(やるならAPIのテストかな)
         class TestWhenValidParam:
             @pytest.mark.smoke
             def test_return_current_user(self, auth_service: AuthService,
@@ -105,6 +106,17 @@ class TestAuthService():
 
                 assert current_user.id == test_user.id
                 assert current_user.refresh_token == refresh_token
+
+        class TestWhenNotExistUserUUID:
+            def test_raise_exception(self, auth_service: AuthService,
+                                     generate_test_token):
+                refresh_token = generate_test_token(
+                    token_type=TokenType.refresh_token)
+
+                with pytest.raises(RetroAppRecordNotFoundError) as e:
+                    auth_service.get_current_user_from_refresh_token(
+                        refresh_token=refresh_token)
+                assert str(e.value) == '条件に合致するレコードは存在しません。'
 
     class TestGenerateToken:
         # テスト観点

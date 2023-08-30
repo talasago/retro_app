@@ -64,8 +64,14 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
 def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
                   token: str = Depends(oauth2_scheme)):
     """リフレッシュトークンでトークンを再取得"""
-    current_user: 'UserModel' = \
-        auth_service.get_current_user_from_refresh_token(refresh_token=token)
+    try:
+        current_user: 'UserModel' = \
+            auth_service.get_current_user_from_refresh_token(refresh_token=token)  # noqa: E501
+    except RetroAppRecordNotFoundError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='再度ログインしてください。',
+                            headers={'WWW-Authenticate': 'Bearer'})
+
     tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
     auth_service.save_refresh_token(current_user, tokens['refresh_token'])
 
