@@ -6,11 +6,12 @@ from app.schemas.token_schema import TokenType
 from app.models.user_model import UserModel
 from sqlalchemy import select
 from tests.test_helpers.token import generate_test_token
+from httpx import Response
+
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
-    from httpx import Response
 
 
 client = TestClient(app)
@@ -28,15 +29,19 @@ def add_user_api():
 # TODO:function用のhelperに移動する
 @pytest.fixture
 def login_api():
-    def _method(login_param: dict) -> tuple:
-        response = client.post(
+    def _method(login_param: dict,
+                is_return_response=False) -> Response | tuple:
+        response: 'Response' = client.post(
             '/token',
             headers={
                 'accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded'},
             data=login_param
         )
-        assert response.status_code == 200
+
+        if is_return_response:
+            return response
+
         res_body = response.json()
         return res_body['access_token'], res_body['refresh_token']
 
@@ -77,7 +82,7 @@ class TestUserFunction:
 
     class TestLogin:
         # TODO:このクラス用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
-        def test_login_200(self, add_user_api):
+        def test_login_200(self, add_user_api, login_api):
             user_data: dict = {
                 'email': 'testuser1@example.com',
                 'name': 'Test User1',
@@ -89,12 +94,7 @@ class TestUserFunction:
                 'username': 'testuser@example.com',
                 'password': 'testpassword'
             }
-
-            response = client.post('token',
-                                   headers={
-                                       'accept': 'application/json',
-                                       'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
-                                   data=user_data)
+            response = login_api(user_data, True)
 
             res_body = response.json()
             assert response.status_code == 200
@@ -105,17 +105,12 @@ class TestUserFunction:
             assert res_body['name'] == 'Test User'
 
         class TestWhenNotExistEmail:
-            def test_401(self):
+            def test_401(self, login_api):
                 user_data: dict = {
                     'username': 'APITestWhenNotExistEmail@example.com',
                     'password': 'testpassword'
                 }
-
-                response = client.post('token',
-                                       headers={
-                                           'accept': 'application/json',
-                                           'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
-                                       data=user_data)
+                response = login_api(user_data, True)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -123,7 +118,7 @@ class TestUserFunction:
                 assert response.headers['WWW-Authenticate'] == 'Bearer'
 
         class TestWhenUnmatchPassword:
-            def test_401(self, add_user_api):
+            def test_401(self, add_user_api, login_api):
                 user_data: dict = {
                     'email': 'apiTestWhenUnmatchPassword@example.com',
                     'name': 'apiTestWhenUnmatchPassword',
@@ -135,12 +130,7 @@ class TestUserFunction:
                     'username': 'apiTestWhenUnmatchPassword@example.com',
                     'password': 'hogehoge'
                 }
-
-                response = client.post('token',
-                                       headers={
-                                           'accept': 'application/json',
-                                           'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
-                                       data=user_data)
+                response = login_api(user_data, True)
 
                 res_body = response.json()
                 assert response.status_code == 401
