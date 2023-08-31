@@ -40,7 +40,7 @@ class AuthService:
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
 
         if payload.token_type != expect_token_type:
-            raise RetroAppValueError('トークンタイプ不一致')
+            raise RetroAppAuthenticationError('トークンタイプ不一致')
 
         # DBからユーザーを取得
         try:
@@ -57,7 +57,8 @@ class AuthService:
         try:
             user: 'UserModel' = self.get_current_user(
                 token=refresh_token, expect_token_type='refresh_token')
-        except RetroAppRecordNotFoundError as e:
+        except (RetroAppRecordNotFoundError,
+                RetroAppAuthenticationError) as e:
             raise e
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
