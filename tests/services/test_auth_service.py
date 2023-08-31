@@ -68,8 +68,9 @@ class TestAuthService():
 
     class TestGetCurrentUserFromRefreshToken:
         # テスト観点
-        # ユーザーが存在しない
-        # リフレッシュトークンが存在しない
+        # リフレッシュトークンがNone(引数の方)
+        # トークンタイプ不一致
+        # usersのリフレッシュトークンがNoneと引数でNoneが一致しても、エラーとなること
         # アクセストークンを渡している(やるならAPIのテストかな)
         class TestWhenValidParam:
             @pytest.mark.smoke
@@ -99,6 +100,22 @@ class TestAuthService():
                     auth_service.get_current_user_from_refresh_token(
                         refresh_token=refresh_token)
                 assert str(e.value) == '条件に合致するレコードは存在しません。'
+
+        class TestWhenUnmatchRefreshToken:
+            def test_raise_exception(self, auth_service: AuthService,
+                                     user_repo):
+                """渡したRefreshTokenとUsersテーブルのRefreshTokenが一致しない場合、エラーを返す"""
+                test_user: 'UserModel' = create_test_user(user_repo)
+                refresh_token: str = generate_test_token(
+                    token_type=TokenType.refresh_token,
+                    user_uuid=test_user.uuid
+                )
+
+                assert test_user.refresh_token is None
+                with pytest.raises(RetroAppAuthenticationError) as e:
+                    auth_service.get_current_user_from_refresh_token(
+                        refresh_token=refresh_token)
+                assert str(e.value) == 'TokenTypeが一致しません。'
 
     class TestGenerateToken:
         # テスト観点

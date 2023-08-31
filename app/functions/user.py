@@ -71,6 +71,10 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail='再度ログインしてください。',
                             headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppAuthenticationError as e:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str(e.message),
+                            headers={'WWW-Authenticate': 'Bearer'})
 
     tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
     auth_service.save_refresh_token(current_user, tokens['refresh_token'])
