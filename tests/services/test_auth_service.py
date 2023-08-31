@@ -52,7 +52,7 @@ class TestAuthService():
                 refresh_token = generate_test_token(token_type=TokenType.refresh_token,
                                                     user_uuid=test_user.uuid)
 
-                with pytest.raises(RetroAppValueError) as e:
+                with pytest.raises(RetroAppAuthenticationError) as e:
                     auth_service.get_current_user(token=refresh_token)
                 assert str(e.value) == 'トークンタイプ不一致'
 
@@ -116,6 +116,19 @@ class TestAuthService():
                     auth_service.get_current_user_from_refresh_token(
                         refresh_token=refresh_token)
                 assert str(e.value) == 'TokenTypeが一致しません。'
+
+        class TestWhenAcessTokenInParameter:
+            def test_raise_exception(self, auth_service: AuthService,
+                                     user_repo):
+                """AccessTokenを渡した場合はエラーになる"""
+                test_user: 'UserModel' = create_test_user(user_repo)
+                tokens = auth_service.generate_tokens(test_user.uuid)
+
+                with pytest.raises(RetroAppAuthenticationError) as e:
+                    auth_service.get_current_user_from_refresh_token(
+                        tokens['access_token'])
+                assert str(e.value) == 'トークンタイプ不一致'
+
 
     class TestGenerateToken:
         # テスト観点

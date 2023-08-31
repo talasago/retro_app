@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordBearer
 from ..database import SessionLocal
 from ..repository.user_repository import UserRepository
 from ..services.auth_service import AuthService
-from ..errors.retro_app_error import RetroAppValueError
+from ..errors.retro_app_error import RetroAppAuthenticationError
 
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
@@ -38,7 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme),
                      Depends(get_auth_service)) -> 'UserModel':
     try:
         user = auth_service.get_current_user(token)
-    except RetroAppValueError as e:
+    except RetroAppAuthenticationError as e:
         raise HTTPException(status_code=401, detail=str(e.message))
 
     return user
