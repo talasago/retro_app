@@ -170,7 +170,7 @@ class TestUserFunction:
             assert user.refresh_token is None
 
         def test_logout_invalid_token(self):
-            token: str = generate_test_token('dummy', 'dummy')
+            token: str = generate_test_token('dummy', 'dummy')  # type: ignore
 
             response = client.post(
                 '/api/v1/logout',
@@ -180,7 +180,7 @@ class TestUserFunction:
             )
             res_body = response.json()
             assert response.status_code == 401
-            assert res_body['detail'] == 'トークンタイプ不一致'
+            assert res_body['detail'] == 'Tokenが間違っています。'
 
     # ログアウトのテスト観点
     # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)

@@ -54,7 +54,7 @@ class TestAuthService():
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
                     auth_service.get_current_user(token=refresh_token)
-                assert str(e.value) == 'トークンタイプ不一致'
+                assert str(e.value) == 'TokenTypeが一致しません。'
 
         class TestWhenNotExistUserUUID:
             def test_raise_error(self, auth_service: AuthService):
@@ -115,7 +115,7 @@ class TestAuthService():
                 with pytest.raises(RetroAppAuthenticationError) as e:
                     auth_service.get_current_user_from_refresh_token(
                         refresh_token=refresh_token)
-                assert str(e.value) == 'TokenTypeが一致しません。'
+                assert str(e.value) == 'リフレッシュトークンが間違っています。'
 
         class TestWhenAcessTokenInParameter:
             def test_raise_exception(self, auth_service: AuthService,
@@ -127,8 +127,7 @@ class TestAuthService():
                 with pytest.raises(RetroAppAuthenticationError) as e:
                     auth_service.get_current_user_from_refresh_token(
                         tokens['access_token'])
-                assert str(e.value) == 'トークンタイプ不一致'
-
+                assert str(e.value) == 'TokenTypeが一致しません。'
 
     class TestGenerateToken:
         # テスト観点
