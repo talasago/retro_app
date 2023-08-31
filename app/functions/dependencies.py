@@ -38,7 +38,7 @@ def get_current_user(token: str = Depends(oauth2_scheme),
                      Depends(get_auth_service)) -> 'UserModel':
     try:
         user = auth_service.get_current_user(token)
-    except RetroAppAuthenticationError as e:
-        raise HTTPException(status_code=401, detail=str(e.message))
+    except RetroAppAuthenticationError:
+        raise HTTPException(status_code=401, detail=str('Tokenが間違っています。'))
 
     return user

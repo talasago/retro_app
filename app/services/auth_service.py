@@ -40,7 +40,7 @@ class AuthService:
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
 
         if payload.token_type != expect_token_type:
-            raise RetroAppAuthenticationError('トークンタイプ不一致')
+            raise RetroAppAuthenticationError('TokenTypeが一致しません。')
 
         # DBからユーザーを取得
         try:
@@ -63,7 +63,7 @@ class AuthService:
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
-            raise RetroAppAuthenticationError(message='TokenTypeが一致しません。')
+            raise RetroAppAuthenticationError(message='リフレッシュトークンが間違っています。')
         return user
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
