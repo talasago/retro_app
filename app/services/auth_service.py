@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
@@ -63,8 +62,7 @@ class AuthService:
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
-            # TODO:カスタムエラークラスにする
-            raise HTTPException(status_code=401, detail='リフレッシュトークン不一致')
+            raise RetroAppAuthenticationError(message='TokenTypeが一致しません。')
         return user
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
