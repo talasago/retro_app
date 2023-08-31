@@ -135,8 +135,6 @@ class TestAuthService():
                 assert str(e.value) == 'refresh_token must be other than None'
 
     class TestGenerateToken:
-        # テスト観点
-        # encodeが失敗したとき(?)
         @pytest.mark.smoke
         def test_valid(self, auth_service: AuthService):
             """uuidが有効な値の場合、access_tokenとrefresh_tokenを返す"""
