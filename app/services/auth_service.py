@@ -36,8 +36,9 @@ class AuthService:
             raise ValueError(f'Invalid expect_token_type: {expect_token_type}')
 
         # トークンをデコードしてペイロードを取得
-        # TODO:例外処理
-        payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
+        decoded_token: dict = jwt.decode(token, SECRET_KEY,
+                                         algorithms=ALGORITHM)
+        payload: TokenPayload = TokenPayload(**decoded_token)
 
         if payload.token_type != expect_token_type:
             raise RetroAppAuthenticationError('TokenTypeが一致しません。')

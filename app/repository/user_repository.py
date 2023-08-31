@@ -24,6 +24,9 @@ class UserRepository:
             # FIXME:repository毎にcommit持たせるのはまずい。
             # ので、他Repositoryを作るタイミングでトランザクション管理は要検討。
             # userがコミットOKでも別テーブルのコミットがNGだったらロールバックできない。
+
+            # TODO:その他のエラーの場合のエラーハンドリング。
+            # 5xxを返したいね。
             self.__db.commit()
         except IntegrityError as e:
             self.__db.rollback()
@@ -49,7 +52,6 @@ class UserRepository:
         # FIXME:現状複数条件に対応できていない。今後対応するなら、引数はdictの方が良さそう。
         # NOTE:コストがかかるので、インデックスが無いの列は検索を不許可とする
         if column not in UserModel.INDEXED_COLUMNS:
-            # TODO: カスタムエラークラス
             raise ValueError('Invalid column for search')
 
         stmt = select(UserModel).where(getattr(UserModel, column) == value)
