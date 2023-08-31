@@ -67,11 +67,6 @@ class TestAuthService():
                 assert str(e.value) == '条件に合致するレコードは存在しません。'
 
     class TestGetCurrentUserFromRefreshToken:
-        # テスト観点
-        # リフレッシュトークンがNone(引数の方)
-        # トークンタイプ不一致
-        # usersのリフレッシュトークンがNoneと引数でNoneが一致しても、エラーとなること
-        # アクセストークンを渡している(やるならAPIのテストかな)
         class TestWhenValidParam:
             @pytest.mark.smoke
             def test_return_current_user(self, auth_service: AuthService,
@@ -128,6 +123,16 @@ class TestAuthService():
                     auth_service.get_current_user_from_refresh_token(
                         tokens['access_token'])
                 assert str(e.value) == 'TokenTypeが一致しません。'
+
+        class TestWhenParamIsNone:
+            def test_raise_exception(self, auth_service: AuthService):
+                """引数がNoneの場合エラーとなる"""
+
+                with pytest.raises(TypeError) as e:
+                    auth_service.get_current_user_from_refresh_token(
+                        refresh_token=None  # type: ignore
+                    )
+                assert str(e.value) == 'refresh_token must be other than None'
 
     class TestGenerateToken:
         # テスト観点
