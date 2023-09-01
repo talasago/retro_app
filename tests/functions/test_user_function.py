@@ -199,6 +199,7 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert res_body['detail'] == 'Tokenが間違っています。'
+                assert response.headers['www-authenticate'] == 'Bearer'
 
     # ログアウトのテスト観点
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
