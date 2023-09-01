@@ -39,6 +39,8 @@ def get_current_user(token: str = Depends(oauth2_scheme),
     try:
         user = auth_service.get_current_user(token)
     except RetroAppAuthenticationError:
-        raise HTTPException(status_code=401, detail=str('Tokenが間違っています。'))
+        raise HTTPException(status_code=401,
+                            detail=str('Tokenが間違っています。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
 
     return user
