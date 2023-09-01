@@ -271,15 +271,13 @@ class TestUserFunction:
             response = response = refresh_token_api(refresh_token_2nd)
             assert response.status_code == 200
 
-        # これテストできてない
-        class WhenNotExistUser:
+        class TestWhenNotExistUser:
             def test_401(self, refresh_token_api):
                 refresh_token: str = \
                     generate_test_token(TokenType.refresh_token)
+
                 response = response = refresh_token_api(refresh_token)
 
                 assert response.status_code == 401
-                assert response.json() == {
-                    'detail': '再度ログインしてください。',
-                    'WWW-Authenticate': 'Bearer'
-                }
+                assert response.json() == {'detail': '再度ログインしてください。'}
+                assert response.headers['www-authenticate'] == 'Bearer'
