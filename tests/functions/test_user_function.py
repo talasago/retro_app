@@ -61,6 +61,19 @@ def refresh_token_api():
     return _method
 
 
+@pytest.fixture(scope='session')
+def logout_api():
+    def _method(access_token: str) -> 'Response':
+        response = client.post(
+            '/api/v1/logout',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'},
+        )
+        return response
+    return _method
+
+
 @pytest.mark.usefixtures('db')
 class TestUserFunction:
     def test_register_user(self):
@@ -138,55 +151,51 @@ class TestUserFunction:
                 assert response.headers['WWW-Authenticate'] == 'Bearer'
 
     class TestLogout:
-        def test_logout_200(self, db: 'Session', add_user_api, login_api):
-            user_data: dict = {
-                'email': 'testuserlogout@example.com',
-                'name': 'Test Userlogout',
-                'password': 'testpassword'
-            }
-            add_user_api(user_data)
+        class TestWhenValidParam:
+            def test_return_200(self, db: 'Session', add_user_api, login_api, logout_api):
+                user_data: dict = {
+                    'email': 'testuserlogout@example.com',
+                    'name': 'Test Userlogout',
+                    'password': 'testpassword'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            access_token, _ = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                access_token, _ = login_api(login_param)
 
-            response = client.post(
-                '/api/v1/logout',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {access_token}'},
-            )
-            assert response.status_code == 200
-            assert response.json() == {
-                'message': 'ログアウトしました'
-            }
+                response = logout_api(access_token)
+                assert response.status_code == 200
+                assert response.json() == {
+                    'message': 'ログアウトしました'
+                }
 
-            user: UserModel = db.execute(
-                select(UserModel).where(UserModel.email == user_data['email'])
-            ).scalars().first()
-            assert user  # Noneではないことの確認
-            assert user.refresh_token is None
+                stmt = select(UserModel).where(
+                    UserModel.email == user_data['email'])
+                user: UserModel = db.execute(stmt).scalars().first()
+                assert user  # Noneではないことの確認
+                assert user.refresh_token is None
 
-        def test_logout_invalid_token(self):
-            token: str = generate_test_token('dummy', 'dummy')  # type: ignore
+        class TestWhenInvalidToken:
+            def test_return_401(self, logout_api):
+                """access_tokenが無効な値の場合、401を返すこと"""
+                token: str = generate_test_token('dummy', 'dummy')  # type: ignore
 
-            response = client.post(
-                '/api/v1/logout',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {token}'},
-            )
-            res_body = response.json()
-            assert response.status_code == 401
-            assert res_body['detail'] == 'Tokenが間違っています。'
+                response = logout_api(token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
 
     # ログアウトのテスト観点
-    # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
     # ・ログイン状態で実施すると、処理が成功すること
-    #     内部的にはトークンを無効化する。revoke_token
+    #     内部的にはリフレッシュトークンを無効化(更新)する。
+    #  　・無効化したリフレッシュトークンでアクセスすると、エラーとなること
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
+    #   ・ログインしていない状態でアクセスするのと同義
+    #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
 
     # TODO:アクセストークンのテストが必要
     # - 10分後にアクセスするとエラーとなること
