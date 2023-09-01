@@ -154,8 +154,6 @@ class TestAuthService():
                 assert str(e.value) == 'user_uuid must be other than None'
 
     class TestAuthenticate:
-        # テスト観点
-        # parameterがNoneの場合
         class TestWhenValidParam:
             @pytest.mark.smoke
             def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
@@ -194,3 +192,24 @@ class TestAuthService():
                         email=test_user.email, password='hoge')
 
                 assert str(e.value) == 'パスワードが一致しません。'
+
+        class TestWhenParamIsNone:
+            def test_raise_exeption(self, auth_service: AuthService):
+                """email、passwordどちらがNondでもエラーとする"""
+                # あまり重要度が高い処理ではないので、1test1assertとはしない
+
+                with pytest.raises(TypeError) as e:
+                    auth_service.authenticate(
+                        email=None, password=None)  # type: ignore
+                assert str(e.value) == 'email and password must be other than None'  # noqa: E501
+
+                with pytest.raises(TypeError) as e:
+                    auth_service.authenticate(
+                        email='hoge', password=None)  # type: ignore
+                assert str(e.value) == 'email and password must be other than None'  # noqa: E501
+
+                with pytest.raises(TypeError) as e:
+                    auth_service.authenticate(
+                        email=None, password='hoge')  # type: ignore
+
+                assert str(e.value) == 'email and password must be other than None'  # noqa: E501
