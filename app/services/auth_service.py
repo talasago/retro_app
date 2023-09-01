@@ -73,6 +73,8 @@ class AuthService:
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
     def authenticate(self, email: str, password: str) -> 'UserModel':
         """認証(emailとpasswordが一致するかどうか)し、認証できたuserを返す"""
+        if email is None or password is None:
+            raise TypeError('email and password must be other than None')
 
         try:
             user: 'UserModel' = self.__user_repo.find_by('email', value=email)
