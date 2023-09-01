@@ -195,7 +195,8 @@ class TestUserFunction:
         class TestWhenInvalidToken:
             def test_return_401(self, logout_api):
                 """access_tokenが無効な値の場合、401を返すこと"""
-                token: str = generate_test_token('dummy', 'dummy')  # type: ignore
+                token: str = generate_test_token(
+                    'dummy', 'dummy')  # type: ignore
 
                 response = logout_api(token)
 
@@ -220,63 +221,65 @@ class TestUserFunction:
     # リフレッシュトークンが異常な値の時
 
     class TestRefreshToken:
-        def test_refresh_token_200(self, add_user_api, login_api,
-                                   refresh_token_api):
-            user_data: dict = {
-                'email': 'testrefresh_token@example.com',
-                'name': 'Test Userrefresh_token',
-                'password': 'QG+UJxEdf,T5'
-            }
-            add_user_api(user_data)
+        class TestWhenValidParam:
+            def test_return_200(self, add_user_api, login_api,
+                                refresh_token_api):
+                user_data: dict = {
+                    'email': 'testrefresh_token@example.com',
+                    'name': 'Test Userrefresh_token',
+                    'password': 'QG+UJxEdf,T5'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            access_token, refresh_token = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                access_token, refresh_token = login_api(login_param)
 
-            response = refresh_token_api(refresh_token)
+                response = refresh_token_api(refresh_token)
 
-            # トークンが再発行されていること
-            res_body = response.json()
-            assert response.status_code == 200
-            assert res_body['access_token'] != access_token
-            assert res_body['refresh_token'] != refresh_token
+                # トークンが再発行されていること
+                res_body = response.json()
+                assert response.status_code == 200
+                assert res_body['access_token'] != access_token
+                assert res_body['refresh_token'] != refresh_token
 
-        # TODO:メソッド名変更
-        def test_refresh_token_invalid_param(self, add_user_api, login_api,
-                                             refresh_token_api):
-            """新しくリフレッシュトークンが発行されたら、
-            それより前に発行されたリフレッシュトークンは無効になること"""
-            user_data: dict = {
-                'email': 'testrefresh_token_invalid_param@example.com',
-                'name': 'Test testrefresh_token_invalid_param',
-                'password': 'QG+UJxEdf,T5'
-            }
-            add_user_api(user_data)
+        class TestWhenCreateNewRefreshToken:
+            def test_previous_refresh_token_is_disable(
+                    self, add_user_api, login_api, refresh_token_api):
+                """新しくリフレッシュトークンが発行されたら、
+                それより前に発行されたリフレッシュトークンは無効になること"""
+                user_data: dict = {
+                    'email': 'testrefresh_token_invalid_param@example.com',
+                    'name': 'Test testrefresh_token_invalid_param',
+                    'password': 'QG+UJxEdf,T5'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            _, refresh_token_1st = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                _, refresh_token_1st = login_api(login_param)
 
-            # リフレッシュトークンAPI実行1回目
-            response = refresh_token_api(refresh_token_1st)
-            refresh_token_2nd = response.json()['refresh_token']
-            assert response.status_code == 200
-            assert refresh_token_2nd != refresh_token_1st
+                # リフレッシュトークンAPI実行1回目
+                response = refresh_token_api(refresh_token_1st)
+                refresh_token_2nd = response.json()['refresh_token']
+                assert response.status_code == 200
+                assert refresh_token_2nd != refresh_token_1st
 
-            # リフレッシュトークンAPI実行2回目
-            response = response = refresh_token_api(refresh_token_1st)
-            assert response.status_code == 401
+                # リフレッシュトークンAPI実行2回目
+                response = response = refresh_token_api(refresh_token_1st)
+                assert response.status_code == 401
 
-            # リフレッシュトークンAPI実行3回目
-            response = response = refresh_token_api(refresh_token_2nd)
-            assert response.status_code == 200
+                # リフレッシュトークンAPI実行3回目
+                response = response = refresh_token_api(refresh_token_2nd)
+                assert response.status_code == 200
 
         class TestWhenNotExistUser:
-            def test_401(self, refresh_token_api):
+            def test_return_401(self, refresh_token_api):
+                """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
                 refresh_token: str = \
                     generate_test_token(TokenType.refresh_token)
 
