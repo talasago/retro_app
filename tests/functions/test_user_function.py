@@ -152,7 +152,13 @@ class TestUserFunction:
 
     class TestLogout:
         class TestWhenValidParam:
-            def test_return_200(self, db: 'Session', add_user_api, login_api, logout_api):
+            def test_logout_api_return_200_and_refresh_token_return_error(
+                    self, db: 'Session', add_user_api, login_api, logout_api,
+                    refresh_token_api):
+                """
+                有効なアクセストークンを渡すと、ログアウトが成功し、リフレッシュトークンがNullに更新されること。
+                その状態で/refresh_tokenにアクセスするとエラーとなること
+                """
                 user_data: dict = {
                     'email': 'testuserlogout@example.com',
                     'name': 'Test Userlogout',
@@ -164,11 +170,11 @@ class TestUserFunction:
                     'username': user_data['email'],
                     'password': user_data['password'],
                 }
-                access_token, _ = login_api(login_param)
+                access_token, refresh_token = login_api(login_param)
 
-                response = logout_api(access_token)
-                assert response.status_code == 200
-                assert response.json() == {
+                logout_response: 'Response' = logout_api(access_token)
+                assert logout_response.status_code == 200
+                assert logout_response.json() == {
                     'message': 'ログアウトしました'
                 }
 
@@ -177,6 +183,11 @@ class TestUserFunction:
                 user: UserModel = db.execute(stmt).scalars().first()
                 assert user  # Noneではないことの確認
                 assert user.refresh_token is None
+
+                ref_token_res: 'Response' = refresh_token_api(refresh_token)
+                assert ref_token_res.status_code == 401
+                assert ref_token_res.json() == {'detail': 'Tokenが間違っています。'}
+                assert ref_token_res.headers['www-authenticate'] == 'Bearer'
 
         class TestWhenInvalidToken:
             def test_return_401(self, logout_api):
@@ -190,9 +201,6 @@ class TestUserFunction:
                 assert res_body['detail'] == 'Tokenが間違っています。'
 
     # ログアウトのテスト観点
-    # ・ログイン状態で実施すると、処理が成功すること
-    #     内部的にはリフレッシュトークンを無効化(更新)する。
-    #  　・無効化したリフレッシュトークンでアクセスすると、エラーとなること
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
@@ -263,6 +271,7 @@ class TestUserFunction:
             response = response = refresh_token_api(refresh_token_2nd)
             assert response.status_code == 200
 
+        # これテストできてない
         class WhenNotExistUser:
             def test_401(self, refresh_token_api):
                 refresh_token: str = \
