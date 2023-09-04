@@ -206,6 +206,18 @@ class TestUserFunction:
                 assert res_body['detail'] == 'Tokenが間違っています。'
                 assert response.headers['www-authenticate'] == 'Bearer'
 
+        class TestWhenNotExistUser:
+            def test_return_401(self, logout_api):
+                """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
+                access_token: str = \
+                    generate_test_token(TokenType.ACCESS_TOKEN)
+
+                response = response = logout_api(access_token)
+
+                assert response.status_code == 401
+                assert response.json() == {'detail': 'ユーザーが存在しません。'}
+                assert response.headers['www-authenticate'] == 'Bearer'
+
         class TestWhenExpiredToken:
             def test_return_401(self, logout_api):
                 """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
@@ -301,7 +313,7 @@ class TestUserFunction:
                 response = response = refresh_token_api(refresh_token)
 
                 assert response.status_code == 401
-                assert response.json() == {'detail': '再度ログインしてください。'}
+                assert response.json() == {'detail': 'ユーザーが存在しません。'}
                 assert response.headers['www-authenticate'] == 'Bearer'
 
         class TestWhenExpiredToken:

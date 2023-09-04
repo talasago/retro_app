@@ -71,7 +71,7 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
             auth_service.get_current_user_from_refresh_token(refresh_token=token)  # noqa: E501
     except RetroAppRecordNotFoundError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                            detail='再度ログインしてください。',
+                            detail='ユーザーが存在しません。',
                             headers={'WWW-Authenticate': 'Bearer'})
     except RetroAppAuthenticationError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
