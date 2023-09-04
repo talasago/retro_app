@@ -42,6 +42,8 @@ class AuthService:
                                              algorithms=ALGORITHM)
         except jwt_exceptions.ExpiredSignatureError as e:
             raise RetroAppTokenExpiredError(message=str(e))
+        except jwt_exceptions.JWTError as e:
+            raise RetroAppAuthenticationError(message=str(e))
 
         payload: TokenPayload = TokenPayload(**decoded_token)
 

@@ -233,6 +233,16 @@ class TestUserFunction:
                 assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
                 assert response.headers['www-authenticate'] == 'Bearer'
 
+        class TestWhenInvalidParam:
+            def test_return_401(self, logout_api):
+                """トークンが不正な値の場合401を返す"""
+                response = logout_api('hoge')
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
     # ログアウトのテスト観点
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
@@ -245,7 +255,6 @@ class TestUserFunction:
     # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
     #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
     # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
-    # リフレッシュトークンが異常な値の時
 
     class TestRefreshToken:
         class TestWhenValidParam:
@@ -329,4 +338,14 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenInvalidParam:
+            def test_return_401(self, refresh_token_api):
+                """トークンが不正な値の場合401を返す"""
+                response = refresh_token_api('hoge')
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
                 assert response.headers['www-authenticate'] == 'Bearer'
