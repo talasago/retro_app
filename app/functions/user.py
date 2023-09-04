@@ -6,7 +6,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from ..schemas.user_schema import UserCreate
 from ..models.user_model import UserModel
-from ..errors.retro_app_error import RetroAppAuthenticationError, RetroAppRecordNotFoundError
+from ..errors.retro_app_error import (RetroAppAuthenticationError,
+                                      RetroAppRecordNotFoundError,
+                                      RetroAppTokenExpiredError)
 from .dependencies import (get_current_user, get_user_repo, get_auth_service,
                            oauth2_scheme)
 
@@ -74,6 +76,10 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
     except RetroAppAuthenticationError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                             detail=str('Tokenが間違っています。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppTokenExpiredError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str('ログイン有効期間を過ぎています。再度ログインしてください。'),
                             headers={'WWW-Authenticate': 'Bearer'})
 
     tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)

@@ -1,6 +1,7 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.functions.user import app
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from app.schemas.token_schema import TokenType
 from app.models.user_model import UserModel
@@ -205,19 +206,33 @@ class TestUserFunction:
                 assert res_body['detail'] == 'Tokenが間違っています。'
                 assert response.headers['www-authenticate'] == 'Bearer'
 
+        class TestWhenExpiredToken:
+            def test_return_401(self, logout_api):
+                """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
+                access_token: str = generate_test_token(
+                    token_type=TokenType.access_token,
+                    exp=datetime.utcnow() - timedelta(minutes=10)
+                )
+
+                response = logout_api(access_token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
     # ログアウトのテスト観点
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
+    # uuidが存在しないユーザーの場合
 
     # TODO:アクセストークンのテストが必要
-    # - 10分後にアクセスするとエラーとなること
 
     # リフレッシュトークン取得のテスト観点
     # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
     #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
     # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
-    # 1週間後にアクセスするとエラーとなること
     # リフレッシュトークンが異常な値の時
 
     class TestRefreshToken:
@@ -287,4 +302,19 @@ class TestUserFunction:
 
                 assert response.status_code == 401
                 assert response.json() == {'detail': '再度ログインしてください。'}
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenExpiredToken:
+            def test_return_401(self, refresh_token_api):
+                """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
+                refresh_token: str = generate_test_token(
+                    token_type=TokenType.refresh_token,
+                    exp=datetime.utcnow() - timedelta(days=7)
+                )
+
+                response = refresh_token_api(refresh_token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
                 assert response.headers['www-authenticate'] == 'Bearer'

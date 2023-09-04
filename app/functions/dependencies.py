@@ -5,7 +5,8 @@ from fastapi.security import OAuth2PasswordBearer
 from ..database import SessionLocal
 from ..repository.user_repository import UserRepository
 from ..services.auth_service import AuthService
-from ..errors.retro_app_error import RetroAppAuthenticationError
+from ..errors.retro_app_error import (RetroAppAuthenticationError,
+                                      RetroAppTokenExpiredError)
 
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
@@ -41,6 +42,10 @@ def get_current_user(token: str = Depends(oauth2_scheme),
     except RetroAppAuthenticationError:
         raise HTTPException(status_code=401,
                             detail=str('Tokenが間違っています。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppTokenExpiredError:
+        raise HTTPException(status_code=401,
+                            detail=str('ログイン有効期間を過ぎています。再度ログインしてください。'),
                             headers={'WWW-Authenticate': 'Bearer'})
 
     return user
