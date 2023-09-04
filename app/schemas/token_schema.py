@@ -6,8 +6,8 @@ from typing import Any
 
 class TokenType(Enum):
     """TokenTypeのEnum。pydanticのクラスではない。"""
-    access_token = 'access_token'
-    refresh_token = 'refresh_token'
+    ACCESS_TOKEN = 'access_token'
+    REFRESH_TOKEN = 'refresh_token'
 
 
 class TokenPayload(BaseModel):
