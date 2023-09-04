@@ -210,7 +210,7 @@ class TestUserFunction:
             def test_return_401(self, logout_api):
                 """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
                 access_token: str = generate_test_token(
-                    token_type=TokenType.access_token,
+                    token_type=TokenType.ACCESS_TOKEN,
                     exp=datetime.utcnow() - timedelta(minutes=10)
                 )
 
@@ -296,7 +296,7 @@ class TestUserFunction:
             def test_return_401(self, refresh_token_api):
                 """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
                 refresh_token: str = \
-                    generate_test_token(TokenType.refresh_token)
+                    generate_test_token(TokenType.REFRESH_TOKEN)
 
                 response = response = refresh_token_api(refresh_token)
 
@@ -308,7 +308,7 @@ class TestUserFunction:
             def test_return_401(self, refresh_token_api):
                 """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
                 refresh_token: str = generate_test_token(
-                    token_type=TokenType.refresh_token,
+                    token_type=TokenType.REFRESH_TOKEN,
                     exp=datetime.utcnow() - timedelta(days=7)
                 )
 

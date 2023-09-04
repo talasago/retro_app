@@ -30,10 +30,11 @@ class AuthService:
     def __init__(self, user_repo: 'UserRepository') -> None:
         self.__user_repo: 'UserRepository' = user_repo
 
-    def get_current_user(self, token: str,
-                         expect_token_type='access_token') -> 'UserModel':
+    def get_current_user(
+            self, token: str,
+            expect_token_type=TokenType.ACCESS_TOKEN) -> 'UserModel':
         """tokenからユーザーを取得"""
-        if expect_token_type not in TokenType.__members__.keys():
+        if expect_token_type not in TokenType.__members__.values():
             raise ValueError(f'Invalid expect_token_type: {expect_token_type}')
 
         try:
@@ -44,7 +45,7 @@ class AuthService:
 
         payload: TokenPayload = TokenPayload(**decoded_token)
 
-        if payload.token_type != expect_token_type:
+        if payload.token_type != expect_token_type.value:
             raise RetroAppAuthenticationError('TokenTypeが一致しません。')
 
         # DBからユーザーを取得
@@ -56,7 +57,8 @@ class AuthService:
 
         return user
 
-    def get_current_user_from_refresh_token(self, refresh_token: str) -> 'UserModel':
+    def get_current_user_from_refresh_token(self,
+                                            refresh_token: str) -> 'UserModel':
         """refresh_tokenからユーザーを取得"""
 
         if refresh_token is None:
@@ -64,7 +66,8 @@ class AuthService:
 
         try:
             user: 'UserModel' = self.get_current_user(
-                token=refresh_token, expect_token_type='refresh_token')
+                token=refresh_token,
+                expect_token_type=TokenType.REFRESH_TOKEN)
         except (RetroAppRecordNotFoundError,
                 RetroAppAuthenticationError,
                 RetroAppTokenExpiredError) as e:
@@ -102,7 +105,7 @@ class AuthService:
         # uidにidを指定したら => ユーザー数がわかってしまう
 
         access_payload = TokenPayload(
-            token_type=TokenType.access_token,
+            token_type=TokenType.ACCESS_TOKEN,
             # FIXME:日本時間に変更する
             exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             uid=str(user_uuid),
@@ -110,7 +113,7 @@ class AuthService:
         )
 
         refresh_payload = TokenPayload(
-            token_type=TokenType.refresh_token,
+            token_type=TokenType.REFRESH_TOKEN,
             exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             uid=str(user_uuid),
             jti=str(uuid4())

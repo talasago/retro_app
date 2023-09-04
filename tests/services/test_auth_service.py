@@ -52,7 +52,7 @@ class TestAuthService():
             def test_raise_error(self, auth_service: AuthService, user_repo):
                 """デコードしたペイロードのTokenTypeとexpect_token_typeが一致していない場合、例外を返す"""
                 test_user: 'UserModel' = create_test_user(user_repo)
-                refresh_token = generate_test_token(token_type=TokenType.refresh_token,
+                refresh_token = generate_test_token(token_type=TokenType.REFRESH_TOKEN,
                                                     user_uuid=test_user.uuid)
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
@@ -63,7 +63,7 @@ class TestAuthService():
             def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
                 access_token = generate_test_token(
-                    token_type=TokenType.access_token)
+                    token_type=TokenType.ACCESS_TOKEN)
 
                 with pytest.raises(RetroAppRecordNotFoundError) as e:
                     auth_service.get_current_user(token=access_token)
@@ -75,7 +75,7 @@ class TestAuthService():
                 """有効期限切れの場合エラーとなること"""
 
                 expired_access_token = generate_test_token(
-                    token_type=TokenType.access_token,
+                    token_type=TokenType.ACCESS_TOKEN,
                     exp=datetime.utcnow() - timedelta(minutes=100)
                 )
 
@@ -91,7 +91,7 @@ class TestAuthService():
                                          user_repo):
                 test_user: 'UserModel' = create_test_user(user_repo)
                 refresh_token: str = generate_test_token(
-                    token_type=TokenType.refresh_token,
+                    token_type=TokenType.REFRESH_TOKEN,
                     user_uuid=test_user.uuid
                 )
                 test_user.refresh_token = refresh_token
@@ -107,7 +107,7 @@ class TestAuthService():
         class TestWhenNotExistUserUUID:
             def test_raise_exception(self, auth_service: AuthService):
                 refresh_token = generate_test_token(
-                    token_type=TokenType.refresh_token)
+                    token_type=TokenType.REFRESH_TOKEN)
 
                 with pytest.raises(RetroAppRecordNotFoundError) as e:
                     auth_service.get_current_user_from_refresh_token(
@@ -120,7 +120,7 @@ class TestAuthService():
                 """渡したRefreshTokenとUsersテーブルのRefreshTokenが一致しない場合、エラーを返す"""
                 test_user: 'UserModel' = create_test_user(user_repo)
                 refresh_token: str = generate_test_token(
-                    token_type=TokenType.refresh_token,
+                    token_type=TokenType.REFRESH_TOKEN,
                     user_uuid=test_user.uuid
                 )
 
