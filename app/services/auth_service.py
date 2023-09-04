@@ -1,10 +1,11 @@
 from jose import jwt
+from jose import exceptions as jwt_exceptions
 from datetime import datetime, timedelta
 from uuid import uuid4
 from ..schemas.token_schema import TokenPayload, TokenType
-from ..errors.retro_app_error import (RetroAppValueError,
-                                      RetroAppAuthenticationError,
-                                      RetroAppRecordNotFoundError)
+from ..errors.retro_app_error import (RetroAppAuthenticationError,
+                                      RetroAppRecordNotFoundError,
+                                      RetroAppTokenExpiredError)
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
@@ -35,9 +36,12 @@ class AuthService:
         if expect_token_type not in TokenType.__members__.keys():
             raise ValueError(f'Invalid expect_token_type: {expect_token_type}')
 
-        # トークンをデコードしてペイロードを取得
-        decoded_token: dict = jwt.decode(token, SECRET_KEY,
-                                         algorithms=ALGORITHM)
+        try:
+            decoded_token: dict = jwt.decode(token, SECRET_KEY,
+                                             algorithms=ALGORITHM)
+        except jwt_exceptions.ExpiredSignatureError as e:
+            raise RetroAppTokenExpiredError(message=str(e))
+
         payload: TokenPayload = TokenPayload(**decoded_token)
 
         if payload.token_type != expect_token_type:
@@ -62,7 +66,8 @@ class AuthService:
             user: 'UserModel' = self.get_current_user(
                 token=refresh_token, expect_token_type='refresh_token')
         except (RetroAppRecordNotFoundError,
-                RetroAppAuthenticationError) as e:
+                RetroAppAuthenticationError,
+                RetroAppTokenExpiredError) as e:
             raise e
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
@@ -98,6 +103,7 @@ class AuthService:
 
         access_payload = TokenPayload(
             token_type=TokenType.access_token,
+            # FIXME:日本時間に変更する
             exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             uid=str(user_uuid),
             jti=str(uuid4())

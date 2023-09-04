@@ -1,13 +1,16 @@
 import pytest
 from app.repository.user_repository import UserRepository
 from app.services.auth_service import AuthService
+from datetime import datetime, timedelta
 from uuid import UUID
 from tests.test_helpers.create_test_user import create_test_user
 from tests.test_helpers.token import generate_test_token
 from app.schemas.token_schema import TokenType
-from app.errors.retro_app_error import (RetroAppValueError,
-                                        RetroAppRecordNotFoundError,
-                                        RetroAppAuthenticationError)
+from app.errors.retro_app_error import (
+    RetroAppRecordNotFoundError,
+    RetroAppAuthenticationError,
+    RetroAppTokenExpiredError
+)
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -65,6 +68,21 @@ class TestAuthService():
                 with pytest.raises(RetroAppRecordNotFoundError) as e:
                     auth_service.get_current_user(token=access_token)
                 assert str(e.value) == '条件に合致するレコードは存在しません。'
+
+        class TestWhenExpiredToken:
+            # リフレッシュトークンの場合もテストする
+            def test_raise_error(self, auth_service: AuthService):
+                """有効期限切れの場合エラーとなること"""
+
+                expired_access_token = generate_test_token(
+                    token_type=TokenType.access_token,
+                    exp=datetime.utcnow() - timedelta(minutes=100)
+                )
+
+                with pytest.raises(RetroAppTokenExpiredError) as e:
+                    auth_service.get_current_user(token=expired_access_token)
+                # assert str(e.value) == 'ログイン有効期間を過ぎています。再度ログインしてください。'
+                assert str(e.value) == 'Signature has expired.'
 
     class TestGetCurrentUserFromRefreshToken:
         class TestWhenValidParam:
