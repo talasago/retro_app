@@ -247,14 +247,6 @@ class TestUserFunction:
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
-    # uuidが存在しないユーザーの場合
-
-    # TODO:アクセストークンのテストが必要
-
-    # リフレッシュトークン取得のテスト観点
-    # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
-    #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
-    # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
 
     class TestRefreshToken:
         class TestWhenValidParam:
@@ -285,7 +277,8 @@ class TestUserFunction:
             def test_previous_refresh_token_is_disable(
                     self, add_user_api, login_api, refresh_token_api):
                 """新しくリフレッシュトークンが発行されたら、
-                それより前に発行されたリフレッシュトークンは無効になること"""
+                それより前に発行されたリフレッシュトークンは無効になること。
+                また、アクセストークンが再発行されること"""
                 user_data: dict = {
                     'email': 'testrefresh_token_invalid_param@example.com',
                     'name': 'Test testrefresh_token_invalid_param',
@@ -297,20 +290,22 @@ class TestUserFunction:
                     'username': user_data['email'],
                     'password': user_data['password'],
                 }
-                _, refresh_token_1st = login_api(login_param)
+                access_token_1st, refresh_token_1st = login_api(login_param)
 
                 # リフレッシュトークンAPI実行1回目
                 response = refresh_token_api(refresh_token_1st)
                 refresh_token_2nd = response.json()['refresh_token']
+                access_token_2nd = response.json()['access_token']
                 assert response.status_code == 200
                 assert refresh_token_2nd != refresh_token_1st
+                assert access_token_2nd != access_token_1st
 
                 # リフレッシュトークンAPI実行2回目
-                response = response = refresh_token_api(refresh_token_1st)
+                response = refresh_token_api(refresh_token_1st)
                 assert response.status_code == 401
 
                 # リフレッシュトークンAPI実行3回目
-                response = response = refresh_token_api(refresh_token_2nd)
+                response = refresh_token_api(refresh_token_2nd)
                 assert response.status_code == 200
 
         class TestWhenNotExistUser:
