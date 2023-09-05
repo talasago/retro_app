@@ -40,8 +40,27 @@ class TestUserModel:
                 assert user.is_password_matching(
                     plain_password='invalid_password') is False
 
-            # TODO:引数がstrじゃない時のテストを追加したい。その時はエラーにしたい。passlib側で実装されてるかもだが。
-            # TestPasswordHelperのバリデーションはpydantic使った方が楽なのだろうか？
+            def test_return_false_when_hashed_password_and_param_are_none(self): # noqa: #E501
+                user_data: dict = {
+                    'name': 'John Doe',
+                    'email': 'invalid_email',
+                }
+                user = UserModel(**user_data)
+
+                assert user.is_password_matching(
+                    plain_password=None) is False  # type: ignore
+
+            def test_raise_error_when_password_is_none(self):
+                user_data: dict = {
+                    'name': 'John Doe',
+                    'email': 'invalid_email',
+                    'password': None
+                }
+
+                # 自前実装せずともエラーとなる。Noneになる可能性はユースケース的にありえない &&
+                # Noneになって処理が続くのはまずいので、エラーになるでヨシ！
+                with pytest.raises(TypeError):
+                    UserModel(**user_data)
 
     class TestPropertyExceptPassword:
         def test_set_uuid_expect_error(self):
