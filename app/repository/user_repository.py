@@ -4,7 +4,7 @@ from sqlalchemy.exc import IntegrityError
 from psycopg2 import errors as psycopg2_errors
 from typing import Union
 from ..models.user_model import UserModel
-from ..errors.retro_app_error import RetroAppColmunUniqueError
+from ..errors.retro_app_error import RetroAppColmunUniqueError, RetroAppRecordNotFoundError
 
 # 型アノテーションだけのimport。これで本番実行時は無駄なimportが発生しないはず。
 from typing import TYPE_CHECKING
@@ -24,6 +24,9 @@ class UserRepository:
             # FIXME:repository毎にcommit持たせるのはまずい。
             # ので、他Repositoryを作るタイミングでトランザクション管理は要検討。
             # userがコミットOKでも別テーブルのコミットがNGだったらロールバックできない。
+
+            # TODO:その他のエラーの場合のエラーハンドリング。
+            # 5xxを返したいね。
             self.__db.commit()
         except IntegrityError as e:
             self.__db.rollback()
@@ -39,17 +42,24 @@ class UserRepository:
         self.__db.refresh(user)
 
     def find_by(self, column: str,
-                value: Union[str, 'UUID', int]) -> UserModel | None:
+                value: Union[str, 'UUID', int],
+                raise_exception=True) -> UserModel | None:
         """条件に合致するレコードを検索して返す"""
+
+        if raise_exception is None:
+            raise TypeError('raise_exception must be True or False')
+
         # FIXME:現状複数条件に対応できていない。今後対応するなら、引数はdictの方が良さそう。
-        # NOTE:コストがかかるので、ユニーク以外の列は検索を不許可とする
+        # NOTE:コストがかかるので、インデックスが無いの列は検索を不許可とする
         if column not in UserModel.INDEXED_COLUMNS:
-            # TODO: カスタムエラークラス
             raise ValueError('Invalid column for search')
 
-        return self.__db.execute(
-            select(UserModel).where(getattr(UserModel, column) == value)
-        ).scalars().first()
+        stmt = select(UserModel).where(getattr(UserModel, column) == value)
+        user = self.__db.execute(stmt).scalars().first()
+
+        if raise_exception and user is None:
+            raise RetroAppRecordNotFoundError(UserModel.__tablename__)
+        return user
 
     def __get_column_name_of_unique_error(
             self, error: IntegrityError) -> str | None:

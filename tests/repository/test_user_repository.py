@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 from app.repository.user_repository import UserRepository
 from passlib.context import CryptContext
 from app.models.user_model import UserModel
-from app.errors.retro_app_error import RetroAppColmunUniqueError
-from tests.factories.user_factory import CommonUserFactory
+from app.errors.retro_app_error import RetroAppColmunUniqueError, RetroAppRecordNotFoundError
+from tests.test_helpers.create_test_user import create_test_user
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
@@ -100,17 +100,32 @@ class TestUserRepository:
         assert user_after_update.updated_at > user_after_update.created_at
 
     class TestFindBy:
-        def test_valid_search(self, db: Session):
-            users = [CommonUserFactory() for _ in range(5)]
-            user_repo = UserRepository(db)
-            # ここまでが前処理
+        def test_valid_search(self, user_repo: 'UserRepository'):
+            test_users = [create_test_user(user_repo) for _ in range(5)]
 
-            [user_repo.save(user) for user in users]
-            searched_user: UserModel = user_repo.find_by('email', users[0].email)
-            assert searched_user
+            searched_user_by_email: UserModel = user_repo.find_by('email', test_users[0].email)
+            assert searched_user_by_email == test_users[0]
 
-            searched_user_by_id: UserModel = user_repo.find_by('id', searched_user.id)
-            assert searched_user_by_id == searched_user
+            searched_user_by_id: UserModel = user_repo.find_by('id', test_users[1].id)
+            assert searched_user_by_id == test_users[1]
 
-            searched_user_by_uuid: UserModel = user_repo.find_by('uuid', searched_user.uuid)
-            assert searched_user_by_uuid == searched_user
+            searched_user_by_uuid: UserModel = user_repo.find_by('uuid', test_users[2].uuid)
+            assert searched_user_by_uuid == test_users[2]
+
+        class TestWhenRecordIsNone:
+            class TestWhenRaiseOptionIsTrue:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    with pytest.raises(RetroAppRecordNotFoundError):
+                        user_repo.find_by(column='email', value='not_exsist_user')
+
+            class TestWhenRaiseOptionIsFalse:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    result = user_repo.find_by(column='email', value='not_exsist_user', raise_exception=False)
+                    assert result is None
+
+            class TestWhenRaiseOptionIsNone:
+                def test_raise_error(self, user_repo: 'UserRepository'):
+                    with pytest.raises(TypeError) as e:
+                        user_repo.find_by(column='email', value='not_exsist_user', raise_exception=None)  # type: ignore
+
+                    assert str(e.value) == 'raise_exception must be True or False'
