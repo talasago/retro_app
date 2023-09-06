@@ -3,7 +3,6 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from datetime import datetime, timedelta
 from uuid import uuid4
-from ..helpers.password_helper import PasswordHelper
 from ..schemas.token_schema import TokenPayload
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
@@ -32,7 +31,7 @@ class AuthService:
 
     def get_current_user(self, token: str,
                          expect_token_type='access_token') -> 'UserModel':
-        """access_tokenからユーザーを取得"""
+        """tokenからユーザーを取得"""
         # トークンをデコードしてペイロードを取得
         # TODO:例外処理
         payload: TokenPayload = TokenPayload(**jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM))
@@ -67,8 +66,7 @@ class AuthService:
         user: 'UserModel' = self.__user_repo.find_by('email', value=email)
         # TODO:emailで検索した結果0件の場合の考慮が必要。get_user_by_email()内でErrorにするのか？それとも別案？
 
-        if not PasswordHelper.is_password_matching(plain_pw=password,
-                                                   hashed_pw=user.hashed_password):
+        if not user.is_password_matching(plain_password=password):
             # TODO:カスタムエラークラスにする
             raise HTTPException(status_code=401, detail='パスワード不一致')
         return user
@@ -106,8 +104,8 @@ class AuthService:
     def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
         """リフレッシュトークンをusersテーブルに保存する"""
         user.refresh_token = refresh_token
-        self.__user_repo.update_user(user)
+        self.__user_repo.save(user)
 
     def delete_refresh_token(self, user: 'UserModel') -> None:
         user.refresh_token = None
-        self.__user_repo.update_user(user)
+        self.__user_repo.save(user)
