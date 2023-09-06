@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from ..schemas.user_schema import UserCreate
+from ..schemas.http_response_body_user_schema import SignInApiResponseBody
 from ..models.user_model import UserModel
 from ..errors.retro_app_error import (RetroAppAuthenticationError,
                                       RetroAppRecordNotFoundError,
@@ -22,8 +23,8 @@ app = FastAPI()
 
 
 # ユーザー登録のエンドポイント
-# FIXME:response_modelが間違ってる
-@app.post('/api/v1/sign_up', response_model=UserCreate, summary='ユーザーを登録します。')
+@app.post('/api/v1/sign_up', summary='ユーザーを登録します。',
+          response_model=SignInApiResponseBody)
 def signup_user(user_params: UserCreate,
                 user_repo: 'UserRepository' = Depends(get_user_repo)):
     user: UserModel = UserModel(name=user_params.name, email=user_params.email,
@@ -32,7 +33,7 @@ def signup_user(user_params: UserCreate,
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content={'message': 'ユーザー登録が成功しました。'}
+        content=SignInApiResponseBody().model_dump()
     )
 
 
