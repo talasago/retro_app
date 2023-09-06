@@ -22,11 +22,11 @@ if TYPE_CHECKING:
 app = FastAPI()
 
 
-# ユーザー登録のエンドポイント
 @app.post('/api/v1/sign_up', summary='ユーザーを登録します。',
           response_model=SignInApiResponseBody)
 def signup_user(user_params: UserCreate,
                 user_repo: 'UserRepository' = Depends(get_user_repo)):
+    """ユーザー登録のAPIエンドポイント"""
     user: UserModel = UserModel(name=user_params.name, email=user_params.email,
                                 password=user_params.password)
     user_repo.save(user=user)
@@ -37,7 +37,6 @@ def signup_user(user_params: UserCreate,
     )
 
 
-# ログインのエンドポイント
 # FIXME:response_model追加
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
 @app.post('/token')
@@ -93,12 +92,11 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
     )
 
 
-# ログアウトのエンドポイント
 # FIXME:response_model追加
 @app.post('/api/v1/logout')
 def logout(current_user: 'UserModel' = Depends(get_current_user),
            auth_service: 'AuthService' = Depends(get_auth_service)):
-    """リフレッシュトークンを無効化する"""
+    """ログアウトのエンドポイント。リフレッシュトークンを無効化する"""
 
     # NOTE:アクセストークンの無効化は、セキュリティ的に対応した方が良いかもしれないが、絶対必要な処理ではないため一旦対応しない。
     # アクセストークンを無効化するなら、アクセストークンのブロックリストを管理する必要がある。
