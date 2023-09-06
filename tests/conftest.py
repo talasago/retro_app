@@ -12,6 +12,7 @@ from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
 from app.database import SessionLocal, Base  # noqa: E402
 from sqlalchemy import create_engine  # noqa: E402
+from app.repository.user_repository import UserRepository  # noqa: E402
 
 
 # TODO:AutoUseをtrueにしたい
@@ -55,3 +56,8 @@ def migrate() -> None:
     # マイグレーションの実行
     alembic_cfg = Config('alembic.ini')
     command.upgrade(alembic_cfg, 'head')
+
+
+@pytest.fixture(scope='session')
+def user_repo(db: Session) -> UserRepository:
+    return UserRepository(db)

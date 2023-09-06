@@ -1,10 +1,15 @@
 """依存性の設定をまとめたモジュール"""
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from ..database import SessionLocal
 from ..repository.user_repository import UserRepository
 from ..services.auth_service import AuthService
+from ..errors.retro_app_error import (RetroAppAuthenticationError,
+                                      RetroAppTokenExpiredError,
+                                      RetroAppRecordNotFoundError)
+
+
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -33,5 +38,19 @@ def get_auth_service(
 def get_current_user(token: str = Depends(oauth2_scheme),
                      auth_service: AuthService =
                      Depends(get_auth_service)) -> 'UserModel':
-    user = auth_service.get_current_user(token)
+    try:
+        user = auth_service.get_current_user(token)
+    except RetroAppAuthenticationError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str('Tokenが間違っています。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppRecordNotFoundError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='ユーザーが存在しません。',
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppTokenExpiredError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str('ログイン有効期間を過ぎています。再度ログインしてください。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+
     return user

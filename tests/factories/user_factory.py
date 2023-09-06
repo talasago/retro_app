@@ -1,14 +1,15 @@
 from factory import Factory, Sequence
-from ..models.test_user_model import UserModel
+from app.models.user_model import UserModel
 
 
-class UserFactory(Factory):
+class TestUserFactory(Factory):
+    name = Sequence(lambda n: f'common user{n}')
+    email = Sequence(lambda n: f'commmon_user{n}@email.com')
+    password: str = 'common user'
+
     class Meta:
         model = UserModel
 
-
-# TODO:クラス名は違うかもなあ
-class CommonUserFactory(UserFactory):
-    name: str = Sequence(lambda n: f'common user{n}')
-    email: str = Sequence(lambda n: f'commmon_user{n}@email.com')
-    password: str = 'common user'
+    # 型ヒントのために記載
+    def __new__(cls, *args, **kwargs) -> UserModel:
+        return super().__new__(*args, **kwargs)
