@@ -23,8 +23,9 @@ app = FastAPI()
 
 # ユーザー登録のエンドポイント
 # FIXME:response_modelが間違ってる
-@app.post('/api/v1/sign_up', response_model=UserCreate)
-def signup_user(user_params: UserCreate, user_repo: 'UserRepository' = Depends(get_user_repo)):
+@app.post('/api/v1/sign_up', response_model=UserCreate, summary='ユーザーを登録します。')
+def signup_user(user_params: UserCreate,
+                user_repo: 'UserRepository' = Depends(get_user_repo)):
     user: UserModel = UserModel(name=user_params.name, email=user_params.email,
                                 password=user_params.password)
     user_repo.save(user=user)
