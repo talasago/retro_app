@@ -1,11 +1,14 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 from typing import TYPE_CHECKING
-from fastapi import FastAPI, Depends, status
+from fastapi import FastAPI, Depends, status, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from ..schemas.user_schema import UserCreate
 from ..models.user_model import UserModel
+from ..errors.retro_app_error import (RetroAppAuthenticationError,
+                                      RetroAppRecordNotFoundError,
+                                      RetroAppTokenExpiredError)
 from .dependencies import (get_current_user, get_user_repo, get_auth_service,
                            oauth2_scheme)
 
@@ -39,9 +42,16 @@ def signup_user(user_params: UserCreate, user_repo: 'UserRepository' = Depends(g
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             auth_service: 'AuthService' = Depends(get_auth_service)):
     """ログインして、トークンを発行する"""
-    # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
-    user = auth_service.authenticate(
-        email=form_data.username, password=form_data.password)
+
+    try:
+        # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
+        user: 'UserModel' = auth_service.authenticate(
+            email=form_data.username, password=form_data.password)
+    except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='メールアドレスまたはパスワードが間違っています。',
+                            headers={'WWW-Authenticate': 'Bearer'})
+
     tokens = auth_service.generate_tokens(user_uuid=user.uuid)
     auth_service.save_refresh_token(user, tokens['refresh_token'])
 
@@ -56,8 +66,22 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
 def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
                   token: str = Depends(oauth2_scheme)):
     """リフレッシュトークンでトークンを再取得"""
-    current_user: 'UserModel' = \
-        auth_service.get_current_user_from_refresh_token(refresh_token=token)
+    try:
+        current_user: 'UserModel' = \
+            auth_service.get_current_user_from_refresh_token(refresh_token=token)  # noqa: E501
+    except RetroAppRecordNotFoundError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail='ユーザーが存在しません。',
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppAuthenticationError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str('Tokenが間違っています。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+    except RetroAppTokenExpiredError:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                            detail=str('ログイン有効期間を過ぎています。再度ログインしてください。'),
+                            headers={'WWW-Authenticate': 'Bearer'})
+
     tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
     auth_service.save_refresh_token(current_user, tokens['refresh_token'])
 
@@ -68,7 +92,6 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
 
 
 # ログアウトのエンドポイント
-# TODO:非同期処理でも良いかもしれない
 # FIXME:response_model追加
 @app.post('/api/v1/logout')
 def logout(current_user: 'UserModel' = Depends(get_current_user),
