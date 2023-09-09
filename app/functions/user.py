@@ -5,8 +5,10 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from ..schemas.user_schema import UserCreate
-from ..schemas.http_response_body_user_schema import (SignInApiResponseBody,
-                                                      TokenApiResponseBody)
+from ..schemas.http_response_body_user_schema import (
+    SignInApiResponseBody,
+    TokenApiResponseBody,
+    RefreshTokenApiResponseBody)
 from ..models.user_model import UserModel
 from ..errors.retro_app_error import (RetroAppAuthenticationError,
                                       RetroAppRecordNotFoundError,
@@ -75,8 +77,8 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
     )
 
 
-# FIXME:response_model追加
-@app.post('/refresh_token')
+@app.post('/refresh_token', summary='リフレッシュトークンでトークンを再発行します。',
+          response_model=RefreshTokenApiResponseBody)
 def refresh_token(
         auth_service: 'AuthService' = Depends(get_auth_service),
         token: str = Depends(oauth2_scheme),
@@ -103,10 +105,11 @@ def refresh_token(
 
     tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
     auth_service.save_refresh_token(current_user, tokens['refresh_token'])
+    res_body = RefreshTokenApiResponseBody(**tokens)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={**tokens}
+        content=res_body.model_dump()
     )
 
 
