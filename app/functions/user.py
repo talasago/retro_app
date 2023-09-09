@@ -1,6 +1,6 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 from typing import TYPE_CHECKING
-from fastapi import FastAPI, Depends, status, HTTPException
+from fastapi import FastAPI, Depends, status, HTTPException, Header
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
@@ -31,6 +31,7 @@ def signup_user(user_params: UserCreate,
     """ユーザー登録のAPIエンドポイント"""
     user: UserModel = UserModel(name=user_params.name, email=user_params.email,
                                 password=user_params.password)
+    # TODO:重複エラーの時、4xx系を返すようにする
     user_repo.save(user=user)
 
     return JSONResponse(
@@ -76,8 +77,13 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
 
 # FIXME:response_model追加
 @app.post('/refresh_token')
-def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
-                  token: str = Depends(oauth2_scheme)):
+def refresh_token(
+        auth_service: 'AuthService' = Depends(get_auth_service),
+        token: str = Depends(oauth2_scheme),
+        Authorization: str = Header(description='OpenAPIで入力値を指定しても、リクエストヘッダーに含まれないため、cURL等で試してください',  # noqa: E501
+                                    examples=['Bearer [ログインAPIのレスポンスのrefresh_token]']),  # noqa: E501
+        ):
+    # AuthorizationはOpenAPI上に表示するためのダミー引数
     """リフレッシュトークンでトークンを再取得"""
     try:
         current_user: 'UserModel' = \
