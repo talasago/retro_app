@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 from ..schemas.user_schema import UserCreate
-from ..schemas.http_response_body_user_schema import SignInApiResponseBody
+from ..schemas.http_response_body_user_schema import (SignInApiResponseBody,
+                                                      TokenApiResponseBody)
 from ..models.user_model import UserModel
 from ..errors.retro_app_error import (RetroAppAuthenticationError,
                                       RetroAppRecordNotFoundError,
@@ -32,20 +33,20 @@ def signup_user(user_params: UserCreate,
     user_repo.save(user=user)
 
     return JSONResponse(
+        # FIXME: HTTP_201_CREATEDがOPENAPIに反映されてない
         status_code=status.HTTP_201_CREATED,
         content=SignInApiResponseBody().model_dump()
     )
 
 
-# FIXME:response_model追加
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
-@app.post('/token')
+@app.post('/token', summary='ログインしてトークンを発行します。',
+          response_model=TokenApiResponseBody)
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             auth_service: 'AuthService' = Depends(get_auth_service)):
-    """ログインして、トークンを発行する
-
-    Parameters(form_data):
+    """
+    Request bodyのParameters(form_data):
       - grant_type: 使用していない
       - username: このアプリではユーザーのメールアドレスとする。紛らわしいがユーザー名ではない。
         OAuthの仕様でメールアドレスがないため、仕方なくusernameに入れている。
@@ -66,9 +67,10 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
     tokens = auth_service.generate_tokens(user_uuid=user.uuid)
     auth_service.save_refresh_token(user, tokens['refresh_token'])
 
+    res_body = TokenApiResponseBody(name=user.name, **tokens)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={'message': 'ログインしました', 'name': user.name, **tokens}
+        content=res_body.model_dump()
     )
 
 
