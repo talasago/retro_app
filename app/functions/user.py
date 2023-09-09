@@ -39,13 +39,23 @@ def signup_user(user_params: UserCreate,
 
 # FIXME:response_model追加
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
+# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
 @app.post('/token')
 def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
             auth_service: 'AuthService' = Depends(get_auth_service)):
-    """ログインして、トークンを発行する"""
+    """ログインして、トークンを発行する
+
+    Parameters(form_data):
+      - grant_type: 使用していない
+      - username: このアプリではユーザーのメールアドレスとする。紛らわしいがユーザー名ではない。
+        OAuthの仕様でメールアドレスがないため、仕方なくusernameに入れている。
+      - password: ユーザーのパスワード
+      - self.scopes: 使用していない
+      - client_id: 使用していない
+      - client_secret: 使用していない
+    """
 
     try:
-        # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
         user: 'UserModel' = auth_service.authenticate(
             email=form_data.username, password=form_data.password)
     except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
