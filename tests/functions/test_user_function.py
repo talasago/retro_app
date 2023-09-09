@@ -248,6 +248,9 @@ class TestUserFunction:
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
 
+    # 各リクエストボディが空の場合(pydanticのバリデーションエラーの場合)
+    # ヘッダーが無い場合
+
     class TestRefreshToken:
         class TestWhenValidParam:
             def test_return_200(self, add_user_api, login_api,
