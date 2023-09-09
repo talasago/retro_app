@@ -37,6 +37,7 @@ def db() -> Session:
 
     # テーブルの削除と作成
     Base.metadata.drop_all(bind=engine)
+    # テーブルの作り方がマイグレーションと異なるので、列の場所がマイグレとここで違うの良くないな...
     Base.metadata.create_all(bind=engine)
 
     # NOTE:これマイグレートしてる意味あるのかな。DB消してないから多分意味ない.
