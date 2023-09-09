@@ -8,7 +8,8 @@ from ..schemas.user_schema import UserCreate
 from ..schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
-    RefreshTokenApiResponseBody)
+    RefreshTokenApiResponseBody,
+    ApiResponseBodyBase)
 from ..models.user_model import UserModel
 from ..errors.retro_app_error import (RetroAppAuthenticationError,
                                       RetroAppRecordNotFoundError,
@@ -113,8 +114,8 @@ def refresh_token(
     )
 
 
-# FIXME:response_model追加
-@app.post('/api/v1/logout')
+@app.post('/api/v1/logout', summary='ログアウトします。',
+          response_model=ApiResponseBodyBase)
 def logout(current_user: 'UserModel' = Depends(get_current_user),
            auth_service: 'AuthService' = Depends(get_auth_service)):
     """ログアウトのエンドポイント。リフレッシュトークンを無効化する"""
@@ -126,7 +127,7 @@ def logout(current_user: 'UserModel' = Depends(get_current_user),
     auth_service.delete_refresh_token(current_user)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content={'message': 'ログアウトしました'}
+        content=ApiResponseBodyBase(message='ログアウトしました').model_dump()
     )
 
 
