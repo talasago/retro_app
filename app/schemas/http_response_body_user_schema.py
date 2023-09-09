@@ -17,3 +17,13 @@ class TokenApiResponseBody(BaseModel):
                             examples=['test_user'])
     access_token: str = Field(description='アクセストークン')
     refresh_token: str = Field(description='リフレッシュトークン')
+
+
+class RefreshTokenApiResponseBody(BaseModel):
+    message: str = Field(default='トークンを再発行しました。',
+                         description='処理メッセージ',
+                         examples=['トークンを再発行しました。'])
+    token_type: str = Field(description='トークンタイプ',
+                            examples=['test_user'])
+    access_token: str = Field(description='アクセストークン')
+    refresh_token: str = Field(description='リフレッシュトークン')
