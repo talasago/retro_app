@@ -24,7 +24,8 @@ app = FastAPI()
 
 
 @app.post('/api/v1/sign_up', summary='ユーザーを登録します。',
-          response_model=SignInApiResponseBody)
+          response_model=SignInApiResponseBody,
+          status_code=status.HTTP_201_CREATED)
 def signup_user(user_params: UserCreate,
                 user_repo: 'UserRepository' = Depends(get_user_repo)):
     """ユーザー登録のAPIエンドポイント"""
@@ -33,7 +34,6 @@ def signup_user(user_params: UserCreate,
     user_repo.save(user=user)
 
     return JSONResponse(
-        # FIXME: HTTP_201_CREATEDがOPENAPIに反映されてない
         status_code=status.HTTP_201_CREATED,
         content=SignInApiResponseBody().model_dump()
     )
