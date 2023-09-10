@@ -1,0 +1,57 @@
+# TODO:後でディレクトリを移動する
+
+service: serverless-example
+frameworkVersion: '>=3.0.0 <4.0.0'
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    # 2023/9/10時点でtrueに変更し手もデプロイできない問題あり。修正されているがリリースされていない模様。
+    # https://github.com/serverless/serverless-python-requirements/pull/780
+    usePipenv: false
+    
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!.venv/**'
+    - '!Pipfile'
+    - '!Pipfile.lock'
+    - '!.python-version'
+    - '!package.json'
+    - '!package.-lock.json'
+    - '!.nvmrc'
+
+provider:
+  name: aws
+  stage: dev # TODO:オプション引数で変更できるように変更したい
+  runtime: python3.10
+  region: ap-northeast-1
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ec2:DescribeInstances
+      Resource: "*"
+  environment:
+    POSTGRES_HOST: dummy
+    POSTGRES_USER: dummy
+    POSTGRES_PASSWORD: dummy
+    POSTGRES_DATABASE: dummy
+
+functions:  
+  user_function:
+    handler: app/functions/user.handler
+    events:
+      - http:
+          path: /api/v1/sign_up
+          method: ANY
+      - http:
+          path: /token
+          method: ANY
+      - http:
+          path: /refresh_token
+          method: ANY
+      - http:
+          path: /api/v1/logout
+          method: ANY
