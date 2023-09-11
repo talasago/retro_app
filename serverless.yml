@@ -41,7 +41,7 @@ provider:
 
 functions:  
   user_function:
-    handler: app/functions/user.handler
+    handler: app.functions.user.handler
     events:
       - http:
           path: /api/v1/sign_up
