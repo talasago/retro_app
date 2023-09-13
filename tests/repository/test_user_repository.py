@@ -1,22 +1,20 @@
 import pytest
 from sqlalchemy.orm import Session
 from app.repository.user_repository import UserRepository
-from app.schemas.user_schema import UserCreate
 from passlib.context import CryptContext
 from app.models.user_model import UserModel
 from app.errors.retro_app_error import RetroAppColmunUniqueError
+from tests.factories.user_factory import CommonUserFactory
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 @pytest.fixture
 def create_user():
-    def _method(db: Session, name: str, email: str,
-                password: str) -> None:
-        user_data = UserCreate(name=name, email=email,
-                               password=password)  # type: ignore
+    def _method(db: Session, **user_params) -> None:
         user_repo = UserRepository(db)
-        user_repo.create_user(user_data)
+        user = UserModel(**user_params)
+        user_repo.save(user)
 
     return _method
 
@@ -40,7 +38,7 @@ class TestUserRepository:
             'password', str(created_user.hashed_password))
 
     def test_email_uniqueness(self, db: Session, create_user):
-        # 予めユーザーを作っておく。
+        # 予め新規ユーザーを作っておく。
         user_data: dict = {
             'name': 'resisted email',
             'email': 'resisted_email@example.com',
@@ -56,7 +54,7 @@ class TestUserRepository:
         assert str(e.value) == '指定されたメールアドレスはすでに登録されています。'
 
     def test_name_uniqueness(self, db: Session, create_user):
-        # 予めユーザーを作っておく。
+        # 予め新規ユーザーを作っておく。
         user_data: dict = {
             'name': 'resisted name',
             'email': 'resisted_name@example.com',
@@ -88,7 +86,7 @@ class TestUserRepository:
         user.hashed_password = 'hashed_password'
         user.refresh_token = 'refresh_token'
 
-        user_repo.update_user(user)
+        user_repo.save(user)
 
         # expireしないと、コミットしてなくても、新しい値を取得してしまうため
         db.expire(user)
@@ -99,3 +97,20 @@ class TestUserRepository:
         assert user_after_update.email == 'afterupdate@email'
         assert user_after_update.hashed_password == 'hashed_password'
         assert user_after_update.refresh_token == 'refresh_token'
+        assert user_after_update.updated_at > user_after_update.created_at
+
+    class TestFindBy:
+        def test_valid_search(self, db: Session):
+            users = [CommonUserFactory() for _ in range(5)]
+            user_repo = UserRepository(db)
+            # ここまでが前処理
+
+            [user_repo.save(user) for user in users]
+            searched_user: UserModel = user_repo.find_by('email', users[0].email)
+            assert searched_user
+
+            searched_user_by_id: UserModel = user_repo.find_by('id', searched_user.id)
+            assert searched_user_by_id == searched_user
+
+            searched_user_by_uuid: UserModel = user_repo.find_by('uuid', searched_user.uuid)
+            assert searched_user_by_uuid == searched_user
