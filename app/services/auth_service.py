@@ -99,6 +99,10 @@ class AuthService:
         """
         アクセストークンとリフレッシュトークンを返す。また、リフレッシュトークンをDBに保存する。
         """
+
+        if user is None:
+            raise TypeError('user must be other than None')
+
         # ペイロード作成
         # NOTE: uidには、uuidを使用する。
         # uuidを使用する理由：悪意の第三者がtokenを復号できた場合を想定し、以下の懸念がありそれに対応するため。
