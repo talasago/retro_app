@@ -71,8 +71,10 @@ class AuthService:
             raise HTTPException(status_code=401, detail='パスワード不一致')
         return user
 
-    def generate_tokens(self, user_uuid: 'UUID') -> dict[str, str]:
-        """アクセストークンとリフレッシュトークンを返す"""
+    def create_tokens(self, user: 'UserModel') -> dict[str, str]:
+        """
+        アクセストークンとリフレッシュトークンを返す。また、リフレッシュトークンをDBに保存する。
+        """
         # ペイロード作成
         # NOTE: uidには、uuidを使用する。
         # uuidを使用する理由：悪意の第三者がtokenを復号できた場合を想定し、以下の懸念がありそれに対応するため。
@@ -82,14 +84,14 @@ class AuthService:
         access_payload = TokenPayload(
             token_type='access_token',
             exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-            uid=str(user_uuid),
+            uid=str(user.uuid),
             jti=str(uuid4())
         )
 
         refresh_payload = TokenPayload(
             token_type='refresh_token',
             exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-            uid=str(user_uuid),
+            uid=str(user.uuid),
             jti=str(uuid4())
         )
 
@@ -98,13 +100,12 @@ class AuthService:
         refresh_token: str = jwt.encode(claims=refresh_payload.model_dump(),
                                         key=SECRET_KEY, algorithm=ALGORITHM)
 
-        return {'access_token': access_token, 'refresh_token': refresh_token,
-                'token_type': 'bearer'}
-
-    def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
-        """リフレッシュトークンをusersテーブルに保存する"""
+        # リフレッシュトークンをusersテーブルに保存する
         user.refresh_token = refresh_token
         self.__user_repo.save(user)
+
+        return {'access_token': access_token, 'refresh_token': refresh_token,
+                'token_type': 'bearer'}
 
     def delete_refresh_token(self, user: 'UserModel') -> None:
         user.refresh_token = None
