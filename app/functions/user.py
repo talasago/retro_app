@@ -42,8 +42,7 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
     # NOTE:usernameとあるが、実際はemailを使用する。OAuthの仕様によりusernameという名前になっているらしい。
     user = auth_service.authenticate(
         email=form_data.username, password=form_data.password)
-    tokens = auth_service.generate_tokens(user_uuid=user.uuid)
-    auth_service.save_refresh_token(user, tokens['refresh_token'])
+    tokens = auth_service.create_tokens(user=user)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -58,8 +57,7 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
     """リフレッシュトークンでトークンを再取得"""
     current_user: 'UserModel' = \
         auth_service.get_current_user_from_refresh_token(refresh_token=token)
-    tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
-    auth_service.save_refresh_token(current_user, tokens['refresh_token'])
+    tokens = auth_service.create_tokens(user=current_user)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
