@@ -86,6 +86,7 @@ $ which python
 $ pip install --upgrade pip
 $ pip install pipenv
 $ pipenv sync
+$ pipenv sync --sync
 # Pipfileのライブラリがローカルにインストールされる
 ``` 
 `Pipfile`に存在するライブラリを実行する際は、`pipenv run ${実行するライブラリ名}` または `pipenv shell`→`${実行するライブラリ名}`としてください。(どちらでも構いません)
