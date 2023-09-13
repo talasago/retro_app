@@ -18,7 +18,7 @@ depends_on = None
 def upgrade() -> None:
     op.add_column(
         'users',
-        sa.Column('refresh_token', sa.VARCHAR(), autoincrement=False, nullable=True))
+        sa.Column('refresh_token', sa.VARCHAR(), autoincrement=False, nullable=True))  # noqa: E501
 
 
 def downgrade() -> None:
