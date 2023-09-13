@@ -52,8 +52,7 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
                             detail='メールアドレスまたはパスワードが間違っています。',
                             headers={'WWW-Authenticate': 'Bearer'})
 
-    tokens = auth_service.generate_tokens(user_uuid=user.uuid)
-    auth_service.save_refresh_token(user, tokens['refresh_token'])
+    tokens = auth_service.create_tokens(user=user)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
@@ -82,8 +81,7 @@ def refresh_token(auth_service: 'AuthService' = Depends(get_auth_service),
                             detail=str('ログイン有効期間を過ぎています。再度ログインしてください。'),
                             headers={'WWW-Authenticate': 'Bearer'})
 
-    tokens = auth_service.generate_tokens(user_uuid=current_user.uuid)
-    auth_service.save_refresh_token(current_user, tokens['refresh_token'])
+    tokens = auth_service.create_tokens(user=current_user)
 
     return JSONResponse(
         status_code=status.HTTP_200_OK,
