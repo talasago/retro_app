@@ -95,10 +95,13 @@ class AuthService:
             raise RetroAppAuthenticationError(message='パスワードが一致しません。')
         return user
 
-    def generate_tokens(self, user_uuid: 'UUID') -> dict[str, str]:
-        """アクセストークンとリフレッシュトークンを返す"""
-        if user_uuid is None:
-            raise TypeError('user_uuid must be other than None')
+    def create_tokens(self, user: 'UserModel') -> dict[str, str]:
+        """
+        アクセストークンとリフレッシュトークンを返す。また、リフレッシュトークンをDBに保存する。
+        """
+
+        if user is None:
+            raise TypeError('user must be other than None')
 
         # ペイロード作成
         # NOTE: uidには、uuidを使用する。
@@ -110,14 +113,14 @@ class AuthService:
             token_type=TokenType.ACCESS_TOKEN,
             # FIXME:日本時間に変更する
             exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-            uid=str(user_uuid),
+            uid=str(user.uuid),
             jti=str(uuid4())
         )
 
         refresh_payload = TokenPayload(
             token_type=TokenType.REFRESH_TOKEN,
             exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-            uid=str(user_uuid),
+            uid=str(user.uuid),
             jti=str(uuid4())
         )
 
@@ -126,14 +129,12 @@ class AuthService:
         refresh_token: str = jwt.encode(claims=refresh_payload.model_dump(),
                                         key=SECRET_KEY, algorithm=ALGORITHM)
 
-        # これをpydanticの型にしてもいいかも？レスポンスモデルで使用できるなら。
-        return {'access_token': access_token, 'refresh_token': refresh_token,
-                'token_type': 'bearer'}
-
-    def save_refresh_token(self, user: 'UserModel', refresh_token: str) -> None:
-        """リフレッシュトークンをusersテーブルに保存する"""
+        # リフレッシュトークンをusersテーブルに保存する
         user.refresh_token = refresh_token
         self.__user_repo.save(user)
+
+        return {'access_token': access_token, 'refresh_token': refresh_token,
+                'token_type': 'bearer'}
 
     def delete_refresh_token(self, user: 'UserModel') -> None:
         user.refresh_token = None
