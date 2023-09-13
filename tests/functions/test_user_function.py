@@ -1,12 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
 from app.functions.user import app
-from jose import jwt
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
-from app.schemas.token_schema import TokenPayload
+from app.schemas.token_schema import TokenType
 from app.models.user_model import UserModel
 from sqlalchemy import select
+from tests.test_helpers.token import generate_test_token
+from httpx import Response
+
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
@@ -28,18 +30,48 @@ def add_user_api():
 # TODO:function用のhelperに移動する
 @pytest.fixture
 def login_api():
-    def _method(login_param: dict) -> tuple:
-        response = client.post(
+    def _method(login_param: dict,
+                is_return_response=False) -> Response | tuple:
+        response: 'Response' = client.post(
             '/token',
             headers={
                 'accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded'},
             data=login_param
         )
-        assert response.status_code == 200
+
+        if is_return_response:
+            return response
+
         res_body = response.json()
         return res_body['access_token'], res_body['refresh_token']
 
+    return _method
+
+
+@pytest.fixture(scope='session')
+def refresh_token_api():
+    def _method(refresh_token: str) -> 'Response':
+        response: 'Response' = client.post(
+            '/refresh_token',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {refresh_token}'},
+        )
+        return response
+    return _method
+
+
+@pytest.fixture(scope='session')
+def logout_api():
+    def _method(access_token: str) -> 'Response':
+        response = client.post(
+            '/api/v1/logout',
+            headers={
+                'accept': 'application/json',
+                'Authorization': f'Bearer {access_token}'},
+        )
+        return response
     return _method
 
 
@@ -63,170 +95,252 @@ class TestUserFunction:
         # パスワードのバリデーションがすり抜けている気がする...
 
     class TestLogin:
-        def test_login_200(self, add_user_api):
-            user_data: dict = {
-                'email': 'testuser1@example.com',
-                'name': 'Test User1',
-                'password': 'testpassword'
-            }
-            add_user_api(user_data)
+        # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
+        class TestValidParam:
+            def test_return_200(self, add_user_api, login_api):
+                user_data: dict = {
+                    'email': 'testuser1@example.com',
+                    'name': 'Test User1',
+                    'password': 'testpassword'
+                }
+                add_user_api(user_data)
 
-            user_data: dict = {
-                'username': 'testuser@example.com',
-                'password': 'testpassword'
-            }
+                user_data: dict = {
+                    'username': 'testuser@example.com',
+                    'password': 'testpassword'
+                }
+                response = login_api(user_data, True)
 
-            response = client.post('token',
-                                   headers={
-                                       'accept': 'application/json',
-                                       'Content-Type': 'application/x-www-form-urlencoded'},  # noqa: E501
-                                   data=user_data)
+                res_body = response.json()
+                assert response.status_code == 200
+                assert res_body['access_token'] is not None
+                assert res_body['refresh_token'] is not None
+                assert res_body['message'] == 'ログインしました'
+                assert res_body['token_type'] == 'bearer'
+                assert res_body['name'] == 'Test User'
 
-            res_body = response.json()
-            assert response.status_code == 200
-            assert res_body['access_token'] is not None
-            assert res_body['refresh_token'] is not None
-            assert res_body['message'] == 'ログインしました'
-            assert res_body['token_type'] == 'bearer'
-            assert res_body['name'] == 'Test User'
+        class TestWhenNotExistEmail:
+            def test_return_401(self, login_api):
+                """存在しないメアドを指定した場合、エラーとなること"""
+                user_data: dict = {
+                    'username': 'APITestWhenNotExistEmail@example.com',
+                    'password': 'testpassword'
+                }
+                response = login_api(user_data, True)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'メールアドレスまたはパスワードが間違っています。'
+                assert response.headers['WWW-Authenticate'] == 'Bearer'
+
+        class TestWhenUnmatchPassword:
+            def test_return_401(self, add_user_api, login_api):
+                """パスワードが一致しない場合、エラーとなること"""
+                user_data: dict = {
+                    'email': 'apiTestWhenUnmatchPassword@example.com',
+                    'name': 'apiTestWhenUnmatchPassword',
+                    'password': 'testpassword'
+                }
+                add_user_api(user_data)
+
+                user_data: dict = {
+                    'username': 'apiTestWhenUnmatchPassword@example.com',
+                    'password': 'hogehoge'
+                }
+                response = login_api(user_data, True)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'メールアドレスまたはパスワードが間違っています。'
+                assert response.headers['WWW-Authenticate'] == 'Bearer'
 
     class TestLogout:
-        def test_logout_200(self, db: 'Session', add_user_api, login_api):
-            user_data: dict = {
-                'email': 'testuserlogout@example.com',
-                'name': 'Test Userlogout',
-                'password': 'testpassword'
-            }
-            add_user_api(user_data)
+        class TestWhenValidParam:
+            def test_logout_api_return_200_and_refresh_token_return_error(
+                    self, db: 'Session', add_user_api, login_api, logout_api,
+                    refresh_token_api):
+                """
+                有効なアクセストークンを渡すと、ログアウトが成功し、リフレッシュトークンがNullに更新されること。
+                その状態で/refresh_tokenにアクセスするとエラーとなること
+                """
+                user_data: dict = {
+                    'email': 'testuserlogout@example.com',
+                    'name': 'Test Userlogout',
+                    'password': 'testpassword'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            access_token, _ = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                access_token, refresh_token = login_api(login_param)
 
-            response = client.post(
-                '/api/v1/logout',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {access_token}'},
-            )
-            assert response.status_code == 200
-            assert response.json() == {
-                'message': 'ログアウトしました'
-            }
+                logout_response: 'Response' = logout_api(access_token)
+                assert logout_response.status_code == 200
+                assert logout_response.json() == {
+                    'message': 'ログアウトしました'
+                }
 
-            user: UserModel = db.execute(
-                select(UserModel).where(UserModel.email == user_data['email'])
-            ).scalars().first()
-            assert user  # Noneではないことの確認
-            assert user.refresh_token is None
+                stmt = select(UserModel).where(
+                    UserModel.email == user_data['email'])
+                user: UserModel = db.execute(stmt).scalars().first()
+                assert user  # Noneではないことの確認
+                assert user.refresh_token is None
 
-        def test_logout_invalid_token(self):
-            payload = TokenPayload(
-                token_type='dummy',
-                exp=datetime.utcnow() + timedelta(days=1),
-                uid='dummy',
-                jti='dummy'
-            )
-            # FIXME:SECRET_KEYを環境変数化
-            access_token = jwt.encode(claims=payload.model_dump(),
-                                      key='secret_key', algorithm='HS256')
+                ref_token_res: 'Response' = refresh_token_api(refresh_token)
+                assert ref_token_res.status_code == 401
+                assert ref_token_res.json() == {'detail': 'Tokenが間違っています。'}
+                assert ref_token_res.headers['www-authenticate'] == 'Bearer'
 
-            response = client.post(
-                '/api/v1/logout',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {access_token}'},
-            )
-            assert response.status_code == 401
+        class TestWhenInvalidToken:
+            def test_return_401(self, logout_api):
+                """access_tokenが無効な値の場合、401を返すこと"""
+                token: str = generate_test_token(
+                    'dummy', 'dummy')  # type: ignore
+
+                response = logout_api(token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenNotExistUser:
+            def test_return_401(self, logout_api):
+                """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
+                access_token: str = \
+                    generate_test_token(TokenType.ACCESS_TOKEN)
+
+                response = response = logout_api(access_token)
+
+                assert response.status_code == 401
+                assert response.json() == {'detail': 'ユーザーが存在しません。'}
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenExpiredToken:
+            def test_return_401(self, logout_api):
+                """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
+                access_token: str = generate_test_token(
+                    token_type=TokenType.ACCESS_TOKEN,
+                    exp=datetime.utcnow() - timedelta(minutes=10)
+                )
+
+                response = logout_api(access_token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenInvalidParam:
+            def test_return_401(self, logout_api):
+                """トークンが不正な値の場合401を返す"""
+                response = logout_api('hoge')
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
+                assert response.headers['www-authenticate'] == 'Bearer'
 
     # ログアウトのテスト観点
-    # ・ログイン状態じゃないと(access_tokenが有効である状態)エラーを返すこと(4XX)
-    # ・ログイン状態で実施すると、処理が成功すること
-    #     内部的にはトークンを無効化する。revoke_token
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
-
-    # TODO:アクセストークンのテストが必要
-    # - 10分後にアクセスするとエラーとなること
-
-    # リフレッシュトークン取得のテスト観点
-    # - アクセストークンは変わらないけど、リフレッシュトークンは変わること。（仕様として正しいのかも含めて確認）
-    #   - やっぱアクセストークンもリフレッシュトークンも変わるのが正しそう。アクセストークンが切れている状態でこのAPIを呼び出すので。
-    # 一方でアクセストークンが有効な時にこのAPIにアクセスしたら時はどうすれば？トークン再発行に倒そう。
-    # 1週間後にアクセスするとエラーとなること
-    # リフレッシュトークンが異常な値の時
+    #   ・ログインしていない状態でアクセスするのと同義
+    #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
 
     class TestRefreshToken:
-        def test_refresh_token_200(self, add_user_api, login_api):
-            user_data: dict = {
-                'email': 'testrefresh_token@example.com',
-                'name': 'Test Userrefresh_token',
-                'password': 'QG+UJxEdf,T5'
-            }
-            add_user_api(user_data)
+        class TestWhenValidParam:
+            def test_return_200(self, add_user_api, login_api,
+                                refresh_token_api):
+                user_data: dict = {
+                    'email': 'testrefresh_token@example.com',
+                    'name': 'Test Userrefresh_token',
+                    'password': 'QG+UJxEdf,T5'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            access_token, refresh_token = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                access_token, refresh_token = login_api(login_param)
 
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token}'},
-            )
+                response = refresh_token_api(refresh_token)
 
-            # トークンが再発行されていること
-            res_body = response.json()
-            assert response.status_code == 200
-            assert res_body['access_token'] != access_token
-            assert res_body['refresh_token'] != refresh_token
+                # トークンが再発行されていること
+                res_body = response.json()
+                assert response.status_code == 200
+                assert res_body['access_token'] != access_token
+                assert res_body['refresh_token'] != refresh_token
 
-        # TODO:メソッド名変更
-        def test_refresh_token_invalid_param(self, add_user_api, login_api):
-            """新しくリフレッシュトークンが発行されたら、
-            それより前に発行されたリフレッシュトークンは無効になること"""
-            user_data: dict = {
-                'email': 'testrefresh_token_invalid_param@example.com',
-                'name': 'Test testrefresh_token_invalid_param',
-                'password': 'QG+UJxEdf,T5'
-            }
-            add_user_api(user_data)
+        class TestWhenCreateNewRefreshToken:
+            def test_previous_refresh_token_is_disable(
+                    self, add_user_api, login_api, refresh_token_api):
+                """新しくリフレッシュトークンが発行されたら、
+                それより前に発行されたリフレッシュトークンは無効になること。
+                また、アクセストークンが再発行されること"""
+                user_data: dict = {
+                    'email': 'testrefresh_token_invalid_param@example.com',
+                    'name': 'Test testrefresh_token_invalid_param',
+                    'password': 'QG+UJxEdf,T5'
+                }
+                add_user_api(user_data)
 
-            login_param: dict = {
-                'username': user_data['email'],
-                'password': user_data['password'],
-            }
-            _, refresh_token_1st = login_api(login_param)
+                login_param: dict = {
+                    'username': user_data['email'],
+                    'password': user_data['password'],
+                }
+                access_token_1st, refresh_token_1st = login_api(login_param)
 
-            # リフレッシュトークンAPI実行1回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_1st}'},
-            )
-            refresh_token_2nd = response.json()['refresh_token']
-            assert response.status_code == 200
-            assert refresh_token_2nd != refresh_token_1st
+                # リフレッシュトークンAPI実行1回目
+                response = refresh_token_api(refresh_token_1st)
+                refresh_token_2nd = response.json()['refresh_token']
+                access_token_2nd = response.json()['access_token']
+                assert response.status_code == 200
+                assert refresh_token_2nd != refresh_token_1st
+                assert access_token_2nd != access_token_1st
 
-            # リフレッシュトークンAPI実行2回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_1st}'},
-            )
-            assert response.status_code == 401
+                # リフレッシュトークンAPI実行2回目
+                response = refresh_token_api(refresh_token_1st)
+                assert response.status_code == 401
 
-            # リフレッシュトークンAPI実行3回目
-            response = client.post(
-                '/refresh_token',
-                headers={
-                    'accept': 'application/json',
-                    'Authorization': f'Bearer {refresh_token_2nd}'},
-            )
-            assert response.status_code == 200
+                # リフレッシュトークンAPI実行3回目
+                response = refresh_token_api(refresh_token_2nd)
+                assert response.status_code == 200
+
+        class TestWhenNotExistUser:
+            def test_return_401(self, refresh_token_api):
+                """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
+                refresh_token: str = \
+                    generate_test_token(TokenType.REFRESH_TOKEN)
+
+                response = response = refresh_token_api(refresh_token)
+
+                assert response.status_code == 401
+                assert response.json() == {'detail': 'ユーザーが存在しません。'}
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenExpiredToken:
+            def test_return_401(self, refresh_token_api):
+                """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
+                refresh_token: str = generate_test_token(
+                    token_type=TokenType.REFRESH_TOKEN,
+                    exp=datetime.utcnow() - timedelta(days=7)
+                )
+
+                response = refresh_token_api(refresh_token)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'ログイン有効期間を過ぎています。再度ログインしてください。'
+                assert response.headers['www-authenticate'] == 'Bearer'
+
+        class TestWhenInvalidParam:
+            def test_return_401(self, refresh_token_api):
+                """トークンが不正な値の場合401を返す"""
+                response = refresh_token_api('hoge')
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body['detail'] == 'Tokenが間違っています。'
+                assert response.headers['www-authenticate'] == 'Bearer'
