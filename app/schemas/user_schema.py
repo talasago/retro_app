@@ -7,8 +7,12 @@ from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
 class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
-    email: EmailStr
-    name: str = Field(max_length=50)
+    email: EmailStr = Field(max_length=50,
+                            description='ユーザーのメールアドレス',
+                            examples=['testuser@example.com'])
+    name: str = Field(max_length=50,
+                      description='ユーザーの名前',
+                      examples=['Test User'])
 
     # emailについて
     # NOTE:emailのバリデーションはコチラ
@@ -32,9 +36,11 @@ class UserSchema(BaseModel):
 
 
 class UserCreate(UserSchema):
-    password: SecretStr
     PASSWARD_REGEX: ClassVar[str] = \
         r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
+    password: SecretStr = \
+        Field(description=f'ユーザーのパスワード。regex_prttern: {PASSWARD_REGEX}',
+              examples=['password'])
 
     # NOTE:半角英数字記号をそれぞれ1種類以上含む8文字以上50文字じゃないと登録できないようにしようと考えたが、
     # それだとユーザー登録ハードルが高くなるのでやめた
