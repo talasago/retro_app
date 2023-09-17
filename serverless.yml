@@ -11,7 +11,7 @@ custom:
     # 2023/9/10時点でtrueに変更し手もデプロイできない問題あり。修正されているがリリースされていない模様。
     # https://github.com/serverless/serverless-python-requirements/pull/780
     usePipenv: false
-    pipCmdExtraArgs: 
+    pipCmdExtraArgs:
       - '--platform'
       - 'manylinux2014_aarch64'
       #- '--implementation'
@@ -34,7 +34,7 @@ package:
 
 provider:
   name: aws
-  architecture: arm64  
+  architecture: arm64
   stage: dev # TODO:オプション引数で変更できるように変更したい
   runtime: python3.10
   region: ap-northeast-1
@@ -49,7 +49,7 @@ provider:
     POSTGRES_PASSWORD: dummy
     POSTGRES_DATABASE: dummy
 
-functions:  
+functions:
   user_function:
     handler: app.functions.user.handler
     events:
