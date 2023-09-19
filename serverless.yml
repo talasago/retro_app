@@ -49,8 +49,12 @@ provider:
   iamRoleStatements:
     - Effect: Allow
       Action:
-        - ec2:DescribeInstances
+        - ec2:DescribeInstances # 何で必要なんだっけ...
+        - ec2:CreateNetworkInterface # VPC設定のために必要
+        - ec2:DescribeNetworkInterfaces # VPC設定のために必要
+        - ec2:DeleteNetworkInterface # VPC設定のために必要
       Resource: "*"
+  # TODO:VPCの設定を追加する
   environment:
     POSTGRES_HOST: dummy
     POSTGRES_USER: dummy
