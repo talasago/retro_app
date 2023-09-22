@@ -39,6 +39,14 @@
 └── tools/ => 便利なツール。デプロイしない。
 ```
 
+# (現時点の)デプロイ方法
+```bash
+$ cd /infra
+$ pipenv requirements > requirements.txt
+$ npx sls deploy  --aws-profile [profile_name]
+# 後はLambdaの環境変数を変更する
+```
+
 # 設計方針(コーディング規約)
 - エンドユーザーに返す可能性があるエラーメッセージは日本語、そうでない内部的なエラーメッセージは英語とする。
 
