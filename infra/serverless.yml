@@ -1,6 +1,4 @@
-# TODO:後でディレクトリを移動する
-
-service: serverless-example
+service: retro-app
 frameworkVersion: '>=3.0.0 <4.0.0'
 
 plugins:
@@ -54,7 +52,14 @@ provider:
         - ec2:DescribeNetworkInterfaces # VPC設定のために必要
         - ec2:DeleteNetworkInterface # VPC設定のために必要
       Resource: "*"
-  # TODO:VPCの設定を追加する
+  vpc:
+    securityGroupIds:
+      - sg-0bf8878f3a1baeba9
+    subnetIds:
+      # XXX:subnetを3つ使う必要があるかわかってない。
+      - subnet-0214fe79fe7b89a1a
+      - subnet-0047acbc1ef639c16
+      - subnet-0fbe6af2f37be64b1
   environment:
     POSTGRES_HOST: dummy
     POSTGRES_USER: dummy
