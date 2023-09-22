@@ -29,7 +29,7 @@ class TestAuthService():
         def test_valid(self, auth_service: AuthService, user_repo):
             """access_tokenをデコードしたuuidがユーザーと一致した場合、そのユーザーを返す"""
             test_user: 'UserModel' = create_test_user(user_repo)
-            tokens = auth_service.generate_tokens(test_user.uuid)
+            tokens = auth_service.create_tokens(user=test_user)
 
             current_user: 'UserModel' = auth_service.get_current_user(
                 tokens['access_token'])
@@ -41,7 +41,7 @@ class TestAuthService():
                 """expect_token_typeが既定の値ではない場合例外を返す"""
                 test_user: 'UserModel' = create_test_user(user_repo)
 
-                tokens = auth_service.generate_tokens(test_user.uuid)
+                tokens = auth_service.create_tokens(user=test_user)
 
                 with pytest.raises(ValueError) as e:
                     auth_service.get_current_user(token=tokens['access_token'],
@@ -135,7 +135,7 @@ class TestAuthService():
                                      user_repo):
                 """AccessTokenを渡した場合はエラーになる"""
                 test_user: 'UserModel' = create_test_user(user_repo)
-                tokens = auth_service.generate_tokens(test_user.uuid)
+                tokens = auth_service.create_tokens(user=test_user)
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
                     auth_service.get_current_user_from_refresh_token(
@@ -152,29 +152,31 @@ class TestAuthService():
                     )
                 assert str(e.value) == 'refresh_token must be other than None'
 
-    class TestGenerateToken:
+    class TestCreateToken:
         @pytest.mark.smoke
-        def test_valid(self, auth_service: AuthService):
-            """uuidが有効な値の場合、access_tokenとrefresh_tokenを返す"""
-            test_uuid: UUID = UUID('a49b19ec-ed16-4416-81ea-b6a9d029baef')
-            tokens = auth_service.generate_tokens(test_uuid)
+        def test_valid(self, auth_service: AuthService,
+                       user_repo: UserRepository):
+            """Userが有効な値の場合、access_tokenとrefresh_tokenを返す"""
+            test_user: 'UserModel' = create_test_user(user_repo)
+            tokens = auth_service.create_tokens(user=test_user)
 
             assert tokens['access_token']
             assert tokens['refresh_token']
             assert tokens['token_type'] == 'bearer'
 
-        class TestWhenUUIDIsNone:
+        class TestWhenUserIsNone:
             def test_raise_error(self, auth_service: AuthService):
-                """uuidがNoneの場合は例外を返す"""
+                """userがNoneの場合は例外を返す"""
                 with pytest.raises(TypeError) as e:
-                    auth_service.generate_tokens(None)  # type: ignore
+                    auth_service.create_tokens(None)  # type: ignore
 
-                assert str(e.value) == 'user_uuid must be other than None'
+                assert str(e.value) == 'user must be other than None'
 
     class TestAuthenticate:
         class TestWhenValidParam:
             @pytest.mark.smoke
-            def test_return_authenticated_user(self, auth_service: AuthService, user_repo):
+            def test_return_authenticated_user(self, auth_service: AuthService,
+                                               user_repo):
                 """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
                 user_params = {
                     'email': 'authenticate_user@example.com',
@@ -201,7 +203,8 @@ class TestAuthService():
                 assert str(e.value) == '条件に合致するレコードは存在しません。'
 
         class TestWhenUnmatchPassword:
-            def test_raise_exception(self, auth_service: AuthService, user_repo):
+            def test_raise_exception(self, auth_service: AuthService,
+                                     user_repo):
                 """パスワードが一致しない場合、エラーを返す"""
                 test_user: 'UserModel' = create_test_user(user_repo)
 

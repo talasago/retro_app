@@ -68,8 +68,7 @@ def sign_in(form_data: OAuth2PasswordRequestForm = Depends(),
                             detail='メールアドレスまたはパスワードが間違っています。',
                             headers={'WWW-Authenticate': 'Bearer'})
 
-    tokens = auth_service.generate_tokens(user_uuid=user.uuid)
-    auth_service.save_refresh_token(user, tokens['refresh_token'])
+    tokens = auth_service.create_tokens(user=user)
 
     res_body = TokenApiResponseBody(name=user.name, **tokens)
     return JSONResponse(
