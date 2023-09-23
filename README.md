@@ -39,6 +39,14 @@
 └── tools/ => 便利なツール。デプロイしない。
 ```
 
+# (現時点の)デプロイ方法
+```bash
+$ cd /infra
+$ pipenv requirements > requirements.txt
+$ npx sls deploy  --aws-profile [profile_name]
+# 後はLambdaの環境変数を変更する
+```
+
 # 設計方針(コーディング規約)
 - エンドユーザーに返す可能性があるエラーメッセージは日本語、そうでない内部的なエラーメッセージは英語とする。
 
@@ -100,7 +108,7 @@ $ brew install postgresql
 ```
 
 ### テスト実行
-`$ pytest`を実行すると、pytestが実行されます。
+`export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"`を実行後、`$ pytest`を実行すると、pytestが実行されます。
 
 ### テーブル定義の反映
 初回実行 または テーブルに変更があった(`database/versions`にファイルが追加・更新された)場合、ローカル環境にテーブル定義を反映させるために以下のコマンドを実行してください
