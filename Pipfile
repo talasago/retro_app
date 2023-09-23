@@ -22,7 +22,6 @@ uvicorn = {version = "*", extras = ["standard"]}
 pytest = "*"
 httpx = "*"
 factory-boy = "*"
-sqlalchemy-utils = "*"
 
 [requires]
 python_version = "3.10"
