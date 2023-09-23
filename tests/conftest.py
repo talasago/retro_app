@@ -37,6 +37,7 @@ def db() -> Session:
     with engine.connect() as connection:
         # マイグレートのバージョン管理しているテーブルも削除することで、マイグレートできる
         connection.execute(text('DROP TABLE IF EXISTS alembic_version;'))
+        connection.commit()
     migrate()
 
     db = SessionLocal()
