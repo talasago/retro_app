@@ -20,10 +20,15 @@ def db() -> Session:
     """データベースセッションのフィクスチャ。TBLを削除→作成→テスト実行→DB接続セッション削除としている"""
 
     # NOTE:TBL削除→TBL作成→→テスト実行できるようにすることで、テストデータを毎回削除する手間を減らしている。
-    # ロジックはこちらのHPを参考にし
+    # テスト実行後にテストデータを削除しない理由について、もしテスト実行後にテストデータを削除したら、
+    # テストが落ちた時になぜ落ちたか、原因を判断するための材料が一つ減ってしまうため。
+    # テスト実行前にデータを削除すると、テストが落ちた時にデータを見て原因を判断しやすくなる。
+
+    # ロジックはこちらのHPを参考にした
     # https://nikaera.com/archives/pytest-sqlalchemy-alembic/
 
-    # TODO:環境変数とかにしたほうがいいかも
+    # FIXME:test_user_functionなどで、このURLを見に行かずにdatabase.pyを見に行っているので、
+    # DB接続セッションが無駄に2個使われてる。
     TEST_SQLALCHEMY_DATABASE_URL = 'postgresql://postgres:postgres_password@localhost:5432/postgres'
     engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
 
