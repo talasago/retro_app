@@ -50,6 +50,5 @@ jobs:
       run: |
         cd ./infra/
         pipenv requirements > requirements.txt
-        npx sls deploy --param="dockerizePip=false"
-        
+        npx sls deploy
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
