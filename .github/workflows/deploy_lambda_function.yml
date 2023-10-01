@@ -50,5 +50,7 @@ jobs:
       run: |
         cd ./infra/
         pipenv requirements > requirements.txt
-        npx sls deploy
+        npx sls package
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
+  # packageは仮のコマンド。
+  # awsへの認証情報を考える。
