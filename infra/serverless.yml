@@ -17,7 +17,7 @@ custom:
       #- '--python-version'
       #- '3.10'
       - '--only-binary=:all:'
-    dockerizePip: true
+    dockerizePip: ${param:dockerizePip, true}
 
 package:
   patterns:

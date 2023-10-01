@@ -32,6 +32,24 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - name: lambda deploy
-      # FIXME: 仮のコマンド
-      run: npx sls --help 
+    - name: Read python version from .python-version
+      id: python_version
+      run: echo "::set-output name=python_version::$(cat .python-version)"
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ steps.python-version.outputs.python_version }}
+        cache: pip
+
+    - name: Install pipenv
+      run: pip install pipenv
+
+    - name: deploy lambda function
+      # FIXME: 別ジョブか別ワークフローにしたい。set upの次に行いたい。
+      run: |
+        cd infla
+        pipenv requirements > requirements.txt
+        npx sls deploy --param="dockerizePip=false"
+        
+      # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
