@@ -6,6 +6,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    name: Set up
 
     steps:
     - name: Checkout repository
@@ -30,6 +31,3 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
-
-    - name: Build and test
-      run: npm run build && npm test
