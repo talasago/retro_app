@@ -6,13 +6,13 @@ name = "pypi"
 [packages]
 fastapi = "*"
 mangum = "*"
-psycopg2 = "*"
 sqlalchemy = "*"
 alembic = "*"
 passlib = {version = "*", extras = ["bcrypt"]}
 email-validator = "*"
 python-multipart = "*"
 python-jose = {version = "*", extras = ["cryptography"]}
+psycopg2-binary = "*"
 
 [dev-packages]
 autopep8 = "*"
