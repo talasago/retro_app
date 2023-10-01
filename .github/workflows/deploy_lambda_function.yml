@@ -22,7 +22,7 @@ jobs:
         node-version: ${{ steps.nvmrc.outputs.node_version }}
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci
 
     - name: Cache dependencies
       uses: actions/cache@v2
@@ -31,3 +31,7 @@ jobs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
+
+    - name: lambda deploy
+      # FIXME: 仮のコマンド
+      run: npx sls --help 
