@@ -11,10 +11,14 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Read Node.js version from .nvmrc
+      id: nvmrc
+      run: echo "::set-output name=node_version::$(cat .nvmrc)"
+
     - name: Set up Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: $(cat .nvmrc)
+        node-version: ${{ steps.nvmrc.outputs.node_version }}
 
     - name: Install dependencies
       run: npm install
