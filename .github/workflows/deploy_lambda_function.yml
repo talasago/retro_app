@@ -48,7 +48,7 @@ jobs:
     - name: deploy lambda function
       # FIXME: 別ジョブか別ワークフローにしたい。set upの次に行いたい。
       run: |
-        cd infla
+        cd ./infra/
         pipenv requirements > requirements.txt
         npx sls deploy --param="dockerizePip=false"
         
