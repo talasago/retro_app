@@ -17,7 +17,11 @@ custom:
       #- '--python-version'
       #- '3.10'
       - '--only-binary=:all:'
-    dockerizePip: true
+    #dockerizePip: true
+    #useDownloadCache: true
+    #useStaticCache: true
+    #cacheLocation: ./.serverless/.requirements_cache
+    dockerBuildCmdExtraArgs: ['--platforms', 'linux/arm64']
 
 package:
   patterns:
