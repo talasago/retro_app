@@ -14,7 +14,7 @@ jobs:
 
     - name: Read Node.js version from .nvmrc
       id: nvmrc
-      run: echo "::set-output name=node_version::$(cat .nvmrc)"
+      run: echo "node_version=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
     - name: Set up Node.js
       uses: actions/setup-node@v3
@@ -34,7 +34,7 @@ jobs:
 
     - name: Read python version from .python-version
       id: python_version
-      run: echo "::set-output name=python_version::$(cat .python-version)"
+      run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
 
     - name: Setup Python
       uses: actions/setup-python@v4
