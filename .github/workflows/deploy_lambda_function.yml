@@ -45,6 +45,16 @@ jobs:
     - name: Install pipenv
       run: pip install pipenv
 
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: linux/arm64
+
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/arm64
+
     - name: deploy lambda function
       # FIXME: 別ジョブか別ワークフローにしたい。set upの次に行いたい。
       run: |
