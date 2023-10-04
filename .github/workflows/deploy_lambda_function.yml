@@ -3,6 +3,10 @@ name: deploy_lambda_function
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -57,12 +61,16 @@ jobs:
       with:
         platforms: linux/arm64
 
-    - name: deploy lambda function
+    - name: Assume role
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_IAM_ROLE_NAME  }}
+        aws-region: ap-northeast-1
+
+    - name: Deploy lambda function
       # FIXME: 別ジョブか別ワークフローにしたい。set upの次に行いたい。
       run: |
         cd ./infra/
         pipenv requirements > requirements.txt
-        npx sls package
+        npx sls deploy
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
-  # packageは仮のコマンド。
-  # awsへの認証情報を考える。
