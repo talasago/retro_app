@@ -8,10 +8,10 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    name: Set up
+    name: Deploy lambda function
 
     steps:
     - name: Checkout repository
@@ -68,8 +68,8 @@ jobs:
         role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.AWS_IAM_ROLE_NAME  }}
         aws-region: ap-northeast-1
 
-    - name: Deploy lambda function
-      # FIXME: 別ジョブか別ワークフローにしたい。set upの次に行いたい。
+    - name: sls deploy
+      # TODO: 別ジョブにしたい。set-upの次に行いたい。ただ、やるとするとcacheを復元する手順とかが必要で、処理時間的に分けるメリットがなさそうと判断して一旦対応しない、
       run: |
         cd ./infra/
         pipenv requirements > requirements.txt
