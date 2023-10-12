@@ -66,10 +66,10 @@ provider:
       - subnet-0047acbc1ef639c16
       - subnet-0fbe6af2f37be64b1
   environment:
-    POSTGRES_HOST: dummy
-    POSTGRES_USER: dummy
-    POSTGRES_PASSWORD: dummy
-    POSTGRES_DATABASE: dummy
+    POSTGRES_HOST: ${ssm:postgres_host}
+    POSTGRES_USER: ${ssm:postgres_password}
+    POSTGRES_PASSWORD: ${ssm:postgres_password}
+    POSTGRES_DATABASE: ${ssm:postgres_database}
 
 functions:
   user_function:
