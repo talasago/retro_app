@@ -45,7 +45,7 @@ jobs:
         run: |
           current_ip=$(curl http://checkip.amazonaws.com/)
           jq '.portStates += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "cidrs": ["'"${current_ip}"'"]}]' org_firewall.json > firewall.json
-          aws lightsail put-instance-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
+          aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
       - name: migrate database
         run: pipenv run alembic upgrade head
