@@ -1,0 +1,65 @@
+name: migrate_database
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  execute_commands:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Read python version from .python-version
+        id: python_version
+        run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python_version.outputs.python_version }}
+          # cache: pip
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: install dependencies
+        run: pipenv sync
+
+      - name: Get firewall JSON
+        run: |
+          aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json > org_firewall.json
+
+      - name: Assume role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DB_MIGRATE_IAM_ROLE_NAME }}
+          aws-region: ap-northeast-1
+
+      - name: Put updated firewall configuration
+        run: |
+          CURRENT_IP=$(curl http://checkip.amazonaws.com/)
+          jq '.[] | select(.port==5432) | .accessRules += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "accessFrom": "'"$CURRENT_IP"'"}]' org_firewall.json > firewall.json
+          aws lightsail put-instance-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
+
+      - name: migrate database
+        run: pipenv run alembic upgrade head
+        env:
+          # TODO:本番環境と開発環境で環境変数を分ける必要あり。
+          # host以外はssm見ても良い気がする。
+          POSTGRES_HOST: ${secrets:POSTGRES_HOST}
+          POSTGRES_USER: ${secrets:POSTGRES_USER}
+          POSTGRES_PASSWORD: ${secrets:POSTGRES_PASSWORD}
+          POSTGRES_DATABASE: ${secrets:POSTGRES_DATABASE}
+
+
+      - name: Put original firewall configuration
+        run: |
+          CURRENT_IP=$(curl http://checkip.amazonaws.com/)
+          jq '.[] | select(.port==5432) | .accessRules += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "accessFrom": "'"$CURRENT_IP"'"}]' org_firewall.json > firewall.json
+          aws lightsail put-instance-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
