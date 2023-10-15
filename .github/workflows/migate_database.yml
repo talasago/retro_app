@@ -48,14 +48,6 @@ jobs:
           jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json > firewall.json
           aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        timeout-minutes: 15
-        with:
-          sudo: true
-          limit-access-to-actor: true
-
       - name: migrate database
         run: pipenv run alembic upgrade head
         env:
