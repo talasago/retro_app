@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  execute_commands:
+  migrate:
     runs-on: ubuntu-latest
 
     steps:
@@ -31,15 +31,14 @@ jobs:
       - name: install dependencies
         run: pipenv sync
 
-      - name: Get firewall JSON
-        run: |
-          aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json > org_firewall.json
-
       - name: Assume role
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DB_MIGRATE_IAM_ROLE_NAME }}
           aws-region: ap-northeast-1
+
+      - name: Get firewall JSON
+        run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json > org_firewall.json
 
       - name: Put updated firewall configuration
         run: |
@@ -59,7 +58,4 @@ jobs:
 
 
       - name: Put original firewall configuration
-        run: |
-          CURRENT_IP=$(curl http://checkip.amazonaws.com/)
-          jq '.[] | select(.port==5432) | .accessRules += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "accessFrom": "'"$CURRENT_IP"'"}]' org_firewall.json > firewall.json
-          aws lightsail put-instance-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
+        run: aws lightsail put-instance-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
