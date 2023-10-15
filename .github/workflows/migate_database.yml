@@ -38,13 +38,14 @@ jobs:
           aws-region: ap-northeast-1
 
       - name: Get firewall JSON
-        run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json > org_firewall.json
+        run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json |
+             jq -r '.portStates' |sed '/state/d' > org_firewall.json
+             # stateとportStatesを消さないと更新用のjsonにならない
 
       - name: Put updated firewall configuration
-        # TODO:org_firewall.jsonにすでに5432が存在しているときの考慮をしたい
         run: |
           current_ip=$(curl http://checkip.amazonaws.com/)
-          jq '.portStates += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "cidrs": ["'"${current_ip}"'"]}]' org_firewall.json > firewall.json
+          jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json > firewall.json
           aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
       - name: migrate database
@@ -59,4 +60,4 @@ jobs:
 
       # TODO:migrate失敗してもこれは実行したい
       - name: Put original firewall configuration
-        run: aws lightsail put-instance-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
+        run: aws lightsail put-instance-public-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
