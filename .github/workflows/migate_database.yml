@@ -41,9 +41,10 @@ jobs:
         run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json > org_firewall.json
 
       - name: Put updated firewall configuration
+        # TODO:org_firewall.jsonにすでに5432が存在しているときの考慮をしたい
         run: |
-          CURRENT_IP=$(curl http://checkip.amazonaws.com/)
-          jq '.[] | select(.port==5432) | .accessRules += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "accessFrom": "'"$CURRENT_IP"'"}]' org_firewall.json > firewall.json
+          current_ip=$(curl http://checkip.amazonaws.com/)
+          jq '.portStates += [{"protocol": "tcp", "portRanges": {"fromPort": 5432, "toPort": 5432}, "cidrs": ["'"${current_ip}"'"]}]' org_firewall.json > firewall.json
           aws lightsail put-instance-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
       - name: migrate database
@@ -56,6 +57,6 @@ jobs:
           POSTGRES_PASSWORD: ${secrets:POSTGRES_PASSWORD}
           POSTGRES_DATABASE: ${secrets:POSTGRES_DATABASE}
 
-
+      # TODO:migrate失敗してもこれは実行したい
       - name: Put original firewall configuration
         run: aws lightsail put-instance-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
