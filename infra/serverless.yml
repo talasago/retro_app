@@ -21,6 +21,7 @@ custom:
     #useDownloadCache: true
     #useStaticCache: true
     #cacheLocation: ./.serverless/.requirements_cache
+    # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
     dockerBuildCmdExtraArgs: ['--platforms', 'linux/arm64']
 
 package:
