@@ -7,7 +7,7 @@ name = "pypi"
 fastapi = "*"
 mangum = "*"
 sqlalchemy = "*"
-alembic = "*"
+alembic = "*" # これはlambdaにデプロイする必要ないからdevでもいいかもな
 passlib = {version = "*", extras = ["bcrypt"]}
 email-validator = "*"
 python-multipart = "*"
