@@ -53,10 +53,10 @@ jobs:
         env:
           # TODO:本番環境と開発環境で環境変数を分ける必要あり。
           # host以外はssm見ても良い気がする。
-          POSTGRES_HOST: ${secrets:POSTGRES_HOST}
-          POSTGRES_USER: ${secrets:POSTGRES_USER}
-          POSTGRES_PASSWORD: ${secrets:POSTGRES_PASSWORD}
-          POSTGRES_DATABASE: ${secrets:POSTGRES_DATABASE}
+          POSTGRES_HOST: ${{secrets.POSTGRES_HOST}}
+          POSTGRES_USER: ${{secrets.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          POSTGRES_DATABASE: ${{secrets.POSTGRES_DATABASE}}
 
       # TODO:migrate失敗してもこれは実行したい
       - name: Put original firewall configuration
