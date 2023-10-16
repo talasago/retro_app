@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Read python version from .python-version
         id: python_version
@@ -39,13 +39,19 @@ jobs:
 
       - name: Get firewall JSON
         run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json |
-             jq -r '.portStates' |sed '/state/d' > org_firewall.json
+             jq -r '.portStates' | sed '/state/d' > org_firewall.json
              # stateとportStatesを消さないと更新用のjsonにならない
 
       - name: Put updated firewall configuration
         run: |
           current_ip=$(curl http://checkip.amazonaws.com/)
-          jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json > firewall.json
+          if grep -q "5432" org_firewall.json; then
+            # 5432のものにcurrent_ipを追加
+            jq '. |= map(if .fromPort == 5432 then .cidrs = ["'"${current_ip}"'/32"] else . end)' org_firewall.json
+          else
+            # 5432のものを新たに追加
+            jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json
+          fi > firewall.json
           aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
       - name: migrate database
