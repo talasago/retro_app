@@ -64,6 +64,7 @@ jobs:
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           POSTGRES_DATABASE: ${{secrets.POSTGRES_DATABASE}}
 
-      # TODO:migrate失敗してもこれは実行したい
+      # migrate失敗してもportは閉じる
       - name: Put original firewall configuration
+        if: always()
         run: aws lightsail put-instance-public-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
