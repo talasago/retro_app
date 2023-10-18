@@ -125,14 +125,17 @@ $ alembic upgrade head
 3. `database/versions/`配下に作成されたマイグレーションファイルを修正する
 4. `alembic upgrade head`を実行すると、ローカルのDBにテーブル定義が反映される
 
-## LinterとFomatter
-**PRを出すときは、LinterとFomatterを実行してからレビュー依頼を投げてほしいです。**綺麗なコードにすることで内部品質を高め、可読性が高く理解しやすいコードにしていきたいためです。
-改修した範囲でエラーが出たものは、全部対応していただきたいのです。が、現状は強制しません。(ローカルだけでなくCI/CDでも実行すべきため)
-いずれLinterに沿っていないコードは、CI/CDでリジェクトするようにしたいと思っています。
+## Lambda Functionのデプロイ方法
+GithubAcions([deploy_lambda_function](https://github.com/talasago/retro_app_backend/actions/workflows/deploy_lambda_function.yml))を手動で起動すると、その時点でpushされているコードをLambdaにデプロイします。
 
-LinterはPylanceやFlake8、FormatterはAutopep8を使用しています。
-※Pylanceは現状VSCodeだけ使用可能になっています。(VSCode限定にしないためにはpipをインストールすれば良いと思うけどやれていない)
+ 
+※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
+※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね
+## LighisailのDBにテーブル定義の変更を加える(migrate)の方法
+GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/actions/workflows/migate_database.yml))を手動で起動すると、その時点でpushされているコード(alembic関連)を、Lighisail上のPostgreSQLに反映します。
 
+※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
+※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね
 
 ### 使い方
 ```bash
