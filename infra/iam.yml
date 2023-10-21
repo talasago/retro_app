@@ -1,0 +1,142 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Metadata:
+  Generator: "former2"
+Description: ""
+Resources:
+  IAMRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: "github_actions_migrate_database"
+      AssumeRolePolicyDocument: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:sub\":[\"repo:talasago/retro_app_backend:ref:refs/heads/main\",\"repo:talasago/retro_app_backend:ref:refs/heads/develop\"]}}}]}"
+      MaxSessionDuration: 3600
+      ManagedPolicyArns: 
+      - !Ref IAMManagedPolicy
+      Description: ""
+
+  IAMRole2:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: !Ref IAMPolicy
+      AssumeRolePolicyDocument: !Sub "{\"Version\":\"2012-10-17\",\"Statement\":[{\"Effect\":\"Allow\",\"Principal\":{\"Federated\":\"arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com\"},\"Action\":\"sts:AssumeRoleWithWebIdentity\",\"Condition\":{\"StringEquals\":{\"token.actions.githubusercontent.com:sub\":[\"repo:talasago/retro_app_backend:ref:refs/heads/main\",\"repo:talasago/retro_app_backend:ref:refs/heads/develop\"]}}}]}"
+      MaxSessionDuration: 3600
+      Description: ""
+
+  IAMManagedPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: "github_actions_migrate_database"
+      Path: "/"
+      PolicyDocument: |
+          {
+          	"Version": "2012-10-17",
+          	"Statement": [
+          		{
+          			"Sid": "VisualEditor0",
+          			"Effect": "Allow",
+          			"Action": [
+          				"lightsail:PutInstancePublicPorts",
+          				"lightsail:GetInstancePortStates"
+          			],
+          			"Resource": "*"
+          		}
+          	]
+          }
+
+  IAMPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyDocument: |
+          {
+          	"Version": "2012-10-17",
+          	"Statement": [
+          		{
+          			"Sid": "VisualEditor0",
+          			"Effect": "Allow",
+          			"Action": [
+          				"lambda:CreateFunction",
+          				"lambda:TagResource",
+          				"iam:List*",
+          				"logs:Describe*",
+          				"s3:CreateBucket",
+          				"iam:CreateRole",
+          				"iam:AttachRolePolicy",
+          				"cloudformation:DescribeStackResource",
+          				"iam:PutRolePolicy",
+          				"cloudformation:CreateChangeSet",
+          				"ssm:GetParameter",
+          				"logs:TagLogGroup",
+          				"iam:DetachRolePolicy",
+          				"cloudformation:DescribeStackEvents",
+          				"logs:DeleteRetentionPolicy",
+          				"s3:PutBucketAcl",
+          				"cloudformation:UpdateStack",
+          				"lambda:DeleteFunction",
+          				"apigateway:GET",
+          				"s3:DeleteObject",
+          				"cloudformation:DescribeChangeSet",
+          				"cloudformation:ExecuteChangeSet",
+          				"cloudformation:ListStackResources",
+          				"lambda:InvokeFunction",
+          				"lambda:List*",
+          				"logs:List*",
+          				"cloudformation:DescribeStackResources",
+          				"iam:DeleteRole",
+          				"ssm:GetParameters",
+          				"s3:DeleteBucketPolicy",
+          				"logs:Get*",
+          				"logs:CreateLogGroup",
+          				"lambda:UpdateAlias",
+          				"cloudformation:DescribeStacks",
+          				"lambda:UpdateFunctionCode",
+          				"s3:PutObject",
+          				"s3:GetObject",
+          				"logs:PutResourcePolicy",
+          				"cloudformation:GetTemplate",
+          				"cloudformation:DeleteStack",
+          				"lambda:PublishVersion",
+          				"apigateway:POST",
+          				"ec2:DescribeSubnets",
+          				"cloudformation:ValidateTemplate",
+          				"lambda:CreateAlias",
+          				"cloudformation:CancelUpdateStack",
+          				"iam:UntagRole",
+          				"iam:TagRole",
+          				"cloudformation:UpdateTerminationProtection",
+          				"s3:ListBucket",
+          				"lambda:UntagResource",
+          				"s3:GetBucketPolicy",
+          				"cloudformation:DeleteChangeSet",
+          				"s3:PutEncryptionConfiguration",
+          				"apigateway:DELETE",
+          				"s3:GetEncryptionConfiguration",
+          				"logs:DeleteResourcePolicy",
+          				"iam:PassRole",
+          				"iam:Get*",
+          				"iam:DeleteRolePolicy",
+          				"apigateway:PATCH",
+          				"s3:DeleteBucket",
+          				"cloudformation:SetStackPolicy",
+          				"cloudformation:ListStacks",
+          				"logs:UntagLogGroup",
+          				"apigateway:PUT",
+          				"logs:DeleteLogGroup",
+          				"lambda:UpdateFunctionConfiguration",
+          				"lambda:Get*",
+          				"ec2:DescribeSecurityGroups",
+          				"lambda:AddPermission",
+          				"cloudformation:CreateStack",
+          				"ec2:DescribeVpcs",
+          				"lambda:DeleteAlias",
+          				"s3:PutBucketPolicy",
+          				"logs:PutRetentionPolicy",
+          				"lambda:RemovePermission"
+          			],
+          			"Resource": "*"
+          		}
+          	]
+          }
+      Roles: 
+      - "github_actions_deploy_lambda_function"
+      PolicyName: "github_actions_deploy_lambda_function"
