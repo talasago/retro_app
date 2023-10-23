@@ -128,14 +128,15 @@ $ alembic upgrade head
 ## Lambda Functionのデプロイ方法
 GithubAcions([deploy_lambda_function](https://github.com/talasago/retro_app_backend/actions/workflows/deploy_lambda_function.yml))を手動で起動すると、その時点でpushされているコードをLambdaにデプロイします。
 
- 
 ※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
-※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね
+※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
+※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
 ## LighisailのDBにテーブル定義の変更を加える(migrate)の方法
-GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/actions/workflows/migate_database.yml))を手動で起動すると、その時点でpushされているコード(alembic関連)を、Lighisail上のPostgreSQLに反映します。
+GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/actions/workflows/migate_database.yml))を手動で起動すると、その時点でpushされているコード(alembic関連)を、Lighisail上のPostgreSQLに反映します。  
 
 ※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
-※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね
+※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
+※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
 
 ### 使い方
 ```bash
