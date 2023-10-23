@@ -148,4 +148,8 @@ Resources:
           - "s3:PutObject"
           - "ssm:GetParameter"
           - "ssm:GetParameters"
-          Resource: "*" #TODO:リソース指定した方が良いのかな...
+          Resource: "*" 
+          # TODO: セキュリティを考慮してリソースは指定した方が良い。
+          # が、リソースごとにarnを指定する必要があり、その為にymlを変更するのが手間なので
+          # 対応は後回し。以下例。
+          #  - !Sub 'arn:aws:iam:*:${AWS::AccountId}:*retro-app-*'
