@@ -36,9 +36,8 @@ jobs:
 
       - name: Run flake8 and create reviewdog report
         run: |
-          pipenv run lint --format=html --htmldir=flake8-report
+          pipenv run flake8 app/*.py app/*/*.py  tests/*.py tests/*/*.py --format=html --htmldir=flake8-report
           mkdir -p /tmp/reviewdog
           reviewdog -f=flake8 flake8-report/flake8.html -reporter=github-pr-review
-        continue-on-error: true
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
