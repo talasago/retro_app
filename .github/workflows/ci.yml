@@ -6,7 +6,7 @@ on:
     #  - '**.py'
 
 jobs:
-  linter:
+  unit_tests_and_component_integration_test:
     runs-on: ubuntu-latest
 
     steps:
@@ -29,15 +29,24 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
-      - name: Setup reviewdog
-        uses: reviewdog/action-setup@v1
-        with:
-          reviewdog_version: latest
-
-      - name: Run flake8 and create reviewdog report
+      - name: Setup database
         run: |
-          pipenv run flake8 app/*.py app/*/*.py  tests/*.py tests/*/*.py --format=html --htmldir=flake8-report
-          mkdir -p /tmp/reviewdog
-          reviewdog -f=flake8 flake8-report/flake8.html -reporter=github-pr-review
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          docker-compose up -d
+          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
+          alembic upgrade head
+
+      - name: Execute unit tests and component integration tests
+        run: pipenv run pytest
+
+      #- name: Setup reviewdog
+      #  uses: reviewdog/action-setup@v1
+      #  with:
+      #    reviewdog_version: latest
+
+      #- name: Run flake8 and create reviewdog report
+      #  run: |
+      #    pipenv run flake8 app/*.py app/*/*.py  tests/*.py tests/*/*.py --format=html --htmldir=flake8-report
+      #    mkdir -p /tmp/reviewdog
+      #    reviewdog -f=flake8 flake8-report/flake8.html -reporter=github-pr-review
+      #  env:
+      #    REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
