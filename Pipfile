@@ -25,3 +25,6 @@ factory-boy = "*"
 
 [requires]
 python_version = "3.10"
+
+[scripts]
+lint = "flake8 app/*.py app/*/*.py  tests/*.py tests/*/*.py"
