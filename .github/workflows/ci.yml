@@ -13,6 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup postgres
+        run: |
+          docker-compose up -d
+
       - name: Read python version from .python-version
         id: python_version
         run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
@@ -29,9 +33,8 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
-      - name: Setup database
+      - name: Exceute alembic migrations
         run: |
-          docker-compose up -d
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run alembic upgrade head
 
