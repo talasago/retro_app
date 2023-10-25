@@ -33,7 +33,7 @@ jobs:
         run: |
           docker-compose up -d
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
-          alembic upgrade head
+          pipenv run alembic upgrade head
 
       - name: Execute unit tests and component integration tests
         run: pipenv run pytest
