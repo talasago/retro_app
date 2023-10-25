@@ -39,14 +39,6 @@
 └── tools/ => 便利なツール。デプロイしない。
 ```
 
-# (現時点の)デプロイ方法
-```bash
-$ cd /infra
-$ pipenv requirements > requirements.txt
-$ npx sls deploy  --aws-profile [profile_name]
-# 後はLambdaの環境変数を変更する
-```
-
 # 設計方針(コーディング規約)
 - エンドユーザーに返す可能性があるエラーメッセージは日本語、そうでない内部的なエラーメッセージは英語とする。
 
@@ -94,7 +86,7 @@ $ which python
 $ pip install --upgrade pip
 $ pip install pipenv
 $ pipenv sync
-$ pipenv sync --sync
+$ pipenv sync --dev
 # Pipfileのライブラリがローカルにインストールされる
 ``` 
 `Pipfile`に存在するライブラリを実行する際は、`pipenv run ${実行するライブラリ名}` または `pipenv shell`→`${実行するライブラリ名}`としてください。(どちらでも構いません)
