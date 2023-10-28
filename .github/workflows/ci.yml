@@ -49,6 +49,7 @@ jobs:
           level: warning
           target: app
           fail_on_error: true
+          ignore_note: true
 
       - name: Exceute alembic migrations
         run: |
