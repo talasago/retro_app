@@ -5,6 +5,11 @@ on:
     #paths:
     #  - '**.py'
 
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
 jobs:
   unit_tests_and_component_integration_test: # TODO:後で名前変更
     runs-on: ubuntu-latest
@@ -33,16 +38,6 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
-      - name: Exceute alembic migrations
-        run: |
-          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
-          pipenv run alembic upgrade head
-
-      - name: Execute unit tests and component integration tests
-        run: |
-          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
-          pipenv run pytest
-
       - name: Execute mypy
         uses: tsuyoshicho/action-mypy@v3
         with:
@@ -55,6 +50,16 @@ jobs:
           # Change the current directory to run mypy command.
           # mypy command reads setup.cfg or other settings file in this path.
           workdir: app
+
+      - name: Exceute alembic migrations
+        run: |
+          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
+          pipenv run alembic upgrade head
+
+      - name: Execute unit tests and component integration tests
+        run: |
+          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
+          pipenv run pytest
 
       #- name: Setup reviewdog
       #  uses: reviewdog/action-setup@v1
