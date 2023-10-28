@@ -47,9 +47,8 @@ jobs:
           # Change reporter level if you need.
           # GitHub Status Check won't become failure with warning.
           level: warning
-          # Change the current directory to run mypy command.
-          # mypy command reads setup.cfg or other settings file in this path.
           target: app
+          fail_on_error: true
 
       - name: Exceute alembic migrations
         run: |
