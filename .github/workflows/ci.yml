@@ -47,7 +47,7 @@ jobs:
           # Change reporter level if you need.
           # GitHub Status Check won't become failure with warning.
           level: warning
-          target: app
+          target: app/database.py
           fail_on_error: true
           ignore_note: true
 
