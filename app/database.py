@@ -12,7 +12,7 @@ POSTGRES_DATABASE = os.environ['POSTGRES_DATABASE']
 # TODO:alembic.iniと共通化した方が良さそう。環境変数とかかなあ
 DATABASE_URL: str = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:5432/{POSTGRES_DATABASE}'
 
-engine: Engine = create_engine(DATABASE_URL)
+engine: str = create_engine(DATABASE_URL)
 SessionLocal: sessionmaker = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
 Base: any = declarative_base()
