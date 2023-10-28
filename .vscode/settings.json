@@ -9,5 +9,7 @@
     "editor.tabSize": 4,
     "editor.insertSpaces": true
   },
-  "python.analysis.typeCheckingMode": "off"
+  "python.analysis.typeCheckingMode": "off",
+  "mypy-type-checker.preferDaemon": false,
+  "$comment": "mypyのデーモンを起動すると、lintが上手くいかない問題があるので起動しない。https://github.com/python/mypy/issues/15677"
 }
