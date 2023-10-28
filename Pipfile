@@ -23,6 +23,8 @@ pytest = "*"
 httpx = "*"
 factory-boy = "*"
 mypy = "*"
+ruff = "*"
+black = "*"
 
 [requires]
 python_version = "3.10"
