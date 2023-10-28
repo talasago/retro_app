@@ -2,18 +2,15 @@
 ふりかえりアプリ用
 
 # 実行環境(バックエンド)
-- Python
-  - 3.10(Lambdaやserverless frameworkとの兼ね合いで変更の可能性あり)
-- PostgreSQL
-- FastAPI
-- Mangum
-  - FastAPIをLambdaで使いやすくする
-- SQLAlchemy
-  - O/Rマッパー
-- alembic
-  - DBのテーブル定義の変更履歴を管理
-- pydantic
-  - パラメタのバリデーション管理
+|  |  |
+| - | - |
+| Python | 3.10 |
+| PostgreSQL |  |
+| FastAPI | PythonのWebAPIフレームワーク |
+| Mangum | FastAPIをLambdaで使いやすくする |
+| SQLAlchemy | O/Rマッパー |
+| alembic | DBのテーブル定義の変更履歴を管理 |
+| pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
 
 # ディレクトリ構成
 ```
@@ -129,16 +126,6 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 ※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
 ※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
 ※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
-
-### 使い方
-```bash
-$ autopep8 app/* -r --in-place
-```
-
-
-```bash
-$  flake8 app/*.py app/*/*.py
-```
 
 ## 開発用のエディタ
 - 何でも良いですが、VSCodeをお勧めします。
