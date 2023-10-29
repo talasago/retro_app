@@ -15,7 +15,6 @@ python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
 
 [dev-packages]
-autopep8 = "*"
 flake8 = "*"
 flake8-quotes = "*"
 uvicorn = {version = "*", extras = ["standard"]}
