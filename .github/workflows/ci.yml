@@ -38,12 +38,14 @@ jobs:
         run: pipenv sync --dev
 
       - name: Output changing files
-        id: changed_files
-        run: |
-          echo "changed_files=$(git diff HEAD --name-only | grep -E '.py$' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            app/**/*.py
+            app/*.py
 
       - name: Execute mypy
-        if: ${{ steps.changed_files.outputs.changed_files != '' }}
+        if: ${{ env.GIT_DIFF }}
         uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
