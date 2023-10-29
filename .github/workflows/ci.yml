@@ -47,7 +47,7 @@ jobs:
 
       - name: Trim single quotes
         id: changed_files
-        run: echo "changed_files=$(${{ env.GIT_DIFF }})" >> $GITHUB_OUTPUT
+        run: echo "changed_files=$(echo ${{ env.GIT_DIFF }})" >> $GITHUB_OUTPUT
 
       - name: Execute mypy
         if: ${{ env.GIT_DIFF }}
