@@ -46,21 +46,21 @@ jobs:
           SEPARATOR: ' '
 
       - name: Trim single quotes
+        if: ${{ env.GIT_DIFF }}
         id: changed_files
         run: |
           no_quotes=$(echo ${{ env.GIT_DIFF }} | tr -d "'")
           echo "changed_files=$(echo ${no_quotes})" >> $GITHUB_OUTPUT
 
       - name: Execute mypy
-        if: ${{ env.GIT_DIFF }}
+        if: ${{ steps.changed_files.outputs.changed_files }}
         uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-check
+          reporter: github-pr-review
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
-          #"なんでstepの値を参照できないんだ
-          fail_on_error: false # TODO:一時的に変更
+          fail_on_error: true
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
           # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
@@ -69,13 +69,6 @@ jobs:
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 15
-        with:
-          sudo: true
-          limit-access-to-actor: true
 
       - name: Exceute alembic migrations
         run: |
