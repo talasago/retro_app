@@ -42,12 +42,15 @@ jobs:
         uses: tsuyoshicho/action-mypy@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
           reporter: github-pr-review
           level: error
-          target: app/database.py #TODO: 後で変更
+          target: app
           fail_on_error: true
-          ignore_note: true
+          ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
+          filter_mode: 'added'
+          setup_method: 'nothing'
+          install_types: true
+          execute_command: 'pipenv run mypy'
 
       - name: Exceute alembic migrations
         run: |
