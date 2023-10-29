@@ -15,7 +15,6 @@ python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
 
 [dev-packages]
-autopep8 = "*"
 flake8 = "*"
 flake8-quotes = "*"
 uvicorn = {version = "*", extras = ["standard"]}
@@ -30,4 +29,4 @@ black = "*"
 python_version = "3.10"
 
 [scripts]
-linter = 'pipenv run mypy app'
+format_and_lint = "bash -c 'pipenv run black app/ && pipenv run mypy app/'"
