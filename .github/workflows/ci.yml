@@ -43,6 +43,7 @@ jobs:
           PATTERNS: |
             app/**/*.py
             app/*.py
+          SEPARATOR: ' '
 
       - name: Execute mypy
         if: ${{ env.GIT_DIFF }}
@@ -54,7 +55,10 @@ jobs:
           target: ${{ env.GIT_DIFF }}
           fail_on_error: false # TODO:一時的に変更
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
-          filter_mode: 'added'
+          filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
+          # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
+          # もしaddedを指定してしまい、fail_on_errorをtrueとしていると、mypyでは怒っているのに、reviewdog出力対象では無くなる。その結果
+          # PRにコメント付かないけどエラーになってしまいハマってしまう。
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
