@@ -58,7 +58,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-check
           level: error
-          target: ${{ env.steps.changed_files.outputs.changed_files }}
+          target: ${{ steps.changed_files.outputs.changed_files }}
+          #"なんでstepの値を参照できないんだ
           fail_on_error: false # TODO:一時的に変更
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
