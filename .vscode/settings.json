@@ -6,7 +6,9 @@
   "python.linting.lintOnSave": true,
   "[python]": {
     "editor.tabSize": 4,
-    "editor.insertSpaces": true
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true
   },
   "python.analysis.typeCheckingMode": "off",
   "mypy-type-checker.preferDaemon": false,
