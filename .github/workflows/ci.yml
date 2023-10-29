@@ -21,7 +21,6 @@ jobs:
       - name: Setup postgres
         run: |
           docker-compose up -d
-
       - name: Read python version from .python-version
         id: python_version
         run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
@@ -38,29 +37,47 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
-      - name: Execute mypy
-        uses: tsuyoshicho/action-mypy@v3
+      - name: Output changing files
+        uses: technote-space/get-diff-action@v6
         with:
-          github_token: ${{ secrets.github_token }}
-          # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
+          PATTERNS: |
+            app/**/*.py
+            app/*.py
+          SEPARATOR: ' '
+
+      - name: Trim single quotes
+        if: ${{ env.GIT_DIFF }}
+        id: changed_files
+        run: |
+          no_quotes=$(echo ${{ env.GIT_DIFF }} | tr -d "'")
+          echo "changed_files=$(echo ${no_quotes})" >> $GITHUB_OUTPUT
+
+      - name: Execute mypy
+        if: ${{ steps.changed_files.outputs.changed_files }}
+        uses: tsuyoshicho/action-mypy@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          # Change reporter level if you need.
-          # GitHub Status Check won't become failure with warning.
-          level: warning
-          target: app
+          level: error
+          target: ${{ steps.changed_files.outputs.changed_files }}
           fail_on_error: true
-          ignore_note: true
+          ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
+          filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
+          # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
+          # もしaddedを指定してしまい、fail_on_errorをtrueとしていると、mypyでは怒っているのに、reviewdog出力対象では無くなる。その結果
+          # PRにコメント付かないけどエラーになってしまいハマってしまう。
+          setup_method: 'nothing'
+          install_types: false
+          execute_command: 'pipenv run mypy'
 
       - name: Exceute alembic migrations
         run: |
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run alembic upgrade head
-
       - name: Execute unit tests and component integration tests
         run: |
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run pytest
-
       #- name: Setup reviewdog
       #  uses: reviewdog/action-setup@v1
       #  with:

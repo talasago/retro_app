@@ -127,10 +127,14 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 ※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
 ※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
 
+## Linterの実行方法
+```bash
+$ pipenv run linter 
+```
+
 ## 開発用のエディタ
 - 何でも良いですが、VSCodeをお勧めします。
   - `.vscode/`にVSCode用の設定ファイルがあります。VSCodeを使用している場合は自動で適用されます。
-  - Linter(PylanceやFlake8)でのエラーがVSCode上に表示されるようになります。
 
 ## テスト戦略
 随時追加予定
