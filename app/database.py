@@ -15,4 +15,4 @@ DATABASE_URL: str = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES
 engine: str = create_engine(DATABASE_URL)
 SessionLocal: sessionmaker = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
-Base: any = declarative_base()
+Base: int = '1'
