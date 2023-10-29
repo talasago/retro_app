@@ -2,18 +2,15 @@
 ふりかえりアプリ用
 
 # 実行環境(バックエンド)
-- Python
-  - 3.10(Lambdaやserverless frameworkとの兼ね合いで変更の可能性あり)
-- PostgreSQL
-- FastAPI
-- Mangum
-  - FastAPIをLambdaで使いやすくする
-- SQLAlchemy
-  - O/Rマッパー
-- alembic
-  - DBのテーブル定義の変更履歴を管理
-- pydantic
-  - パラメタのバリデーション管理
+|  |  |
+| - | - |
+| Python | 3.10 |
+| PostgreSQL |  |
+| FastAPI | PythonのWebAPIフレームワーク |
+| Mangum | FastAPIをLambdaで使いやすくする |
+| SQLAlchemy | O/Rマッパー |
+| alembic | DBのテーブル定義の変更履歴を管理 |
+| pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
 
 # ディレクトリ構成
 ```
@@ -37,14 +34,6 @@
 │   ├── feature/ => テストデータを管理
 │   └── それ以外のディレクトリ => app/配下と同じレイヤーのテストを管理
 └── tools/ => 便利なツール。デプロイしない。
-```
-
-# (現時点の)デプロイ方法
-```bash
-$ cd /infra
-$ pipenv requirements > requirements.txt
-$ npx sls deploy  --aws-profile [profile_name]
-# 後はLambdaの環境変数を変更する
 ```
 
 # 設計方針(コーディング規約)
@@ -94,7 +83,7 @@ $ which python
 $ pip install --upgrade pip
 $ pip install pipenv
 $ pipenv sync
-$ pipenv sync --sync
+$ pipenv sync --dev
 # Pipfileのライブラリがローカルにインストールされる
 ``` 
 `Pipfile`に存在するライブラリを実行する際は、`pipenv run ${実行するライブラリ名}` または `pipenv shell`→`${実行するライブラリ名}`としてください。(どちらでも構いません)
@@ -137,16 +126,6 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 ※現時点でdevelopブランチのみ対応、mainブランチは今後対応予定  
 ※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
 ※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
-
-### 使い方
-```bash
-$ autopep8 app/* -r --in-place
-```
-
-
-```bash
-$  flake8 app/*.py app/*/*.py
-```
 
 ## 開発用のエディタ
 - 何でも良いですが、VSCodeをお勧めします。
