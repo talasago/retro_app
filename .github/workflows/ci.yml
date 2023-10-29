@@ -37,14 +37,20 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
+      - name: Output changing files
+        id: changed_files
+        run: |
+          echo "changed_files=$(git diff HEAD --name-only | grep -E '.py$' | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
       - name: Execute mypy
+        if: ${{ steps.changed_files.outputs.changed_files != '' }}
         uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
           level: error
-          target: app
-          fail_on_error: false # TODO:一時的に変更
+          target: ${{ steps.changed_files.outputs.changed_files }}
+          fail_on_error: true # TODO:一時的に変更
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'added'
           setup_method: 'nothing'
