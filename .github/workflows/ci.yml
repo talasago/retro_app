@@ -49,7 +49,7 @@ jobs:
         uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
+          reporter: github-pr-check
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
           fail_on_error: false # TODO:一時的に変更
