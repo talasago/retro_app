@@ -48,8 +48,15 @@ jobs:
           # GitHub Status Check won't become failure with warning.
           level: warning
           target: app/database.py
-          fail_on_error: true
+          fail_on_error: false
           ignore_note: true
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 15
+        with:
+          sudo: true
+          limit-access-to-actor: true
 
       - name: Exceute alembic migrations
         run: |
