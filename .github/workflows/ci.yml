@@ -48,7 +48,7 @@ jobs:
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'added'
           setup_method: 'nothing'
-          install_types: true
+          #install_types: true
           execute_command: 'pipenv run mypy'
 
       - name: Exceute alembic migrations
