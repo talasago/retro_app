@@ -43,10 +43,10 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           # Change reviewdog reporter if you need [github-pr-check,github-check,github-pr-review].
-          reporter: github-pr-check
+          reporter: github-pr-review
           level: error
-          target: app/database.py
-          fail_on_error: false
+          target: app/database.py #TODO: 後で変更
+          fail_on_error: true
           ignore_note: true
 
       - name: Exceute alembic migrations
