@@ -127,9 +127,9 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 ※GithubActionsの手動起動方法は、[公式サイト](https://docs.github.com/ja/actions/using-workflows/manually-running-a-workflow)みてね  
 ※ロールの定義は[ココ](https://github.com/talasago/retro_app_backend/blob/develop/infra/iam_for_cd.yml)  
 
-## Linterの実行方法
+## Linter+Formatterの実行方法
 ```bash
-$ pipenv run linter 
+$ pipenv run format_and_lint 
 ```
 
 ## 開発用のエディタ
