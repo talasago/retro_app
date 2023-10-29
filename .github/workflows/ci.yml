@@ -45,6 +45,10 @@ jobs:
             app/*.py
           SEPARATOR: ' '
 
+      - name: Trim single quotes
+        id: changed_files
+        run: echo "changed_files=$(${{ env.GIT_DIFF }})" >> $GITHUB_OUTPUT
+
       - name: Execute mypy
         if: ${{ env.GIT_DIFF }}
         uses: tsuyoshicho/action-mypy@v4
@@ -52,7 +56,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-check
           level: error
-          target: ${{ env.GIT_DIFF }}
+          target: echo ${{ env.steps.changed_files.outputs.changed_files }}
           fail_on_error: false # TODO:一時的に変更
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
