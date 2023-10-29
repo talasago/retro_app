@@ -7,7 +7,7 @@ on:
 
 permissions:
   checks: write
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -52,7 +52,20 @@ jobs:
           no_quotes=$(echo ${{ env.GIT_DIFF }} | tr -d "'")
           echo "changed_files=$(echo ${no_quotes})" >> $GITHUB_OUTPUT
 
-      - name: Execute mypy
+      - name: Execute Black(Fomatter)
+        if: ${{ steps.changed_files.outputs.changed_files }}
+        uses: psf/black@stable
+        with:
+          options: ""
+          src: ${{ steps.changed_files.outputs.changed_files }}
+
+      - name: Auto-commit Black results
+        if: ${{ steps.changed_files.outputs.changed_files }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply Code Formatter Change
+
+      - name: Execute mypy(Linter)
         if: ${{ steps.changed_files.outputs.changed_files }}
         uses: tsuyoshicho/action-mypy@v4
         with:
