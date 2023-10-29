@@ -30,4 +30,4 @@ black = "*"
 python_version = "3.10"
 
 [scripts]
-linter = 'pipenv run mypy app'
+format_and_lint = "bash -c 'pipenv run black app/ && pipenv run mypy app/'"
