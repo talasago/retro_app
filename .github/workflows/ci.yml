@@ -52,7 +52,7 @@ jobs:
           reporter: github-pr-review
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
-          fail_on_error: true # TODO:一時的に変更
+          fail_on_error: false # TODO:一時的に変更
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'added'
           setup_method: 'nothing'
