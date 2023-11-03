@@ -71,12 +71,16 @@ jobs:
         with:
           src: ${{ steps.changed_files.outputs.changed_files }}
           args: --config ruff.toml --fix
-        # fail_on_error: trueみたいなのを入れなくても勝手に落ちる模様
 
-      - uses: reviewdog/action-suggester@v1
+      - uses: reviewdog/action-suggester@v1.8.0
         if: ${{ failure() }}
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          level: error
           tool_name: ruff
+          filter_mode: 'nofilter'
+          fail_on_error: false
+          cleanup: false
 
       - name: Auto-commit ruff results
         if: ${{ steps.changed_files.outputs.changed_files }}
