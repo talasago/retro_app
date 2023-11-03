@@ -18,6 +18,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1.0.6
+        with:
+          reviewdog_version: latest
+
       - name: Setup postgres
         run: |
           docker-compose up -d
@@ -66,21 +71,12 @@ jobs:
           commit_message: Apply Code Formatter(Black) Change
 
       - name: Execute ruff(Linter and formatter)
-        if: ${{ steps.changed_files.outputs.changed_files }}
-        uses: chartboost/ruff-action@v1
-        with:
-          src: ${{ steps.changed_files.outputs.changed_files }}
-          args: --config ruff.toml --fix
-
-      - uses: reviewdog/action-suggester@v1.8.0
-        if: ${{ failure() }}
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          level: error
-          tool_name: ruff
-          filter_mode: 'nofilter'
-          fail_on_error: false
-          cleanup: false
+        run: |
+          pipenv run ruff ${{ steps.changed_files.outputs.changed_files }} --fix |\
+          sed '$d' |\
+          reviewdog -name="ruff" -efm="%f:%l:%c: %m" -reporter=github-pr-review -level=error  -diff="git diff FETCH_HEAD"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Auto-commit ruff results
         if: ${{ steps.changed_files.outputs.changed_files }}
