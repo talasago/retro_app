@@ -63,7 +63,20 @@ jobs:
         if: ${{ steps.changed_files.outputs.changed_files }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: Apply Code Formatter Change
+          commit_message: Apply Code Formatter(Black) Change
+
+      - name: Execute ruff(Linter and formatter)
+        if: ${{ steps.changed_files.outputs.changed_files }}
+        uses: chartboost/ruff-action@v1
+        with:
+          src: ${{ steps.changed_files.outputs.changed_files }}
+          args: --config ruff.toml --fix
+
+      - name: Auto-commit ruff results
+        if: ${{ steps.changed_files.outputs.changed_files }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply Code Formatter(ruff) Change
 
       - name: Execute mypy(Linter)
         if: ${{ steps.changed_files.outputs.changed_files }}
