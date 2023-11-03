@@ -71,6 +71,7 @@ jobs:
         with:
           src: ${{ steps.changed_files.outputs.changed_files }}
           args: --config ruff.toml --fix
+        #TODO:fail_on_error: trueみたいなのを入れる
 
       - name: Auto-commit ruff results
         if: ${{ steps.changed_files.outputs.changed_files }}
