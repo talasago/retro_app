@@ -107,7 +107,7 @@ jobs:
           # もしaddedを指定してしまい、fail_on_errorをtrueとしていると、mypyでは怒っているのに、reviewdog出力対象では無くなる。その結果
           # PRにコメント付かないけどエラーになってしまいハマってしまう。
           setup_method: 'nothing'
-          install_types: false
+          install_types: true
           execute_command: 'pipenv run mypy'
           mypy_flags: '--explicit-package-bases'
 
