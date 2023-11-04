@@ -14,6 +14,7 @@ permissions:
 jobs:
   unit_tests_and_component_integration_test: # TODO:後で名前変更
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout repository
