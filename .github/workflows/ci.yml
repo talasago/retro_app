@@ -88,16 +88,18 @@ jobs:
           commit_message: Apply Code Formatter(ruff) Change
 
       - name: Execute mypy(Linter)
-         # NOTE: rerunしたときに自動コミットが異常終了する。それでも後続処理を続けるために指定
+        # NOTE: rerunしたときに自動コミットが異常終了する。それでも後続処理を続けるために指定
         # なぜ異常終了するかの詳細は調べてない。
         if: ${{ steps.changed_files.outputs.changed_files && !cancelled() }}
         uses: tsuyoshicho/action-mypy@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          reporter: github-pr-review
+          reporter: github-pr-check
+          # github-pr-reviewだとなぜか出力できない時があるので使用しない
+          # エラーメッセージ→422 Unprocessable Entity [{Resource: Field: Code: Message:Pull request review thread line must be part of the diff and Pull request review thread diff hunk can't be blank}]
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
-          # fail_on_error: true
+          fail_on_error: true
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
           # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
@@ -106,10 +108,6 @@ jobs:
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
-
-      - uses: mxschmitt/action-tmate@v3
-        env:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Exceute alembic migrations
         run: |
