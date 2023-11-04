@@ -101,6 +101,7 @@ jobs:
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
+          reviewdog_flags: '-tee'
 
       - name: Exceute alembic migrations
         run: |
