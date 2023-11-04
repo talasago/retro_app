@@ -29,4 +29,4 @@ black = "*"
 python_version = "3.10"
 
 [scripts]
-format_and_lint = "bash -c '(pipenv run black app/ || true) && (pipenv run ruff app/ --fix || true) && pipenv run mypy app/'"
+format_and_lint = "bash -c '(pipenv run black app/ || true) && (pipenv run ruff app/ --fix || true) && pipenv run mypy app/ --explicit-package-bases'"
