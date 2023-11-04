@@ -6,30 +6,30 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 
-from ..errors.retro_app_error import (
+from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
-from ..models.user_model import UserModel
-from ..schemas.http_response_body_user_schema import (
-    ApiResponseBodyBase,
-    RefreshTokenApiResponseBody,
-    SignInApiResponseBody,
-    TokenApiResponseBody,
-)
-from ..schemas.user_schema import UserCreate
-from .dependencies import (
+from app.functions.dependencies import (
     get_auth_service,
     get_current_user,
     get_user_repo,
     oauth2_scheme,
 )
+from app.models.user_model import UserModel
+from app.schemas.http_response_body_user_schema import (
+    ApiResponseBodyBase,
+    RefreshTokenApiResponseBody,
+    SignInApiResponseBody,
+    TokenApiResponseBody,
+)
+from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from ..repository.user_repository import UserRepository
-    from ..services.auth_service import AuthService
+    from app.repository.user_repository import UserRepository
+    from app.services.auth_service import AuthService
 
 app = FastAPI()
 

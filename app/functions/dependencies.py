@@ -6,17 +6,17 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
-from ..database import SessionLocal
-from ..errors.retro_app_error import (
+from app.database import SessionLocal
+from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
-from ..repository.user_repository import UserRepository
-from ..services.auth_service import AuthService
+from app.repository.user_repository import UserRepository
+from app.services.auth_service import AuthService
 
 if TYPE_CHECKING:
-    from ..models.user_model import UserModel
+    from app.models.user_model import UserModel
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 

@@ -20,9 +20,9 @@ class TokenPayload(BaseModel):
     uid: str
     jti: str
 
-    def model_dump(self) -> dict[str, Any]:
+    def model_dump(self, *args, **kwargs) -> dict[str, Any]:
         """Override: jwt.encode()時に、Enumだとエラーになるためstrに変更"""
-        dump: dict[str, Any] = super().model_dump()
+        dump: dict[str, Any] = super().model_dump(*args, **kwargs)
         if isinstance(dump["token_type"], TokenType):
             dump["token_type"] = dump["token_type"].value
 

@@ -6,11 +6,11 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from ..errors.retro_app_error import (
+from app.errors.retro_app_error import (
     RetroAppColmunUniqueError,
     RetroAppRecordNotFoundError,
 )
-from ..models.user_model import UserModel
+from app.models.user_model import UserModel
 
 if TYPE_CHECKING:
     from uuid import UUID
