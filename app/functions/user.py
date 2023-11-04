@@ -1,3 +1,4 @@
+# test
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 from typing import TYPE_CHECKING
 from fastapi import FastAPI, Depends, status, HTTPException, Header
