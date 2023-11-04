@@ -5,6 +5,8 @@ on:
     paths:
       - 'app/**.py'
       - 'app/*.py'
+      - 'tests/**.py'
+      - 'tests/*.py'
 
 permissions:
   checks: write
@@ -48,6 +50,8 @@ jobs:
           PATTERNS: |
             app/**/*.py
             app/*.py
+            tests/**/*.py
+            tests/*.py
           SEPARATOR: ' '
 
       - name: Trim single quotes
