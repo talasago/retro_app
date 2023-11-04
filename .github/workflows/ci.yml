@@ -12,7 +12,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  unit_tests_and_component_integration_test: # TODO:後で名前変更
+  lint_and_format:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -25,9 +25,7 @@ jobs:
         with:
           reviewdog_version: latest
 
-      - name: Setup postgres
-        run: |
-          docker-compose up -d
+      # TODO: Pythonのセットアップとかは共通化したい気持ち
       - name: Read python version from .python-version
         id: python_version
         run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
@@ -41,7 +39,7 @@ jobs:
       - name: Install pipenv
         run: pip install pipenv
 
-      - name: install dependencies
+      - name: Install dependencies
         run: pipenv sync --dev
 
       - name: Output changing files
@@ -53,21 +51,18 @@ jobs:
           SEPARATOR: ' '
 
       - name: Trim single quotes
-        if: ${{ env.GIT_DIFF }}
         id: changed_files
         run: |
           no_quotes=$(echo ${{ env.GIT_DIFF }} | tr -d "'")
           echo "changed_files=$(echo ${no_quotes})" >> $GITHUB_OUTPUT
 
       - name: Execute Black(Fomatter)
-        if: ${{ steps.changed_files.outputs.changed_files }}
         uses: psf/black@stable
         with:
           options: ""
           src: ${{ steps.changed_files.outputs.changed_files }}
 
       - name: Auto-commit Black results
-        if: ${{ steps.changed_files.outputs.changed_files && !cancelled() }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Apply Code Formatter(Black) Change
@@ -84,7 +79,7 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Auto-commit ruff results
-        if: ${{ steps.changed_files.outputs.changed_files && !cancelled() }}
+        if: ${{ !cancelled() }}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Apply Code Formatter(ruff) Change
@@ -120,11 +115,52 @@ jobs:
           url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
           gh pr comment ${PR_NUMBER} -b "Linterがコードの違反を見つけたで！詳細をチェックや！！${url}"
 
+  unit_tests_and_component_integration_test: # TODO:後で名前変更
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ !cancelled() }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup postgres
+        run: |
+          docker-compose up -d
+
+      - name: Read python version from .python-version
+        id: python_version
+        run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python_version.outputs.python_version }}
+          # cache: pip
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: install dependencies
+        run: pipenv sync --dev
+
       - name: Exceute alembic migrations
+        if: ${{ !cancelled() }}
         run: |
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run alembic upgrade head
+
       - name: Execute unit tests and component integration tests
+        if: ${{ !cancelled() }}
         run: |
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run pytest
+
+      - name: Post comments
+        if: ${{ failure() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
+          gh pr comment ${PR_NUMBER} -b "Testが落ちたで！詳細をチェックや！！${url}"
