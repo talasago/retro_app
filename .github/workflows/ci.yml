@@ -2,8 +2,9 @@ name: ci
 
 on:
   pull_request:
-    #paths:
-    #  - '**.py'
+    paths:
+      - 'app/**.py'
+      - 'app/*.py'
 
 permissions:
   checks: write
