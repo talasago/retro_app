@@ -1,35 +1,36 @@
 # test
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 from typing import TYPE_CHECKING
-from fastapi import FastAPI, Depends, status, HTTPException, Header
+
+from fastapi import Depends, FastAPI, Header, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
-from ..schemas.user_schema import UserCreate
-from ..schemas.http_response_body_user_schema import (
-    SignInApiResponseBody,
-    TokenApiResponseBody,
-    RefreshTokenApiResponseBody,
-    ApiResponseBodyBase,
-)
-from ..models.user_model import UserModel
+
 from ..errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
+from ..models.user_model import UserModel
+from ..schemas.http_response_body_user_schema import (
+    ApiResponseBodyBase,
+    RefreshTokenApiResponseBody,
+    SignInApiResponseBody,
+    TokenApiResponseBody,
+)
+from ..schemas.user_schema import UserCreate
 from .dependencies import (
+    get_auth_service,
     get_current_user,
     get_user_repo,
-    get_auth_service,
     oauth2_scheme,
 )
 
-
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from ..services.auth_service import AuthService
     from ..repository.user_repository import UserRepository
+    from ..services.auth_service import AuthService
 
 app = FastAPI()
 
