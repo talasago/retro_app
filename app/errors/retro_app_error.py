@@ -6,7 +6,7 @@ class RetroAppBaseError(Exception):
 
 class RetroAppColmunUniqueError(RetroAppBaseError):
     def __init__(self, display_name: str):
-        message: str = f'指定された{display_name}はすでに登録されています。'
+        message: str = f"指定された{display_name}はすでに登録されています。"
         super().__init__(message)
         self.message = message
 
@@ -19,7 +19,7 @@ class RetroAppValueError(RetroAppBaseError):
 
 class RetroAppRecordNotFoundError(RetroAppBaseError):
     def __init__(self, model_name: str):
-        message: str = '条件に合致するレコードは存在しません。'
+        message: str = "条件に合致するレコードは存在しません。"
         super().__init__(message)
         self.message = message
         self.model_name = model_name
