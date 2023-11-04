@@ -1,22 +1,21 @@
 from datetime import datetime, timedelta
-
-# 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 from typing import TYPE_CHECKING
 from uuid import uuid4
 
 from jose import exceptions as jwt_exceptions
 from jose import jwt
 
-from ..errors.retro_app_error import (
+from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
-from ..schemas.token_schema import TokenPayload, TokenType
+from app.schemas.token_schema import TokenPayload, TokenType
 
+# 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from ..models.user_model import UserModel
-    from ..repository.user_repository import UserRepository
+    from app.models.user_model import UserModel
+    from app.repository.user_repository import UserRepository
 
 
 # JWT関連の設定
@@ -56,7 +55,7 @@ class AuthService:
         # DBからユーザーを取得
         try:
             # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
-            user = self.__user_repo.find_by("uuid", payload.uid)
+            user: "UserModel" = self.__user_repo.find_by("uuid", payload.uid)  # type: ignore
         except RetroAppRecordNotFoundError as e:
             raise e
 
@@ -91,7 +90,7 @@ class AuthService:
             raise TypeError("email and password must be other than None")
 
         try:
-            user: "UserModel" = self.__user_repo.find_by("email", value=email)
+            user: "UserModel" = self.__user_repo.find_by("email", value=email)  # type: ignore
         except RetroAppRecordNotFoundError as e:
             raise e
 

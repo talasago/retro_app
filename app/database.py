@@ -17,4 +17,4 @@ engine: Engine = create_engine(DATABASE_URL)
 SessionLocal: sessionmaker = sessionmaker(
     autocommit=False, autoflush=False, bind=engine
 )
-Base: any = declarative_base()
+Base = declarative_base()

@@ -6,7 +6,7 @@ from sqlalchemy import DateTime, Integer, String, event
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..database import Base
+from app.database import Base
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
