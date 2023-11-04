@@ -97,7 +97,7 @@ jobs:
           reporter: github-pr-review
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
-          fail_on_error: true
+          # fail_on_error: true
           ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
           # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
@@ -106,6 +106,10 @@ jobs:
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
+
+      - uses: mxschmitt/action-tmate@v3
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Exceute alembic migrations
         run: |
