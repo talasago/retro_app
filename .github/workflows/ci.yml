@@ -109,6 +109,15 @@ jobs:
           install_types: false
           execute_command: 'pipenv run mypy'
 
+      - name: Post comments
+        if: ${{ failure() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
+          gh pr comment ${PR_NUMBER} -b "Linterがコードの違反を見つけたで！詳細をチェックや！！${url}"
+
       - name: Exceute alembic migrations
         run: |
           export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
