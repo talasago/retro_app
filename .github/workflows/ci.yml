@@ -101,7 +101,7 @@ jobs:
           level: error
           target: ${{ steps.changed_files.outputs.changed_files }}
           fail_on_error: true
-          ignore_note: true # action-mypy@v3で複数行のエラーを出力できないため
+          ignore_note: false
           filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
           # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
           # もしaddedを指定してしまい、fail_on_errorをtrueとしていると、mypyでは怒っているのに、reviewdog出力対象では無くなる。その結果
@@ -123,6 +123,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ !cancelled() }}
+    needs: lint_and_format
 
     steps:
       - name: Checkout repository
