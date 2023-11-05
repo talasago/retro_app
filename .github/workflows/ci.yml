@@ -109,7 +109,6 @@ jobs:
           setup_method: 'nothing'
           install_types: false
           execute_command: 'pipenv run mypy'
-          mypy_flags: ' --ignore-missing-imports --explicit-package-bases'
 
       - name: Post comments
         if: ${{ failure() }}
