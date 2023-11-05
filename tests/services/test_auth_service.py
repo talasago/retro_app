@@ -100,7 +100,7 @@ class TestAuthService:
                 user_repo.save(test_user)
 
                 current_user: "UserModel" = (
-                    auth_service.get_current_user_from_refresh_token(  # noqa: E501
+                    auth_service.get_current_user_from_refresh_token(
                         refresh_token=refresh_token
                     )
                 )

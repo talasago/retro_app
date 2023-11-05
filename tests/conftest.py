@@ -1,18 +1,15 @@
-# appディレクトリの実行パスを追加
-# TODO:テストコードのファイル毎に書くのはめんどいので共通化したい気持ち
 import os
 import sys
 from collections.abc import Generator
 
+import pytest
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm.session import Session
+
 pj_root_path = os.path.join(os.path.dirname(__file__), "../")
 sys.path.append(pj_root_path)
-
-
-import pytest  # noqa: E402
-from alembic import command  # noqa: E402
-from alembic.config import Config  # noqa: E402
-from sqlalchemy import create_engine, text  # noqa: E402
-from sqlalchemy.orm.session import Session  # noqa: E402
 
 from app.database import Base, SessionLocal  # noqa: E402
 from app.repository.user_repository import UserRepository  # noqa: E402
