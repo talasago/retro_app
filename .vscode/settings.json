@@ -11,6 +11,10 @@
     }
   },
   "python.analysis.typeCheckingMode": "off",
+  "ruff.format.args":  ["--config=${workspaceFolder}/.ruff.toml"],
   "mypy-type-checker.preferDaemon": false,
+  "mypy-type-checker.args": [
+    "--config-file=${workspaceFolder}/mypy.ini"
+  ],
   "$comment": "mypyのデーモンを起動すると、lintが上手くいかない問題があるので起動しない。https://github.com/python/mypy/issues/15677"
 }
