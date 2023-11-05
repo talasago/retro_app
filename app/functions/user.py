@@ -109,7 +109,7 @@ def refresh_token(
     try:
         current_user: "UserModel" = auth_service.get_current_user_from_refresh_token(
             refresh_token=token
-        )  # noqa: E501
+        )
     except RetroAppRecordNotFoundError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
