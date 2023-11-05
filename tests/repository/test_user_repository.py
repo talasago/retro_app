@@ -81,7 +81,7 @@ class TestUserRepository:
         create_user(db=db, **user_data)
 
         user_repo = UserRepository(db)
-        user: UserModel = user_repo.find_by("email", user_data["email"])
+        user: UserModel = user_repo.find_by("email", user_data["email"])  # type: ignore
         assert user  # userがNoneではないことの確認
         user.name = "after updatename"
         user.email = "afterupdate@email"
@@ -93,7 +93,7 @@ class TestUserRepository:
         # expireしないと、コミットしてなくても、新しい値を取得してしまうため
         db.expire(user)
 
-        user_after_update: UserModel = user_repo.find_by("id", user.id)
+        user_after_update: UserModel = user_repo.find_by("id", user.id)  # type: ignore
         assert user_after_update  # userがNoneではないことの確認
         assert user_after_update.name == "after updatename"
         assert user_after_update.email == "afterupdate@email"
@@ -105,15 +105,15 @@ class TestUserRepository:
         def test_valid_search(self, user_repo: "UserRepository"):
             test_users = [create_test_user(user_repo) for _ in range(5)]
 
-            searched_user_by_email: UserModel = user_repo.find_by(
+            searched_user_by_email: UserModel = user_repo.find_by(  # type: ignore
                 "email", test_users[0].email
             )
             assert searched_user_by_email == test_users[0]
 
-            searched_user_by_id: UserModel = user_repo.find_by("id", test_users[1].id)
+            searched_user_by_id: UserModel = user_repo.find_by("id", test_users[1].id)  # type: ignore
             assert searched_user_by_id == test_users[1]
 
-            searched_user_by_uuid: UserModel = user_repo.find_by(
+            searched_user_by_uuid: UserModel = user_repo.find_by(  # type: ignore
                 "uuid", test_users[2].uuid
             )
             assert searched_user_by_uuid == test_users[2]
