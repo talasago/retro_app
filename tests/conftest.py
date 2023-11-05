@@ -2,6 +2,7 @@
 # TODO:テストコードのファイル毎に書くのはめんどいので共通化したい気持ち
 import os
 import sys
+from collections.abc import Generator
 
 pj_root_path = os.path.join(os.path.dirname(__file__), "../")
 sys.path.append(pj_root_path)
@@ -18,7 +19,7 @@ from app.repository.user_repository import UserRepository  # noqa: E402
 
 
 @pytest.fixture(scope="session")
-def db() -> Session:
+def db() -> Generator[Session, None, None]:
     """データベースセッションのフィクスチャ。TBLを削除→作成→テスト実行→DB接続セッション削除としている"""
 
     # NOTE:TBL削除→TBL作成→→テスト実行できるようにすることで、テストデータを毎回削除する手間を減らしている。

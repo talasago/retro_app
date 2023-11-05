@@ -108,11 +108,11 @@ class TestUserFunction:
                 }
                 add_user_api(user_data)
 
-                user_data: dict = {
-                    "username": "testuser@example.com",
-                    "password": "testpassword",
+                login_user_data: dict = {
+                    "username": user_data["email"],
+                    "password": user_data["password"],
                 }
-                response = login_api(user_data, True)
+                response = login_api(login_user_data, True)
 
                 res_body = response.json()
                 assert response.status_code == 200
@@ -120,7 +120,7 @@ class TestUserFunction:
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
                 assert res_body["token_type"] == "bearer"
-                assert res_body["name"] == "Test User"
+                assert res_body["name"] == "Test User1"
 
         class TestWhenNotExistEmail:
             def test_return_401(self, login_api):
@@ -146,11 +146,11 @@ class TestUserFunction:
                 }
                 add_user_api(user_data)
 
-                user_data: dict = {
-                    "username": "apiTestWhenUnmatchPassword@example.com",
+                login_user_data: dict = {
+                    "username": user_data["email"],
                     "password": "hogehoge",
                 }
-                response = login_api(user_data, True)
+                response = login_api(login_user_data, True)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -189,7 +189,7 @@ class TestUserFunction:
                 assert logout_response.json() == {"message": "ログアウトしました"}
 
                 stmt = select(UserModel).where(UserModel.email == user_data["email"])
-                user: UserModel = db.execute(stmt).scalars().first()
+                user: UserModel = db.execute(stmt).scalars().first()  # type: ignore
                 assert user  # Noneではないことの確認
                 assert user.refresh_token is None
 

@@ -40,10 +40,10 @@ class TestUserSchema:
 
             assert user_params is None
 
-        user_data: dict = {"name": "email null", "email": None}
+        user_data_email_null: dict = {"name": "email null", "email": None}
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
+            user_params = UserSchema(**user_data_email_null)
 
             assert user_params is None
 
@@ -80,9 +80,7 @@ class TestUserSchema:
 
             assert user_params is None
 
-        user_data: dict = {
-            "email": "johndoe1@example.com",
-        }
+        del user_data["name"]
 
         with pytest.raises(ValidationError):
             user_params = UserSchema(**user_data)
@@ -102,11 +100,7 @@ class TestUserCreate:
 
             assert user_params is None
 
-        user_data: dict = {
-            "name": "John Doe",
-            "email": "johndoe1@example.com",
-            "password": None,
-        }
+        user_data["password"] = None
 
         with pytest.raises(ValidationError):
             user_params = UserCreate(**user_data)
@@ -125,11 +119,7 @@ class TestUserCreate:
 
             assert user_params is None
 
-        user_data: dict = {
-            "name": "John Doe",
-            "email": "johndoe1@example.com",
-            "password": "a" * 51,
-        }
+        user_data["password"] = "a" * 51
 
         with pytest.raises(ValidationError):
             user_params = UserCreate(**user_data)
@@ -148,11 +138,8 @@ class TestUserCreate:
         assert user_params.name == "John Doe"
         assert user_params.email == "johndoe1@example.com"
 
-        user_data: dict = {
-            "name": "John Doe",
-            "email": "johndoe1@example.com",
-            "password": "a" * 50,
-        }
+        user_data["password"] = "a" * 50
+
         user_params = UserSchema(**user_data)
 
         assert user_params.name == "John Doe"
