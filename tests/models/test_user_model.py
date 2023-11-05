@@ -44,9 +44,9 @@ class TestUserModel:
                     is False
                 )
 
-            def test_return_false_when_hashed_password_and_param_are_none(
-                self,
-            ):  # noqa: #E501
+            # fmt: off
+            def test_return_false_when_hashed_password_and_param_are_none(self):
+            # fmt: on
                 user_data: dict = {
                     "name": "John Doe",
                     "email": "invalid_email",
