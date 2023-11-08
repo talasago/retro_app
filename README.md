@@ -140,17 +140,14 @@ $ pipenv run format_and_lint
 随時追加予定
 ### 単体テスト
 - pytestで実施
-- services/とschemas/とmodels/に対して実行するテスト
+- schemas/とmodels/に対して実行するテスト
   - DBに接続せずに実施できるため一番早い
-  - services/はビジネスロジックだけをテストしたいため、DBとの接続はモック化してください
-  - TODO:詳細を書く
 
 ### コンポーネント結合テスト
 - pytestで実施
-  - repository/とfunctions/に対して実行するテスト
+  - repository/とfunctions/とservices/に対して実行するテスト
     - DBアクセスが必要なのでやや遅い
-    - ※DBアクセスは外部依存となるためコンポーネント結合テストに位置付け
-
+  
 ### システム結合テスト
 (TBD)AWSに接続してWebAPIを叩くテスト
 
