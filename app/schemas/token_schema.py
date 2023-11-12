@@ -28,6 +28,6 @@ class TokenPayload(BaseModel):
 
         return dump
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
         frozen = True

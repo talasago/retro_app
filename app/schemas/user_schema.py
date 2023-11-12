@@ -31,8 +31,8 @@ class UserSchema(BaseModel):
         # 半角スペースも全角スペースも削除する
         return None if name is None else name.strip().strip("　")
 
-    class Config:
-        orm_mode = True
+    class ConfigDict:
+        from_attributes = True
 
 
 class UserCreate(UserSchema):
