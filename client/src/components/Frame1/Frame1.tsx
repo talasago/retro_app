@@ -33,12 +33,12 @@ export const Frame1: FC<Props> = memo(function Frame1(props = {}) {
       <div className={classes.textField}>
         <div className={classes.label4}>Email</div>
         <div className={classes.inputGroup}>
-          <input type="email" className={classes.input} onChange={(e) => setName(e.target.value)}></input>
+          <input type="email" className={classes.input} onChange={(e) => setEmail(e.target.value)}></input>
         </div>
       </div>
       <div className={classes.label5}>Name</div>
       <div className={classes.inputGroup2}>
-        <input type="text" className={classes.input2} onChange={(e) => setEmail(e.target.value)}></input>
+        <input type="text" className={classes.input2} onChange={(e) => setName(e.target.value)}></input>
       </div>
       <PasswordField_sizeDefaultIsDis
         className={classes.passwordField}
