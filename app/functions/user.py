@@ -2,6 +2,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
@@ -32,6 +33,16 @@ if TYPE_CHECKING:
     from app.services.auth_service import AuthService
 
 app = FastAPI()
+# TODO:originとMethodを可変にしたい。そして外だししたい。
+# TODO:その他の設定は適切に設定したい。
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 許可するフロントエンドのオリジン
+    allow_credentials=True,  # 資格情報の共有の可否
+    allow_methods=["*"],  # 許可するHTTPリクエストメソッド
+    allow_headers=["*"],  # フロントエンドからの認可するHTTPヘッダー情報
+    expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
+)
 
 
 @app.post(
