@@ -2,7 +2,6 @@ import { memo } from 'react';
 import type { FC, ReactNode } from 'react';
 
 import resets from '../../_resets.module.css';
-import { Button_sizeDefaultIsDisabledFa } from '../Button_sizeDefaultIsDisabledFa/Button_sizeDefaultIsDisabledFa';
 import classes from './PasswordField_sizeDefaultIsDis.module.css';
 
 interface Props {
@@ -12,7 +11,6 @@ interface Props {
   };
   hide?: {
     buttonIcon?: boolean;
-    button?: boolean;
   };
   text?: {
     label?: ReactNode;
@@ -24,18 +22,7 @@ export const PasswordField_sizeDefaultIsDis: FC<Props> = memo(function PasswordF
     <div className={`${resets.storybrainResets} ${props.classes?.root || ''} ${props.className || ''} ${classes.root}`}>
       {props.text?.label != null ? props.text?.label : <div className={classes.label}>Label</div>}
       <div className={classes.inputGroup}>
-        <div className={classes.input}>
-          <div className={classes.placeholder}>Placeholder</div>
-          {!props.hide?.button && (
-            <Button_sizeDefaultIsDisabledFa
-              className={classes.button}
-              classes={{ buttonIcon: classes.buttonIcon }}
-              hide={{
-                buttonIcon: false,
-              }}
-            />
-          )}
-        </div>
+        <input type="password" className={classes.input}></input>
       </div>
     </div>
   );
