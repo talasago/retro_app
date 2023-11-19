@@ -25,18 +25,15 @@ export const Frame1: FC<Props> = memo(function Frame1(props = {}) {
       <div className={classes.textField}>
         <div className={classes.label4}>Email</div>
         <div className={classes.inputGroup}>
-          <div className={classes.input}></div>
+          <input type="email" className={classes.input}></input>
         </div>
       </div>
       <div className={classes.label5}>Name</div>
       <div className={classes.inputGroup2}>
-        <div className={classes.input2}></div>
+        <input type="text" className={classes.input2}></input>
       </div>
       <PasswordField_sizeDefaultIsDis
         className={classes.passwordField}
-        hide={{
-          button: true,
-        }}
         text={{
           label: <div className={classes.label}>Password</div>,
         }}
