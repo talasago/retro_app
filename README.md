@@ -133,6 +133,12 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 $ pipenv run format_and_lint 
 ```
 
+### ローカルでwebサーバーを立ち上げる方法
+例）ユーザーに関するFunctionを起動できるようにする場合
+```bash
+$ pipenv run uvicorn app.functions.user:app --reload
+```
+
 ## 開発用のエディタ
 - 何でも良いですが、VSCodeをお勧めします。
   - `.vscode/`にVSCode用の設定ファイルがあります。VSCodeを使用している場合は自動で適用されます。
