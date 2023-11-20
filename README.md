@@ -25,6 +25,7 @@
 │   ├── repository/ => データベースへの更新処理や登録処理など、データベースとのやり取りを行うコード。
 │   ├── schemas/ => pydantic用のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
 │   └── services/ => ビジネスロジックを管理。
+├── client/ => フロントエンド用
 ├── database/ => alembic用
 │   └── versions => テーブル定義の変更履歴を管理
 ├── debug/ => 検証のための一時コード。デプロイしない。
@@ -130,6 +131,12 @@ GithubAcions([migrate_database](https://github.com/talasago/retro_app_backend/ac
 ## Linter+Formatterの実行方法
 ```bash
 $ pipenv run format_and_lint 
+```
+
+### ローカルでwebサーバーを立ち上げる方法
+例）ユーザーに関するFunctionを起動できるようにする場合
+```bash
+$ pipenv run uvicorn app.functions.user:app --reload
 ```
 
 ## 開発用のエディタ
