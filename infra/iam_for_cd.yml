@@ -17,8 +17,8 @@ Resources:
           Condition: 
             StringEquals: 
               token.actions.githubusercontent.com:sub: 
-              - "repo:talasago/retro_app_backend:ref:refs/heads/main"
-              - "repo:talasago/retro_app_backend:ref:refs/heads/develop"
+              - "repo:talasago/retro_app:ref:refs/heads/main"
+              - "repo:talasago/retro_app:ref:refs/heads/develop"
       MaxSessionDuration: 3600
       ManagedPolicyArns: 
       - !Ref IAMManagedPolicy
@@ -40,8 +40,8 @@ Resources:
           Condition: 
             StringEquals: 
               token.actions.githubusercontent.com:sub: 
-              - "repo:talasago/retro_app_backend:ref:refs/heads/main"
-              - "repo:talasago/retro_app_backend:ref:refs/heads/develop"
+              - "repo:talasago/retro_app:ref:refs/heads/main"
+              - "repo:talasago/retro_app:ref:refs/heads/develop"
       MaxSessionDuration: 3600
       Description: "Resources created by CFn"
 
