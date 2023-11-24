@@ -11,6 +11,7 @@
     }
   },
   "python.analysis.typeCheckingMode": "off",
+  "python.languageServer": "Pylance",
   "ruff.format.args":  ["--config=${workspaceFolder}/.ruff.toml"],
   "mypy-type-checker.preferDaemon": false,
   "mypy-type-checker.args": [
