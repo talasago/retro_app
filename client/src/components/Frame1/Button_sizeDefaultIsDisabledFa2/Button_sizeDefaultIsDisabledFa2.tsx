@@ -25,8 +25,6 @@ export const Button_sizeDefaultIsDisabledFa2: FC<Props> = memo(function Button_s
     console.log('Password:', props.password);
 
     try {
-      //TODO: 環境変数とかでドメインを管理する
-      const url = 'http://127.0.0.1:8000';
       const urlPath = '/api/v1/sign_up';
 
       const data = {
@@ -35,7 +33,7 @@ export const Button_sizeDefaultIsDisabledFa2: FC<Props> = memo(function Button_s
         password: props.password,
       };
 
-      const response = await axios.post(`${url}${urlPath}`, data, {
+      const response = await axios.post(`${process.env.REACT_APP_BACKEND_API_URL}${urlPath}`, data, {
         headers: {
           'Content-Type': 'application/json' // ヘッダーにapplication/jsonを追加
         },
