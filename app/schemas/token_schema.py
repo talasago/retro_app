@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel
+from .base_model import BaseModel
 
 
 class TokenType(Enum):
@@ -29,5 +29,4 @@ class TokenPayload(BaseModel):
         return dump
 
     class ConfigDict:
-        from_attributes = True
         frozen = True

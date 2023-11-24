@@ -1,4 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
+
+from .base_model import BaseModel
 
 
 class ApiResponseBodyBase(BaseModel):
