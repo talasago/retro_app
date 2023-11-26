@@ -12,6 +12,12 @@ pj_root_path = os.path.join(os.path.dirname(__file__), "../")
 sys.path.append(pj_root_path)
 
 from app.database import Base, SessionLocal  # noqa: E402
+
+# Base.metadataにテーブルを含めるために一時的にmodelをインポート。
+# TODO:repositoryを作成したら、repositoryをインポートするように変更する
+from app.models.retrospective_method.comment_model import (  # noqa: F401,E402
+    CommentModel,
+)
 from app.repository.user_repository import UserRepository  # noqa: E402
 
 
