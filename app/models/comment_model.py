@@ -33,6 +33,7 @@ class CommentModel(Base):
         DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow()
     )
 
+
 # @event.listens_for(CommentModel.uuid, "set")
 # def disable_uuid_column_update(target, value, oldvalue, initiator):
 #     """
