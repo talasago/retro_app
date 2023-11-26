@@ -1,7 +1,9 @@
+import uuid as _uuid
 from datetime import datetime
 
 from passlib.context import CryptContext
-from sqlalchemy import DateTime, Integer, String
+from sqlalchemy import DateTime, Integer, String, event
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -19,10 +21,12 @@ class CommentModel(Base):
     # uuid: Mapped[_uuid.UUID] = mapped_column(
     #     UUID(as_uuid=True), default=_uuid.uuid4, nullable=False, unique=True
     # )
-    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
-    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
-    refresh_token: Mapped[str | None] = mapped_column(String, nullable=True)
+
+    # TODO : foreign_keyは後で指定する (retrospective_method_id & user_id)
+    retrospective_method_id: Mapped[int] = mapped_column(Integer, primary_key=False, nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=False, nullable=False)
+    comment: Mapped[str] = mapped_column(String, nullable=False)
+    
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow()
@@ -30,7 +34,6 @@ class CommentModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow()
     )
-
 
 # @event.listens_for(CommentModel.uuid, "set")
 # def disable_uuid_column_update(target, value, oldvalue, initiator):
