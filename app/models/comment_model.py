@@ -1,9 +1,7 @@
-import uuid as _uuid
 from datetime import datetime
 
 from passlib.context import CryptContext
-from sqlalchemy import DateTime, Integer, String, event
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
