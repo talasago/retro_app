@@ -25,6 +25,7 @@ from app.schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
 )
+
 # from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
@@ -44,12 +45,16 @@ app.add_middleware(
     expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
 )
 
+
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
-@app.post("/api/v1/retrospective_method/{retrospective_method_id}/comment", summary="レビューコメント登録します。")
+@app.post(
+    "/api/v1/retrospective_method/{retrospective_method_id}/comment",
+    summary="レビューコメント登録します。",
+)
 def add_comment(
     retrospective_method_id: int,
     current_user: "UserModel" = Depends(get_current_user),
-    auth_service: "AuthService" = Depends(get_auth_service)
+    auth_service: "AuthService" = Depends(get_auth_service),
 ):
     """コメント登録のエンドポイント。"""
     # リクエストボディのコメントを受け取る
