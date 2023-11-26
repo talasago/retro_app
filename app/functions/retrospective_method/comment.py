@@ -49,7 +49,7 @@ app.add_middleware(
 def add_comment(
     current_user: "UserModel" = Depends(get_current_user),
     auth_service: "AuthService" = Depends(get_auth_service),
-    retrospective_method_id: int,
+    retrospective_method_id: int
 ):
     """コメント登録のエンドポイント。"""
     # リクエストボディのコメントを受け取る
