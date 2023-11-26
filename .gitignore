@@ -1,3 +1,5 @@
 **/node_modules/
 .serverless/
 requirements.txt
+app/__pycache__/
+tests/__pycache__/
