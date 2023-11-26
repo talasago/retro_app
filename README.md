@@ -111,9 +111,17 @@ $ alembic upgrade head
 1. SQLAlchemyのモデルファイルを作成する
   - 例) `app/models/user.py`
 2. alembicのマイグレーションファイルを作成する
-  - `$ alembic revision --autogenerate -m "${メッセージ}"`
+  - `$ alembic revision -m "${メッセージ}"`
 3. `database/versions/`配下に作成されたマイグレーションファイルを修正する
 4. `alembic upgrade head`を実行すると、ローカルのDBにテーブル定義が反映される
+5. `tests/conftest.py`に以下のようにモデルをインポートするように修正する。以下の様なインポートをしないと、pytest時にTBL削除/作成でエラーになってしまうため。
+  ```python
+  # Base.metadataにテーブルを含めるために一時的にmodelをインポート。
+  # TODO:repositoryを作成したら、repositoryをインポートするように変更する
+  from app.models.retrospective_method.comment_model import (  # noqa: F401,E402
+      CommentModel,
+  )
+  ```
 
 ## Lambda Functionのデプロイ方法
 GithubAcions([deploy_lambda_function](https://github.com/talasago/retro_app_backend/actions/workflows/deploy_lambda_function.yml))を手動で起動すると、その時点でpushされているコードをLambdaにデプロイします。
