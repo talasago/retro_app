@@ -3,7 +3,9 @@ from __future__ import annotations
 import re
 from typing import ClassVar
 
-from pydantic import BaseModel, EmailStr, Field, SecretStr, field_validator
+from pydantic import EmailStr, Field, SecretStr, field_validator
+
+from .base_model import BaseModel
 
 
 class UserSchema(BaseModel):
@@ -30,9 +32,6 @@ class UserSchema(BaseModel):
     def name_strip(cls, name: str) -> str | None:
         # 半角スペースも全角スペースも削除する
         return None if name is None else name.strip().strip("　")
-
-    class ConfigDict:
-        from_attributes = True
 
 
 class UserCreate(UserSchema):
