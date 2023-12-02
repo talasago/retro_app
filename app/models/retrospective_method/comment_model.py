@@ -1,12 +1,9 @@
 from datetime import datetime
 
-from passlib.context import CryptContext
 from sqlalchemy import DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class CommentModel(Base):
