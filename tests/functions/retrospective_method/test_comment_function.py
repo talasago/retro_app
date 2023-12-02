@@ -91,3 +91,4 @@ class TestCommentFunction:
                     "comment": "test comment",
                 }
                 add_comment_api(comment_data, res_body["access_token"])
+                # APIを実際に追加されているかどうかのテストは、コメント取得APIの時で代替する

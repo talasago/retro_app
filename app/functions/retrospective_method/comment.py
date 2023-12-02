@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 
 from app.functions.dependencies import (
-    get_auth_service,
+    get_comment_repo,
     get_current_user,
 )
 from app.models.retrospective_method.comment_model import CommentModel
@@ -21,7 +21,8 @@ from app.schemas.retrospective_method.comment_schema import CommentCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from app.services.auth_service import AuthService
+    from app.repository.retrospective_method.comment_repository import CommentRepository
+
 
 app = FastAPI()
 # TODO:originとMethodを可変にしたい。そして外だししたい。
@@ -45,20 +46,17 @@ def add_comment(
     retrospective_method_id: int,
     comment_params: CommentCreate,
     current_user: "UserModel" = Depends(get_current_user),
-    auth_service: "AuthService" = Depends(get_auth_service),
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント登録のエンドポイント。"""
 
-    # retrospective_method_idとcurrent_user.idとコメントを基に、CommentModelのインスタンスを生成する
-    # CommentRepository(commentモデルのインスタンス)
-    # breakpoint()
     comment: CommentModel = CommentModel(
         retrospective_method_id=retrospective_method_id,
         user_id=current_user.id,
         comment=comment_params.comment,
     )
     # TODO:重複エラーの時、4xx系を返すようにする
-    # comment_repo.save(comment=comment)
+    comment_repo.save(comment)
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,

@@ -12,6 +12,7 @@ from app.errors.retro_app_error import (
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
+from app.repository.retrospective_method.comment_repository import CommentRepository
 from app.repository.user_repository import UserRepository
 from app.services.auth_service import AuthService
 
@@ -31,6 +32,10 @@ def get_db():
 
 def get_user_repo(db: Session = Depends(get_db)) -> UserRepository:
     return UserRepository(db)
+
+
+def get_comment_repo(db: Session = Depends(get_db)) -> CommentRepository:
+    return CommentRepository(db)
 
 
 def get_auth_service(user_repo: UserRepository = Depends(get_user_repo)) -> AuthService:
