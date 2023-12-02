@@ -72,8 +72,8 @@ class TestCommentFunction:
         class TestValidParam:
             def test_return_201(self, add_user_api, login_api, add_comment_api):
                 user_data: dict = {
-                    "email": "testuser1@example.com",
-                    "name": "Test User1",
+                    "email": "testcomment1@example.com",
+                    "name": "Test Comment1",
                     "password": "testpassword",
                 }
                 add_user_api(user_data)
