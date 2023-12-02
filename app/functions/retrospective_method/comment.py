@@ -10,10 +10,12 @@ from app.functions.dependencies import (
     get_auth_service,
     get_current_user,
 )
+from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     ApiResponseBodyBase,
 )
+from app.schemas.retrospective_method.comment_schema import CommentCreate
 
 # from app.schemas.user_schema import UserCreate
 
@@ -41,13 +43,22 @@ app.add_middleware(
 )
 def add_comment(
     retrospective_method_id: int,
+    comment_params: CommentCreate,
     current_user: "UserModel" = Depends(get_current_user),
     auth_service: "AuthService" = Depends(get_auth_service),
 ):
     """コメント登録のエンドポイント。"""
-    # リクエストボディのコメントを受け取る
-    # retrospective_method_idとcurrent_user.idとコメントを基に、Commentモデルのインスタンスを生成する
+
+    # retrospective_method_idとcurrent_user.idとコメントを基に、CommentModelのインスタンスを生成する
     # CommentRepository(commentモデルのインスタンス)
+    # breakpoint()
+    comment: CommentModel = CommentModel(
+        retrospective_method_id=retrospective_method_id,
+        user_id=current_user.id,
+        comment=comment_params.comment,
+    )
+    # TODO:重複エラーの時、4xx系を返すようにする
+    # comment_repo.save(comment=comment)
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,

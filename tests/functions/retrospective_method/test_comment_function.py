@@ -1,24 +1,20 @@
-from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
 from fastapi.testclient import TestClient
 from httpx import Response
-from sqlalchemy import select
 
-from app.functions.user import app as app_user
 from app.functions.retrospective_method.comment import app as app_comment
-from app.models.user_model import UserModel
-from app.schemas.token_schema import TokenType
-from tests.test_helpers.token import generate_test_token
+from app.functions.user import app as app_user
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
-    from sqlalchemy.orm.session import Session
+    pass
 
 
 client_user = TestClient(app_user)
 client_comment = TestClient(app_comment)
+
 
 @pytest.fixture
 def add_user_api():
@@ -27,6 +23,7 @@ def add_user_api():
         assert response.status_code == 201
 
     return _method
+
 
 @pytest.fixture
 def login_api():
@@ -47,18 +44,21 @@ def login_api():
         return res_body["access_token"], res_body["refresh_token"]
 
     return _method
-    
+
+
 @pytest.fixture
 def add_comment_api():
-    def _method(comment_data: dict, access_token: str, retrospective_method_id=1) -> None:
-        response = client_comment.post(f"/api/v1/retrospective_method/{retrospective_method_id}/comment", 
+    def _method(
+        comment_data: dict, access_token: str, retrospective_method_id=1
+    ) -> None:
+        response = client_comment.post(
+            f"/api/v1/retrospective_method/{retrospective_method_id}/comment",
             json=comment_data,
             headers={
                 "accept": "application/json",
                 "Authorization": f"Bearer {access_token}",
-            }    
+            },
         )
-        #breakpoint()
         assert response.status_code == 201
 
     return _method
@@ -67,7 +67,6 @@ def add_comment_api():
 # TODO : ユーザ作成~ログイン周りの共通関数
 @pytest.mark.usefixtures("db")
 class TestCommentFunction:
-
     class TestAddComment:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
         class TestValidParam:
@@ -91,6 +90,4 @@ class TestCommentFunction:
                 comment_data: dict = {
                     "comment": "test comment",
                 }
-                add_comment_api(comment_data, res_body['access_token'])
-            
-
+                add_comment_api(comment_data, res_body["access_token"])
