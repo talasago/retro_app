@@ -26,7 +26,7 @@ class TestCommentRepository:
             db=db, retrospective_method_id=1, user_id=1, comment="Test Comment"
         )
 
-        created_comment: CommentModel = db.query(CommentModel).filter_by(id=comment.id)  # type: ignore
+        created_comment: CommentModel = db.query(CommentModel).filter_by(id=comment.id).one()  # type: ignore
         assert created_comment.retrospective_method_id == 1
         assert created_comment.user_id == 1
         assert created_comment.comment == "Test Comment"
