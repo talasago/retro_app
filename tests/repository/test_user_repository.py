@@ -1,5 +1,6 @@
 import pytest
 from passlib.context import CryptContext
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.errors.retro_app_error import (
@@ -101,6 +102,33 @@ class TestUserRepository:
             assert user_after_update.hashed_password == "hashed_password"
             assert user_after_update.refresh_token == "refresh_token"
             assert user_after_update.updated_at > user_after_update.created_at
+
+        class TestWhenCommitError:
+            def test_expect_rollback(self, db: Session, mocker):
+                """commit時にエラーが発生した場合、rollbackされることを確認する"""
+
+                # commit時に強制的にエラーを発生させる
+                mocker.patch.object(
+                    db,
+                    "commit",
+                    side_effect=OperationalError(
+                        "Simulated OperationalError", None, None  # type: ignore
+                    ),
+                )
+                mocker.patch.object(db, "rollback")  # rollbackメソッドを呼び出されたか確認したいためモック
+
+                user_data: dict = {
+                    "name": "commit error",
+                    "email": "commit error@example.com",
+                    "password": "password",
+                }
+                user = UserModel(**user_data)
+                user_repo = UserRepository(db)
+
+                with pytest.raises(OperationalError):
+                    user_repo.save(user)
+
+                assert db.rollback.call_count == 1  # type: ignore
 
     class TestFindBy:
         def test_valid_search(self, user_repo: "UserRepository"):
