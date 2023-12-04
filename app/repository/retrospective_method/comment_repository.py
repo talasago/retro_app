@@ -10,8 +10,10 @@ class CommentRepository:
     def save(self, comment: CommentModel) -> None:
         self.__db.add(comment)
 
-        # TODO:その他のエラーの場合のエラーハンドリング。
-        # 5xxを返したいね。
-        self.__db.commit()
+        try:
+            self.__db.commit()
+        except Exception as e:
+            self.__db.rollback()
+            raise e
 
         self.__db.refresh(comment)

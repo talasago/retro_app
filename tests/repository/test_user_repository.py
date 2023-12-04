@@ -1,5 +1,6 @@
 import pytest
 from passlib.context import CryptContext
+from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
 from app.errors.retro_app_error import (
@@ -25,81 +26,109 @@ def create_user():
 
 @pytest.mark.usefixtures("db")
 class TestUserRepository:
-    def test_create_user(self, db: Session, create_user):
-        create_user(
-            db=db, name="John Doe", email="johndoe@example.com", password="password"
-        )
+    class TestSave:
+        def test_create_user(self, db: Session, create_user):
+            create_user(
+                db=db, name="John Doe", email="johndoe@example.com", password="password"
+            )
 
-        # ユーザーが正しく作成されたか検証
-        # TODO:日付のassertが欲しい。日本時間かどうか。
-        created_user: UserModel = db.query(UserModel).filter_by(email="johndoe@example.com").first()  # type: ignore
+            # ユーザーが正しく作成されたか検証
+            # TODO:日付のassertが欲しい。日本時間かどうか。
+            created_user: UserModel = db.query(UserModel).filter_by(email="johndoe@example.com").first()  # type: ignore
 
-        assert created_user is not None
-        assert str(created_user.name) == "John Doe"
-        assert str(created_user.email) == "johndoe@example.com"
-        assert pwd_context.verify("password", str(created_user.hashed_password))
+            assert created_user is not None
+            assert str(created_user.name) == "John Doe"
+            assert str(created_user.email) == "johndoe@example.com"
+            assert pwd_context.verify("password", str(created_user.hashed_password))
 
-    def test_email_uniqueness(self, db: Session, create_user):
-        # 予め新規ユーザーを作っておく。
-        user_data: dict = {
-            "name": "resisted email",
-            "email": "resisted_email@example.com",
-            "password": "password",
-        }
-        create_user(db=db, **user_data)
-        # emailだけが重複になるようにパラメタ修正
-        user_data["name"] = "resisted email1"
+        def test_email_uniqueness(self, db: Session, create_user):
+            # 予め新規ユーザーを作っておく。
+            user_data: dict = {
+                "name": "resisted email",
+                "email": "resisted_email@example.com",
+                "password": "password",
+            }
+            create_user(db=db, **user_data)
+            # emailだけが重複になるようにパラメタ修正
+            user_data["name"] = "resisted email1"
 
-        with pytest.raises(RetroAppColmunUniqueError) as e:
+            with pytest.raises(RetroAppColmunUniqueError) as e:
+                create_user(db=db, **user_data)
+
+            assert str(e.value) == "指定されたメールアドレスはすでに登録されています。"
+
+        def test_name_uniqueness(self, db: Session, create_user):
+            # 予め新規ユーザーを作っておく。
+            user_data: dict = {
+                "name": "resisted name",
+                "email": "resisted_name@example.com",
+                "password": "password",
+            }
+            create_user(db=db, **user_data)
+            # nameだけが重複になるようにパラメタ修正
+            user_data["email"] = "resisted_name1@example.com"
+
+            with pytest.raises(RetroAppColmunUniqueError) as e:
+                create_user(db=db, **user_data)
+
+            assert str(e.value) == "指定された名前はすでに登録されています。"
+
+        def test_update(self, db: Session, create_user):
+            # 予めユーザーを作っておく。
+            user_data: dict = {
+                "name": "for update name1",
+                "email": "for_update2@example.com",
+                "password": "password",
+            }
             create_user(db=db, **user_data)
 
-        assert str(e.value) == "指定されたメールアドレスはすでに登録されています。"
+            user_repo = UserRepository(db)
+            user: UserModel = user_repo.find_by("email", user_data["email"])  # type: ignore
+            assert user  # userがNoneではないことの確認
+            user.name = "after updatename"
+            user.email = "afterupdate@email"
+            user.hashed_password = "hashed_password"
+            user.refresh_token = "refresh_token"
 
-    def test_name_uniqueness(self, db: Session, create_user):
-        # 予め新規ユーザーを作っておく。
-        user_data: dict = {
-            "name": "resisted name",
-            "email": "resisted_name@example.com",
-            "password": "password",
-        }
-        create_user(db=db, **user_data)
-        # nameだけが重複になるようにパラメタ修正
-        user_data["email"] = "resisted_name1@example.com"
+            user_repo.save(user)
 
-        with pytest.raises(RetroAppColmunUniqueError) as e:
-            create_user(db=db, **user_data)
+            # expireしないと、コミットしてなくても、新しい値を取得してしまうため
+            db.expire(user)
 
-        assert str(e.value) == "指定された名前はすでに登録されています。"
+            user_after_update: UserModel = user_repo.find_by("id", user.id)  # type: ignore
+            assert user_after_update  # userがNoneではないことの確認
+            assert user_after_update.name == "after updatename"
+            assert user_after_update.email == "afterupdate@email"
+            assert user_after_update.hashed_password == "hashed_password"
+            assert user_after_update.refresh_token == "refresh_token"
+            assert user_after_update.updated_at > user_after_update.created_at
 
-    def test_update(self, db: Session, create_user):
-        # 予めユーザーを作っておく。
-        user_data: dict = {
-            "name": "for update name1",
-            "email": "for_update2@example.com",
-            "password": "password",
-        }
-        create_user(db=db, **user_data)
+        class TestWhenCommitError:
+            def test_expect_rollback(self, db: Session, mocker):
+                """commit時にエラーが発生した場合、rollbackされることを確認する"""
 
-        user_repo = UserRepository(db)
-        user: UserModel = user_repo.find_by("email", user_data["email"])  # type: ignore
-        assert user  # userがNoneではないことの確認
-        user.name = "after updatename"
-        user.email = "afterupdate@email"
-        user.hashed_password = "hashed_password"
-        user.refresh_token = "refresh_token"
+                # commit時に強制的にエラーを発生させる
+                mocker.patch.object(
+                    db,
+                    "commit",
+                    side_effect=OperationalError(
+                        "Simulated OperationalError", None, None  # type: ignore
+                    ),
+                )
+                mocker.patch.object(db, "rollback")  # rollbackメソッドを呼び出されたか確認したいためモック
 
-        user_repo.save(user)
+                user_data: dict = {
+                    "name": "commit error",
+                    "email": "commit error@example.com",
+                    "password": "password",
+                }
+                user = UserModel(**user_data)
+                user_repo = UserRepository(db)
 
-        # expireしないと、コミットしてなくても、新しい値を取得してしまうため
-        db.expire(user)
+                with pytest.raises(OperationalError):
+                    user_repo.save(user)
 
-        user_after_update: UserModel = user_repo.find_by("id", user.id)  # type: ignore
-        assert user_after_update  # userがNoneではないことの確認
-        assert user_after_update.name == "after updatename"
-        assert user_after_update.email == "afterupdate@email"
-        assert user_after_update.hashed_password == "hashed_password"
-        assert user_after_update.refresh_token == "refresh_token"
-        assert user_after_update.updated_at > user_after_update.created_at
+                assert db.rollback.call_count == 1  # type: ignore
 
     class TestFindBy:
         def test_valid_search(self, user_repo: "UserRepository"):

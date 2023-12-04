@@ -25,8 +25,6 @@ class UserRepository:
         self.__db.merge(user) if user.id else self.__db.add(user)
 
         try:
-            # TODO:その他のエラーの場合のエラーハンドリング。
-            # 5xxを返したいね。
             self.__db.commit()
         except IntegrityError as e:
             self.__db.rollback()
@@ -41,6 +39,10 @@ class UserRepository:
             ):
                 raise RetroAppColmunUniqueError(col_name)
             raise e
+        except Exception as e:
+            self.__db.rollback()
+            raise e
+
         self.__db.refresh(user)
 
     def find_by(
