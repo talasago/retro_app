@@ -1,9 +1,15 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+# from app.models.user_model import UserModel
+
+if TYPE_CHECKING:
+    from app.models.user_model import UserModel
 
 
 class CommentModel(Base):
@@ -21,7 +27,9 @@ class CommentModel(Base):
     retrospective_method_id: Mapped[int] = mapped_column(
         Integer, primary_key=False, nullable=False
     )
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=False, nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id"), nullable=False
+    )
     comment: Mapped[str] = mapped_column(String, nullable=False)
 
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
@@ -31,6 +39,9 @@ class CommentModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow()
     )
+
+    # 外部キー
+    user: Mapped["UserModel"] = relationship(back_populates="comments")
 
 
 # @event.listens_for(CommentModel.uuid, "set")
