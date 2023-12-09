@@ -1,3 +1,7 @@
+import pytest
+from psycopg2 import errors as psycopg2_errors
+from sqlalchemy.exc import IntegrityError
+
 from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 
@@ -27,10 +31,12 @@ class TestCommentModel:
                 retrospective_method_id=1, user_id=9999, comment="test"
             )
             db.add(comment)
-            db.commit()
-            # breakpoint()
-            # TODO assertを後ほど追加
 
+            with pytest.raises(IntegrityError) as e:
+                db.commit()
+                assert isinstance(
+                    e.orig, psycopg2_errors.ForeignKeyViolation  # type:ignore
+                )
+            db.rollback()
 
-# コメント登録時、usersに存在するidのみを登録できる(usersに存在しないuser_idの場合登録できない)
-# usersのデータを削除時、紐づいているcommentを削除
+        # TODO 「ユーザ削除時にコメントも削除されているか」のケース

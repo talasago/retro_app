@@ -27,6 +27,15 @@ def upgrade() -> None:
         sa.Column('updated_at', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id', name='comments_pkey'),
     )
+
+    op.create_foreign_key(
+        constraint_name="fk_user_id",
+        source_table="comments",
+        referent_table="users",
+        local_cols=["user_id"],
+        remote_cols=["id"],
+        ondelete="CASCADE"
+    )
     # ### end Alembic commands ###
 
 
