@@ -34,9 +34,8 @@ class TestCommentModel:
 
             with pytest.raises(IntegrityError) as e:
                 db.commit()
-                assert isinstance(
-                    e.orig, psycopg2_errors.ForeignKeyViolation  # type:ignore
-                )
+
             db.rollback()
+            assert isinstance(e.value.orig, psycopg2_errors.ForeignKeyViolation)
 
         # TODO 「ユーザ削除時にコメントも削除されているか」のケース
