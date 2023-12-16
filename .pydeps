@@ -1,0 +1,22 @@
+
+[pydeps]
+max_bacon = 5
+no_show = True
+exclude =
+    fastapi
+    mangum
+    pydantic
+    jose
+    psycopg2
+    sqlalchemy
+    passlib
+    app.errors
+    app.database
+exclude_exact =
+    app
+    app.functions
+    app.services
+    app.repository
+    app.models
+    app.schemas
+    app.schemas.http_response_body_user_schema
