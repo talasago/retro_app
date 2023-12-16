@@ -25,10 +25,8 @@ class TestUserSchema:
             "email": "invalid_email",
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e:
+            UserSchema(**user_data)
 
     def test_email_null(self):
         user_data: dict = {
@@ -36,16 +34,12 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
         user_data_email_null: dict = {"name": "email null", "email": None}
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data_email_null)
-
-            assert user_params is None
+            UserSchema(**user_data_email_null)
 
     def test_name_invalid_max_len(self):
         user_data: dict = {
@@ -54,9 +48,7 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
     def test_name_valid_max_len(self):
         user_data: dict = {
@@ -76,16 +68,12 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
         del user_data["name"]
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
 
 class TestUserCreate:
@@ -96,16 +84,12 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+            UserCreate(**user_data)
 
         user_data["password"] = None
 
         with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+            UserCreate(**user_data)
 
     def test_password_invalid_length(self):
         user_data: dict = {
@@ -115,16 +99,12 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+            UserCreate(**user_data)
 
         user_data["password"] = "a" * 51
 
         with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+            UserCreate(**user_data)
 
     def test_password_valid_length(self):
         user_data: dict = {
@@ -164,6 +144,4 @@ class TestUserCreate:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+            UserCreate(**user_data)
