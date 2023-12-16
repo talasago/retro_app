@@ -58,7 +58,6 @@ def signup_user(
     user: UserModel = UserModel(
         name=user_params.name, email=user_params.email, password=user_params.password
     )
-    # TODO:重複エラーの時、4xx系を返すようにする
     user_repo.save(user=user)
 
     return JSONResponse(
