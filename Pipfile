@@ -13,6 +13,7 @@ email-validator = "*"
 python-multipart = "*"
 python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
+pydantic-i18n = "*"
 
 [dev-packages]
 flake8 = "*"
