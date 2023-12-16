@@ -24,7 +24,6 @@ factory-boy = "*"
 mypy = "*"
 ruff = "*"
 black = "*"
-pydeps = "*"
 
 [requires]
 python_version = "3.10"
