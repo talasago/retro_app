@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.translations.I18nTranslateWrapper import I18nTranslateWrapper
+from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate, UserSchema
 
 # FIXME:バリデーションのエラーメッセージも確認した方が良い

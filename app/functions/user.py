@@ -26,7 +26,7 @@ from app.schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
 )
-from app.schemas.translations.I18nTranslateWrapper import I18nTranslateWrapper
+from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
