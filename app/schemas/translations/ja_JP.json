@@ -1,3 +1,4 @@
 {
-  "String should have at most {}": "{}文字以下で入力してください。"
+  "String should have at most {}": "{}文字以下で入力してください。",
+  "value is not a valid email address: The email address is not valid. It must have exactly one @-sign.": "有効なメールアドレスではありません。"
 }
