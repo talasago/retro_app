@@ -1,3 +1,4 @@
 {
-  "String should have at most {}": "{}文字以下で入力してください。"
+  "String should have at most {}": "{}文字以下で入力してください。",
+  "Input should be a valid string": "有効な文字を入力してください。"
 }

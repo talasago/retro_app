@@ -27,10 +27,14 @@ class I18nTranslateWrapper:
 
     @staticmethod
     def __update_error_message(error: dict) -> str:
-        if "email" in error.get("loc", "") or "email" in error.get("input", ""):
+        loc = error.get("loc", "") or ""  # Noneの場合があるため空文字を設定
+        input_ = error.get("input", "") or ""  # Noneの場合があるため空文字を設定
+        msg = error.get("msg", "")
+
+        if "email" in loc or "email" in input_:
             return "有効なメールアドレスではありません。"
         else:
-            return re.sub("[a-zA-Z]", "", error["msg"])
+            return re.sub("[a-zA-Z]", "", msg)
             # 正規表現を使用してアルファベットを削除
             # 理由：「String should have at most {} characters」のようなエラーメッセージの場合
             # 「50 charactars文字以下で入力してください。」と不要な英語が残ってしまうため
