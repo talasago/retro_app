@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.base_model import JaMassageValidationError
+from app.schemas.translations.I18nTranslateWrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate, UserSchema
 
 # FIXME:バリデーションのエラーメッセージも確認した方が良い
@@ -56,9 +56,11 @@ class TestUserSchema:
 
         with pytest.raises(ValidationError) as e:
             UserSchema(**user_data)
-        jmve = JaMassageValidationError(e.value)
 
-        assert jmve.trans()[0]["msg"] == "50 文字以下で入力してください。"
+        assert (
+            I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+            == "50 文字以下で入力してください。"
+        )
 
     def test_name_valid_max_len(self):
         user_data: dict = {
