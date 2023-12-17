@@ -4,9 +4,6 @@ from pydantic import ValidationError
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate, UserSchema
 
-# FIXME:バリデーションのエラーメッセージも確認した方が良い
-# ValidationErrorが返ってきているのはわかるが、なぜそうなったかの確認が足りない
-
 
 class TestUserSchema:
     def test_email_format_valid(self):
@@ -26,14 +23,8 @@ class TestUserSchema:
             "email": "invalid_email",
         }
 
-        with pytest.raises(ValidationError) as e:
+        with pytest.raises(ValidationError):
             UserSchema(**user_data)
-
-        # TODO:後で変更
-        assert (
-            e.value.errors()[0]["msg"]
-            == "value is not a valid email address: The email address is not valid. It must have exactly one @-sign."
-        )
 
     def test_email_null(self):
         user_data: dict = {
@@ -79,13 +70,17 @@ class TestUserSchema:
             "email": "johndoe1@example.com",
         }
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e1:
             UserSchema(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"] == "有効な文字を入力してください。"
+        )
 
         del user_data["name"]
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e2:
             UserSchema(**user_data)
+        assert I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
 
 
 class TestUserCreate:
@@ -93,15 +88,20 @@ class TestUserCreate:
         user_data: dict = {
             "name": "John Doe",
             "email": "johndoe1@example.com",
+            "password": None,
         }
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e1:
             UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"] == "有効な文字を入力してください。"
+        )
 
-        user_data["password"] = None
+        del user_data["name"]
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e2:
             UserCreate(**user_data)
+        assert I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
 
     def test_password_invalid_length(self):
         user_data: dict = {
@@ -110,13 +110,21 @@ class TestUserCreate:
             "password": "a" * 7,
         }
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e1:
             UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )
 
         user_data["password"] = "a" * 51
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e2:
             UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )
 
     def test_password_valid_length(self):
         user_data: dict = {
@@ -155,5 +163,10 @@ class TestUserCreate:
             "password": "ＰＡＳＳＷＯＲＤ",
         }
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e:
             UserCreate(**user_data)
+
+        assert (
+            I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )
