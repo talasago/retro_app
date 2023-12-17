@@ -9,6 +9,7 @@ class TestI18nTranslateWrapper:
         # ①複数のエラーがある場合でも翻訳されていること
         # ②不要な英語が含まれていないこと
         # ③msgがNoneの場合でもエラーにならないこと
+        # ④emailのエラーかどうかの判断は、locだけであること
         errors = [
             {
                 "type": "value_error",
@@ -34,9 +35,17 @@ class TestI18nTranslateWrapper:
                 "input": None,
                 "url": "https://errors.pydantic.dev/2.5/v/string_type",
             },
+            {
+                "type": "missing",
+                "loc": ("name",),
+                "msg": "Field required",
+                "input": {"email": "johndoe1@example.com"},
+                "url": "https://errors.pydantic.dev/2.5/v/missing",
+            },
         ]
 
         translated_errors = I18nTranslateWrapper.trans(errors)
         assert translated_errors[0]["msg"] == "有効なメールアドレスではありません。"
         assert translated_errors[1]["msg"] == "50 文字以下で入力してください。"
         assert translated_errors[2]["msg"] == "有効な文字を入力してください。"
+        assert translated_errors[3]["msg"] == "必須項目です。"

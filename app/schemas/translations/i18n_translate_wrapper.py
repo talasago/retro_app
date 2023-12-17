@@ -28,10 +28,9 @@ class I18nTranslateWrapper:
     @staticmethod
     def __update_error_message(error: dict) -> str:
         loc = error.get("loc", "") or ""  # Noneの場合があるため空文字を設定
-        input_ = error.get("input", "") or ""  # Noneの場合があるため空文字を設定
         msg = error.get("msg", "")
 
-        if "email" in loc or "email" in input_:
+        if "email" in loc:
             return "有効なメールアドレスではありません。"
         else:
             return re.sub("[a-zA-Z]", "", msg)
