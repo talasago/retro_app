@@ -110,7 +110,6 @@ class TestUserFunction:
 
             assert response.status_code == 422
             assert response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
-            # TODO: urlは不要な情報のため後で消したい
 
     class TestLogin:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか

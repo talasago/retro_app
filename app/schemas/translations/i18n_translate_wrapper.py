@@ -22,7 +22,7 @@ class I18nTranslateWrapper:
 
         for error in translated_errors:
             error["msg"] = cls.__update_error_message(error)
-
+            error.pop("url", None)
         return translated_errors
 
     @staticmethod

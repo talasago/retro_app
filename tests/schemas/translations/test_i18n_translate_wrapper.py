@@ -10,6 +10,7 @@ class TestI18nTranslateWrapper:
         # ②不要な英語が含まれていないこと
         # ③msgがNoneの場合でもエラーにならないこと
         # ④emailのエラーかどうかの判断は、locだけであること
+        # ⑤urlが削除されていること
         errors = [
             {
                 "type": "value_error",
@@ -49,3 +50,4 @@ class TestI18nTranslateWrapper:
         assert translated_errors[1]["msg"] == "50 文字以下で入力してください。"
         assert translated_errors[2]["msg"] == "有効な文字を入力してください。"
         assert translated_errors[3]["msg"] == "必須項目です。"
+        assert translated_errors[2].get("url") is None
