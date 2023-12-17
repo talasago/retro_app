@@ -53,7 +53,6 @@ app.add_middleware(
 async def validation_exception_handler(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
-    breakpoint()
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={"detail": I18nTranslateWrapper.trans(exc.errors())},  # type: ignore
