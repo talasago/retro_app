@@ -2,6 +2,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -25,10 +26,13 @@ from app.schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
 )
+from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
+    from fastapi import Request
+
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
@@ -43,6 +47,17 @@ app.add_middleware(
     allow_headers=["*"],  # フロントエンドからの認可するHTTPヘッダー情報
     expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
 )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: "Request", exc: RequestValidationError
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": I18nTranslateWrapper.trans(exc.errors())},  # type: ignore
+        #  type(exc.errors()) => listとなっていることを確認している
+    )
 
 
 @app.post(

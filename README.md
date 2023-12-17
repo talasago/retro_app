@@ -22,7 +22,9 @@
 │   ├── functions/ => ※1
 │   ├── models/ => ※1
 │   ├── repository/ => ※1
-│   ├── schemas/ => pydantic用のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
+│   ├── schemas/ => pydantic用(パラメタのバリデーション管理 + OpenAPIの定義用)のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
+│   │   └── translations/ 
+|   |       └── ja_JP.json => エラーメッセージを日本語するためのファイル
 │   └── services/ => ※1
 ├── client/ => フロントエンド用
 ├── database/ => alembic用

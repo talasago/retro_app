@@ -82,20 +82,34 @@ def logout_api():
 
 @pytest.mark.usefixtures("db")
 class TestUserFunction:
-    def test_register_user(self):
-        user_data: dict = {
-            "email": "testuser@example.com",
-            "name": "Test User",
-            "password": "testpassword",
-        }
+    class TestSignUp:
+        def test_register_user(self):
+            user_data: dict = {
+                "email": "testuser@example.com",
+                "name": "Test User",
+                "password": "testpassword",
+            }
 
-        response = client.post("/api/v1/sign_up", json=user_data)
+            response = client.post("/api/v1/sign_up", json=user_data)
 
-        assert response.status_code == 201
-        assert response.json() == {"message": "ユーザー登録が成功しました。"}
-        # TODO:異常系のテストを追加する
-        # DBに保存されているかの観点が必要。
-        # パスワードのバリデーションがすり抜けている気がする...
+            assert response.status_code == 201
+            assert response.json() == {"message": "ユーザー登録が成功しました。"}
+            # TODO:異常系のテストを追加する
+            # DBに保存されているかの観点が必要。
+            # パスワードのバリデーションがすり抜けている気がする...
+
+        def test_422_be_translated_into_japanese(self):
+            """pydenticのエラーメッセージが日本語化されていること"""
+            user_data: dict = {
+                "email": "test_422_be_translated_into_japanese@example.com",
+                "name": "芳" * 51,
+                "password": "testpassword",
+            }
+
+            response = client.post("/api/v1/sign_up", json=user_data)
+
+            assert response.status_code == 422
+            assert response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
 
     class TestLogin:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
