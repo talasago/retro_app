@@ -20,11 +20,18 @@ class I18nTranslateWrapper:
     def trans(cls, errors: list["ErrorDict"]) -> List:
         translated_errors = tr.translate(errors, locale=DEFAULT_LOCALE)
 
-        # 正規表現を使用してアルファベットを削除
-        # 理由：「String should have at most {} characters」のようなエラーメッセージの場合
-        # 「50 charactars文字以下で入力してください。」と不要な英語が残ってしまうため
-        # 恐らくPydanticI18nのバグ
         for error in translated_errors:
-            error["msg"] = re.sub("[a-zA-Z]", "", error["msg"])
+            error["msg"] = cls.__update_error_message(error)
 
         return translated_errors
+
+    @staticmethod
+    def __update_error_message(error: dict) -> str:
+        if "email" in error.get("loc", "") or "email" in error.get("input", ""):
+            return "有効なメールアドレスではありません。"
+        else:
+            return re.sub("[a-zA-Z]", "", error["msg"])
+            # 正規表現を使用してアルファベットを削除
+            # 理由：「String should have at most {} characters」のようなエラーメッセージの場合
+            # 「50 charactars文字以下で入力してください。」と不要な英語が残ってしまうため
+            # 恐らくPydanticI18nのバグ
