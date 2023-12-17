@@ -1,6 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
+from app.schemas.base_model import JaMassageValidationError
 from app.schemas.user_schema import UserCreate, UserSchema
 
 # FIXME:バリデーションのエラーメッセージも確認した方が良い
@@ -28,6 +29,12 @@ class TestUserSchema:
         with pytest.raises(ValidationError) as e:
             UserSchema(**user_data)
 
+        # TODO:後で変更
+        assert (
+            e.value.errors()[0]["msg"]
+            == "value is not a valid email address: The email address is not valid. It must have exactly one @-sign."
+        )
+
     def test_email_null(self):
         user_data: dict = {
             "name": "email null",
@@ -47,8 +54,11 @@ class TestUserSchema:
             "email": "johndoe1@example.com",
         }
 
-        with pytest.raises(ValidationError):
+        with pytest.raises(ValidationError) as e:
             UserSchema(**user_data)
+        jmve = JaMassageValidationError(e.value)
+
+        assert jmve.trans()[0]["msg"] == "50 文字以下で入力してください。"
 
     def test_name_valid_max_len(self):
         user_data: dict = {

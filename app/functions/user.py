@@ -1,11 +1,14 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
+import os
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
+from pydantic_i18n import JsonLoader, PydanticI18n
 
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
@@ -19,6 +22,7 @@ from app.functions.dependencies import (
     oauth2_scheme,
 )
 from app.models.user_model import UserModel
+from app.schemas.base_model import JaMassageValidationError
 from app.schemas.http_response_body_user_schema import (
     ApiResponseBodyBase,
     RefreshTokenApiResponseBody,
@@ -29,6 +33,8 @@ from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
+    from fastapi import Request
+
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
@@ -43,6 +49,25 @@ app.add_middleware(
     allow_headers=["*"],  # フロントエンドからの認可するHTTPヘッダー情報
     expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
 )
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
+tlans_path = os.path.join(file_dir, "../schemas/translations/")
+loader = JsonLoader(tlans_path)
+tr = PydanticI18n(loader, default_locale="ja_JP")
+
+DEFAULT_LOCALE = "ja_JP"  # TODO:定数化したい、外だししたい
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: "Request", exc: RequestValidationError
+) -> JSONResponse:
+    jmve = JaMassageValidationError(exc)
+
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": jmve.trans()},
+    )
 
 
 @app.post(
