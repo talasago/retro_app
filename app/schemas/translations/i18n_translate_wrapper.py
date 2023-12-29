@@ -37,4 +37,4 @@ class I18nTranslateWrapper:
             # 正規表現を使用してアルファベットを削除
             # 理由：「String should have at most {} characters」のようなエラーメッセージの場合
             # 「50 charactars文字以下で入力してください。」と不要な英語が残ってしまうため
-            # 恐らくPydanticI18nのバグ
+            # 恐らくPydanticI18nのバグ。https://github.com/boardpack/pydantic-i18n/issues/160 で対応されそうな気がする。
