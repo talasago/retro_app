@@ -1,3 +1,4 @@
+// 後でmain.tsxに変更する
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
