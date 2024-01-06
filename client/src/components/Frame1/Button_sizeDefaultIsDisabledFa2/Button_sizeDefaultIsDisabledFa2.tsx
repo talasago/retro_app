@@ -17,6 +17,9 @@ interface Props {
   email: string;
   password: string;
 }
+
+const BACKEND_API_URL = import.meta.env.VITE_APP_BACKEND_API_URL;
+
 /* @figmaId 107:436 */
 export const Button_sizeDefaultIsDisabledFa2: FC<Props> = memo(function Button_sizeDefaultIsDisabledFa2(props) {
   const handleClick = async () => {
@@ -33,7 +36,7 @@ export const Button_sizeDefaultIsDisabledFa2: FC<Props> = memo(function Button_s
         password: props.password,
       };
 
-      const response = await axios.post(`${process.env.REACT_APP_BACKEND_API_URL}${urlPath}`, data, {
+      const response = await axios.post(`${BACKEND_API_URL}${urlPath}`, data, {
         headers: {
           'Content-Type': 'application/json' // ヘッダーにapplication/jsonを追加
         },
