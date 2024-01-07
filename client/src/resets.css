@@ -16,11 +16,9 @@ body,
 body button:not(:disabled) {
   cursor: pointer;
   user-select: none;
-  user-select: none;
 }
 
 body label {
   cursor: pointer;
-  user-select: none;
   user-select: none;
 }
