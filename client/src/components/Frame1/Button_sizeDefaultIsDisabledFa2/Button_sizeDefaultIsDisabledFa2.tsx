@@ -33,7 +33,7 @@ export const Button_sizeDefaultIsDisabledFa2: FC<Props> = memo(function Button_s
         password: props.password,
       };
 
-      const response = await axios.post(`${process.env.BACKEND_API_URL}${urlPath}`, data, {
+      const response = await axios.post(`${import.meta.env.VITE_BACKEND_API_URL}${urlPath}`, data, {
         headers: {
           'Content-Type': 'application/json' // ヘッダーにapplication/jsonを追加
         },
