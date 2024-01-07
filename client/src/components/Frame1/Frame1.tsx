@@ -14,7 +14,8 @@ interface Props {
     button?: boolean;
   };
 }
-/* @figmaId 113:70 */
+const title = import.meta.env.VITE_APP_TITLE;
+
 export const Frame1: FC<Props> = memo(function Frame1(props = {}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -29,7 +30,7 @@ export const Frame1: FC<Props> = memo(function Frame1(props = {}) {
       <div className={classes.union}>
         <UnionIcon className={classes.icon} />
       </div>
-      <div className={classes.welcomeWorld}>Welcome world!</div>
+      <div className={classes.welcomeWorld}>{title}</div>
       <div className={classes.textField}>
         <div className={classes.label4}>Email</div>
         <div className={classes.inputGroup}>
