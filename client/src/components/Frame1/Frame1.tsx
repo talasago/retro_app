@@ -4,9 +4,9 @@ import type { FC } from 'react';
 import resets from '../_resets.module.css';
 import { Button_sizeDefaultIsDisabledFa2 } from './Button_sizeDefaultIsDisabledFa2/Button_sizeDefaultIsDisabledFa2';
 import { Button_sizeSmallIsDisabledFals } from './Button_sizeSmallIsDisabledFals/Button_sizeSmallIsDisabledFals';
-import classes from './Frame1.module.css';
 import { PasswordField_sizeDefaultIsDis } from './PasswordField_sizeDefaultIsDis/PasswordField_sizeDefaultIsDis';
 import { UnionIcon } from './UnionIcon';
+import classes from './Frame1.module.css';
 
 interface Props {
   className?: string;
@@ -34,12 +34,12 @@ export const Frame1: FC<Props> = memo(function Frame1(props = {}) {
       <div className={classes.textField}>
         <div className={classes.label4}>Email</div>
         <div className={classes.inputGroup}>
-          <input type="email" className={classes.input} onChange={(e) => setEmail(e.target.value)}></input>
+          <input type="email" className={classes.input} onChange={(e) => { setEmail(e.target.value); }}></input>
         </div>
       </div>
       <div className={classes.label5}>Name</div>
       <div className={classes.inputGroup2}>
-        <input type="text" className={classes.input2} onChange={(e) => setName(e.target.value)}></input>
+        <input type="text" className={classes.input2} onChange={(e) => { setName(e.target.value); }}></input>
       </div>
       <PasswordField_sizeDefaultIsDis
         className={classes.passwordField}

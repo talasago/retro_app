@@ -1,4 +1,4 @@
-import { memo, SVGProps } from 'react';
+import { memo, type SVGProps } from 'react';
 
 const UnionIcon = (props: SVGProps<SVGSVGElement>) => (
   <svg preserveAspectRatio='none' viewBox='0 0 62 53' fill='none' xmlns='http://www.w3.org/2000/svg' {...props}>

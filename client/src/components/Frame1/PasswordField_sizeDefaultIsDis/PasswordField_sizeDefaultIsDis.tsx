@@ -18,7 +18,7 @@ export const PasswordField_sizeDefaultIsDis: FC<Props> = memo(function PasswordF
     <div className={`${resets.storybrainResets} ${props.className} ${classes.root}`}>
       <div className={classes.label}>Password</div>
       <div className={classes.inputGroup}>
-        <input type="password" className={classes.input} onChange={(e) => handlePasswordChange(e.target.value)} ></input>
+        <input type="password" className={classes.input} onChange={(e) => { handlePasswordChange(e.target.value); }} ></input>
       </div>
     </div>
   );
