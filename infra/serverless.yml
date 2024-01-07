@@ -26,6 +26,7 @@ custom:
 
 package:
   patterns:
+    # TODO:許可するものだけを指定した方が楽な気がしてきた
     - '../**'
     - '!../node_modules/**'
     - '!../.venv/**'
@@ -43,6 +44,7 @@ package:
     - '!../.flake8'
     - '!../.alembic.ini'
     - '!../docker-compose.yml'
+    - '!../client/**'
 
 provider:
   name: aws
