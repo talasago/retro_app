@@ -3,10 +3,25 @@
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": false,
+    "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit",
+      "source.fixAll.eslint": "explicit"
     }
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "[graphql]": {
+    "editor.formatOnSave": true
+  },
+  "[javascript]": {
+    "editor.formatOnSave": true
+  },
+  "[javascriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.formatOnSave": true
+  },
+  "[typescriptreact]": {
+    "editor.formatOnSave": true
+  },
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

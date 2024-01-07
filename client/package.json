@@ -21,6 +21,7 @@
     "preview": "vite preview",
     "lint": "eslint 'src/**/*.{js,jsx,ts,tsx}'",
     "lint:fix": "eslint --fix 'src/**/*.{js,jsx,ts,tsx}'",
+    "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}'",
     "preinstall": "npx typesync || :"
   },
   "eslintConfig": {
