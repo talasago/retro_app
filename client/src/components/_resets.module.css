@@ -1,14 +1,14 @@
 :where(.storybrainResets),
 :where(.storybrainResets) * {
   box-sizing: border-box;
-  margin: 0;
+  flex-shrink: 0;
+  min-width: 0;
   padding: 0;
+  margin: 0;
+  text-decoration: none;
+  overflow-wrap: anywhere;
   background: none;
   border: none;
-  flex-shrink: 0;
-  text-decoration: none;
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 :where(.storybrainResets),
@@ -18,13 +18,13 @@
 
 :where(.storybrainResets) ul,
 :where(.storybrainResets) ol {
-  text-indent: 0;
   padding-inline-start: 1.5em;
+  text-indent: 0;
 }
 
 :where(.storybrainResets) p:empty::before {
-  content: '';
   display: inline-block;
+  content: '';
 }
 
 :where(.storybrainResets) img {
