@@ -1,146 +1,163 @@
 .passwordField.passwordField {
-  width: initial;
-  align-self: stretch;
   align-items: flex-start;
-}
-.label {
-  color: #304050;
-  font-size: 16px;
-  line-height: 150%;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    'Liberation Sans', sans-serif;
-  height: min-content;
   align-self: stretch;
-  flex-direction: column;
-}
-.button.button {
   width: initial;
-  align-self: stretch;
 }
-.label2 {
-  color: #fff;
+
+.label {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'Liberation Sans', sans-serif;
   font-size: 16px;
   line-height: 150%;
-  font-weight: bold;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    'Liberation Sans', sans-serif;
+  color: #304050;
+}
+
+.button.button {
+  align-self: stretch;
+  width: initial;
+}
+
+.label2 {
   z-index: 0;
+  flex-direction: column;
   width: min-content;
   height: min-content;
-  white-space: nowrap;
-  flex-direction: column;
-}
-.label3 {
-  color: #047d95;
-  font-size: 14px;
-  line-height: 150%;
-  font-weight: bold;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
     'Liberation Sans', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  line-height: 150%;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.label3 {
+  flex-direction: column;
   width: min-content;
   height: min-content;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'Liberation Sans', sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 150%;
+  color: #047d95;
   white-space: nowrap;
-  flex-direction: column;
 }
+
 .root {
-  width: 1134px;
-  height: 888px;
   flex-direction: column;
+  gap: 16px;
   place-content: center;
   align-items: center;
-  gap: 16px;
+  width: 1134px;
+  height: 888px;
   padding: 16px 60px;
 }
+
 .union {
   width: 60.98px;
   height: 52.9467px;
   overflow: visible;
 }
+
 .icon {
   width: 100%;
   height: 100%;
 }
+
 .welcomeWorld {
-  color: #0d1a26;
+  flex-direction: column;
+  align-items: center;
+  align-self: stretch;
+  height: min-content;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'Liberation Sans', sans-serif;
   font-size: 32px;
-  line-height: 150%;
   font-weight: bold;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    'Liberation Sans', sans-serif;
-  height: min-content;
-  align-self: stretch;
-  text-align: center;
-  align-items: center;
-  flex-direction: column;
-}
-.textField {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-  place-content: center;
-  gap: 8px;
-}
-.label4 {
-  color: #304050;
-  font-size: 16px;
   line-height: 150%;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    'Liberation Sans', sans-serif;
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-}
-.inputGroup {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-}
-.input {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-  padding: 8px 16px;
-  outline: solid 1px #89949f;
-  border-radius: 4px;
-}
-.label5 {
-  color: #304050;
-  font-size: 16px;
-  line-height: 150%;
-  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
-    'Liberation Sans', sans-serif;
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-}
-.inputGroup2 {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-}
-.input2 {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-  padding: 8px 16px;
-  outline: solid 1px #89949f;
-  border-radius: 4px;
-}
-.signUp {
-  height: min-content;
-  align-self: stretch;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-.doHaveAnAccount {
   color: #0d1a26;
-  font-size: 16px;
-  line-height: 150%;
+  text-align: center;
+}
+
+.textField {
+  flex-direction: column;
+  gap: 8px;
+  place-content: center;
+  align-self: stretch;
+  height: min-content;
+}
+
+.label4 {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
   font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
     'Liberation Sans', sans-serif;
+  font-size: 16px;
+  line-height: 150%;
+  color: #304050;
+}
+
+.inputGroup {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+}
+
+.input {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+  padding: 8px 16px;
+  border-radius: 4px;
+  outline: solid 1px #89949f;
+}
+
+.label5 {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'Liberation Sans', sans-serif;
+  font-size: 16px;
+  line-height: 150%;
+  color: #304050;
+}
+
+.inputGroup2 {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+}
+
+.input2 {
+  flex-direction: column;
+  align-self: stretch;
+  height: min-content;
+  padding: 8px 16px;
+  border-radius: 4px;
+  outline: solid 1px #89949f;
+}
+
+.signUp {
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  align-self: stretch;
+  height: min-content;
+}
+
+.doHaveAnAccount {
+  flex-direction: column;
   width: min-content;
   height: min-content;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans',
+    'Liberation Sans', sans-serif;
+  font-size: 16px;
+  line-height: 150%;
+  color: #0d1a26;
   white-space: nowrap;
-  flex-direction: column;
 }

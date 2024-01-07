@@ -9,17 +9,27 @@ interface Props {
   onPasswordChange: (newPassword: string) => void;
 }
 /* @figmaId 107:371 */
-export const PasswordField_sizeDefaultIsDis: FC<Props> = memo(function PasswordField_sizeDefaultIsDis(props) {
-  const handlePasswordChange = (newPassword: string) => {
-    props.onPasswordChange(newPassword); // 親コンポーネントに通知
-  };
+export const PasswordField_sizeDefaultIsDis: FC<Props> = memo(
+  function PasswordField_sizeDefaultIsDis(props) {
+    const handlePasswordChange = (newPassword: string) => {
+      props.onPasswordChange(newPassword); // 親コンポーネントに通知
+    };
 
-  return (
-    <div className={`${resets.storybrainResets} ${props.className} ${classes.root}`}>
-      <div className={classes.label}>Password</div>
-      <div className={classes.inputGroup}>
-        <input type="password" className={classes.input} onChange={(e) => handlePasswordChange(e.target.value)} ></input>
+    return (
+      <div
+        className={`${resets.storybrainResets} ${props.className} ${classes.root}`}
+      >
+        <div className={classes.label}>Password</div>
+        <div className={classes.inputGroup}>
+          <input
+            type="password"
+            className={classes.input}
+            onChange={(e) => {
+              handlePasswordChange(e.target.value);
+            }}
+          ></input>
+        </div>
       </div>
-    </div>
-  );
-});
+    );
+  },
+);

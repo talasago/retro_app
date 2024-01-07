@@ -11,10 +11,14 @@ interface Props {
   };
 }
 /* @figmaId 107:551 */
-export const Icon_typeNone: FC<Props> = memo(function Icon_typeNone(props = {}) {
+export const Icon_typeNone: FC<Props> = memo(function Icon_typeNone(
+  props = {},
+) {
   return (
     <div
-      className={`${resets.storybrainResets} ${props.classes?.root || ''} ${props.className || ''} ${classes.root}`}
+      className={`${resets.storybrainResets} ${props.classes?.root || ''} ${
+        props.className || ''
+      } ${classes.root}`}
     ></div>
   );
 });
