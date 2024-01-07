@@ -904,7 +904,20 @@
   dependencies:
     "@babel/types" "^7.20.7"
 
-"@types/estree@1.0.5":
+"@types/eslint-config-prettier@~6.11.3":
+  version "6.11.3"
+  resolved "https://registry.yarnpkg.com/@types/eslint-config-prettier/-/eslint-config-prettier-6.11.3.tgz#319f53eeb5a8b50e702fa081a9fe39bf01df8c1d"
+  integrity sha512-3wXCiM8croUnhg9LdtZUJQwNcQYGWxxdOWDjPe1ykCqJFPVpzAKfs/2dgSoCtAvdPeaponcWPI7mPcGGp9dkKQ==
+
+"@types/eslint@~8.56.1":
+  version "8.56.1"
+  resolved "https://registry.yarnpkg.com/@types/eslint/-/eslint-8.56.1.tgz#988cabb39c973e9200f35fdbb29d17992965bb08"
+  integrity sha512-18PLWRzhy9glDQp3+wOgfLYRWlhgX0azxgJ63rdpoUHyrC9z0f5CkFburjQx4uD7ZCruw85ZtMt6K+L+R8fLJQ==
+  dependencies:
+    "@types/estree" "*"
+    "@types/json-schema" "*"
+
+"@types/estree@*", "@types/estree@1.0.5":
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/@types/estree/-/estree-1.0.5.tgz#a6ce3e556e00fd9895dd872dd172ad0d4bd687f4"
   integrity sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==
@@ -935,7 +948,7 @@
   dependencies:
     "@types/istanbul-lib-report" "*"
 
-"@types/json-schema@^7.0.12", "@types/json-schema@^7.0.9":
+"@types/json-schema@*", "@types/json-schema@^7.0.12", "@types/json-schema@^7.0.9":
   version "7.0.15"
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.15.tgz#596a1747233694d50f6ad8a7869fcb6f56cf5841"
   integrity sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==
@@ -2051,7 +2064,7 @@ eslint-plugin-jsx-a11y@^6.8.0:
     object.entries "^1.1.7"
     object.fromentries "^2.0.7"
 
-"eslint-plugin-n@^15.0.0 || ^16.0.0 ":
+eslint-plugin-n@^16.0.0:
   version "16.6.1"
   resolved "https://registry.yarnpkg.com/eslint-plugin-n/-/eslint-plugin-n-16.6.1.tgz#b16e0033bc9ce592b1c3512cb1cee24f84ecb5ae"
   integrity sha512-M1kE5bVQRLBMDYRZwDhWzlzbp370SRRRC1MHqq4I3L2Tatey+9/2csc5mwLDPlmhJaDvkojbrNUME5/llpRyDg==
@@ -4551,7 +4564,7 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
-typescript@*:
+typescript@^5.3.3:
   version "5.3.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.3.3.tgz#b3ce6ba258e72e6305ba66f5c9b452aaee3ffe37"
   integrity sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==
