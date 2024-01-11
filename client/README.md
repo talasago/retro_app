@@ -1,8 +1,7 @@
-TODO:あとでREADMEを更新する
-
 # ブラウザ上でローカルのコードを動かす
 ```bash
-$ npm start
+$ yarn dev
+# localhost:5173にアクセスすると、ブラウザで表示される！
 ```
 
 ---
