@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
@@ -6,9 +7,10 @@ import {
   TextField,
   FormHelperText,
 } from '@mui/material';
+import axios from 'axios';
+import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 import { registrationFormSchema } from '../schemas/registrationFormSchema';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
@@ -29,9 +31,23 @@ const RegistrationForm: FC = () => {
   });
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
-  const onSubmit: SubmitHandler<RegistrationFormSchema> = (data) => {
-    // TODO: APIを叩くようにする
-    console.log(data);
+  const onSubmit: SubmitHandler<RegistrationFormSchema> = async (data) => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_API_URL}${SIGN_UP_URL}`,
+        data,
+        {
+          headers: {
+            'Content-Type': 'application/json', // ヘッダーにapplication/jsonを追加
+          },
+        },
+      );
+      window.alert('ユーザー登録API正常終了したで');
+      console.log('Response:', response.data);
+    } catch (error) {
+      window.alert('ユーザー登録APIエラーになってるで');
+      console.error('Error:', error);
+    }
   };
 
   return (
