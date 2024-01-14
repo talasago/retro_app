@@ -1,4 +1,3 @@
-// これ実はpresentasion componentだったりするかも
 import type { FC } from 'react';
 import {
   Box,
@@ -16,6 +15,7 @@ import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 const RegistrationForm: FC = () => {
   // TODO:アプリ名を入れる
 
+  // hooks/に移動した方が良いのかな...よくわかってない
   // MEMO: formStateのisSubmittingとか使えば二重送信防止とかできるかも
   const {
     register,
@@ -27,7 +27,7 @@ const RegistrationForm: FC = () => {
     shouldFocusError: true,
     resolver: yupResolver(registrationFormSchema),
   });
-  // TODO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
+  // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
   const onSubmit: SubmitHandler<RegistrationFormSchema> = (data) => {
     // TODO: APIを叩くようにする
