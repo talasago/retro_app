@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { useState } from 'react';
-import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
@@ -11,56 +10,39 @@ import {
   CircularProgress,
 } from '@mui/material';
 import type { AlertColor } from '@mui/material';
+import type { SubmitHandler } from 'react-hook-form';
+import { useRegistrationForm } from '../../hooks/useRegistrationForm';
+import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 import axios from 'axios';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
-import { useForm } from 'react-hook-form';
-import type { SubmitHandler } from 'react-hook-form';
-import { registrationFormSchema } from '../schemas/registrationFormSchema';
-import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
 const RegistrationForm: FC = () => {
-  const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertType, setAlertType] = useState<AlertColor>('success');
+  const [alert, setAlert] = useState<{
+    message: string | null;
+    type: AlertColor;
+  }>({ message: null, type: 'success' });
 
-  // hooks/に移動した方が良いのかな...よくわかってない
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegistrationFormSchema>({
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
-    resolver: yupResolver(registrationFormSchema),
-  });
+  const { register, handleSubmit, errors, isSubmitting } =
+    useRegistrationForm();
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
   const onSubmit: SubmitHandler<RegistrationFormSchema> = async (data) => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_API_URL}${SIGN_UP_URL}`,
-        data,
-        {
-          headers: {
-            'Content-Type': 'application/json', // ヘッダーにapplication/jsonを追加
-          },
-        },
-      );
-      setAlertMessage('ユーザー登録が成功したで');
-      setAlertType('success');
+      const response = await registUser(data);
+
+      setAlert({ message: 'ユーザー登録が成功したで', type: 'success' });
       console.log('Response:', response.data);
     } catch (error) {
-      setAlertMessage('ユーザー登録APIエラーになってるで');
-      setAlertType('error');
+      setAlert({ message: 'ユーザー登録APIエラーになってるで', type: 'error' });
       console.error('Error:', error);
     }
   };
 
   return (
     <Box padding={3}>
-      {alertMessage !== null && (
-        <Alert severity={alertType} sx={{ mb: 3 }}>
-          {alertMessage}
+      {alert.message !== null && !isSubmitting && (
+        <Alert severity={alert.type} sx={{ mb: 3 }}>
+          {alert.message}
         </Alert>
       )}
       <form onSubmit={handleSubmit(onSubmit)}>
@@ -90,3 +72,11 @@ const RegistrationForm: FC = () => {
 };
 
 export default RegistrationForm;
+
+const registUser = async (data: RegistrationFormSchema) => {
+  return await axios.post(SIGN_UP_URL, data, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
