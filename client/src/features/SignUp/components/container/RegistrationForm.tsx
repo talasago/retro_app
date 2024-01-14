@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -6,7 +7,9 @@ import {
   FormControl,
   TextField,
   FormHelperText,
+  Alert,
 } from '@mui/material';
+import type { AlertColor } from '@mui/material';
 import axios from 'axios';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import { useForm } from 'react-hook-form';
@@ -16,6 +19,9 @@ import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
 const RegistrationForm: FC = () => {
   // TODO:アプリ名を入れる
+
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<AlertColor>('success');
 
   // hooks/に移動した方が良いのかな...よくわかってない
   // MEMO: formStateのisSubmittingとか使えば二重送信防止とかできるかも
@@ -42,16 +48,23 @@ const RegistrationForm: FC = () => {
           },
         },
       );
-      window.alert('ユーザー登録API正常終了したで');
+      setAlertMessage('ユーザー登録が成功したで');
+      setAlertType('success');
       console.log('Response:', response.data);
     } catch (error) {
-      window.alert('ユーザー登録APIエラーになってるで');
+      setAlertMessage('ユーザー登録APIエラーになってるで');
+      setAlertType('error');
       console.error('Error:', error);
     }
   };
 
   return (
     <Box padding={3}>
+      {alertMessage !== null && (
+        <Alert severity={alertType} sx={{ mb: 3 }}>
+          {alertMessage}
+        </Alert>
+      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
           <FormControl error={errors.email !== undefined}>
