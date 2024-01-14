@@ -8,6 +8,7 @@ import {
   TextField,
   FormHelperText,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import type { AlertColor } from '@mui/material';
 import axios from 'axios';
@@ -22,11 +23,10 @@ const RegistrationForm: FC = () => {
   const [alertType, setAlertType] = useState<AlertColor>('success');
 
   // hooks/に移動した方が良いのかな...よくわかってない
-  // MEMO: formStateのisSubmittingとか使えば二重送信防止とかできるかも
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<RegistrationFormSchema>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -77,8 +77,11 @@ const RegistrationForm: FC = () => {
             <TextField label="パスワード" {...register('password')} />
             <FormHelperText>{errors.password?.message}</FormHelperText>
           </FormControl>
-          <Button variant="contained" type="submit">
-            登録する
+          {
+            //このボタンは共通化しても良さそう
+          }
+          <Button variant="contained" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <CircularProgress size={24} /> : '登録する'}
           </Button>
         </Box>
       </form>
