@@ -18,8 +18,6 @@ import { registrationFormSchema } from '../schemas/registrationFormSchema';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
 const RegistrationForm: FC = () => {
-  // TODO:アプリ名を入れる
-
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<AlertColor>('success');
 

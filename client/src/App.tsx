@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { FC } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 import { Frame1 } from './components/Frame1/Frame1';
 import resets from './components/_resets.module.css';
@@ -17,6 +18,14 @@ interface Props {
 //    </div>
 //  );
 // });
+const appTitle = import.meta.env.VITE_APP_TITLE;
 
-const App: FC = () => <RegistrationForm />;
+const App: FC = () => (
+  <div>
+    <Helmet>
+      <title>{appTitle}</title>
+    </Helmet>
+    <RegistrationForm />
+  </div>
+);
 export default App;
