@@ -40,6 +40,9 @@ const RegistrationForm: FC = () => {
 
   return (
     <Box padding={3}>
+      {
+        // アラートはformではなくもっと上位のコンポーネントに実装してもいいかも。共通的に使うものだし。
+      }
       {alert.message !== null && !isSubmitting && (
         <Alert severity={alert.type} sx={{ mb: 3 }}>
           {alert.message}
