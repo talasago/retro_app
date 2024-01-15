@@ -10,11 +10,11 @@ import {
   CircularProgress,
 } from '@mui/material';
 import type { AlertColor } from '@mui/material';
+import axios from 'axios';
+import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import type { SubmitHandler } from 'react-hook-form';
 import { useRegistrationForm } from '../../hooks/useRegistrationForm';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
-import axios from 'axios';
-import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 
 const RegistrationForm: FC = () => {
   const [alert, setAlert] = useState<{
@@ -60,7 +60,7 @@ const RegistrationForm: FC = () => {
             <FormHelperText>{errors.password?.message}</FormHelperText>
           </FormControl>
           {
-            //このボタンは共通化しても良さそう
+            // このボタンは共通化しても良さそう
           }
           <Button variant="contained" type="submit" disabled={isSubmitting}>
             {isSubmitting ? <CircularProgress size={24} /> : '登録する'}
