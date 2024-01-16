@@ -74,6 +74,26 @@ provider:
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
+	logs:
+    # Enable REST API logs
+    # This can either be set to `restApi: true` to use defaults, or configured via subproperties
+    # Can only be configured if the API is created by Serverless Framework
+    restApi:
+      accessLogging: true
+      # Log format to use for access logs
+      format: 'requestId: $context.requestId'
+      
+      executionLogging: true
+      # Log level to use for execution logging
+      level: INFO
+      # Log full requests/responses for execution logging
+      fullExecutionData: true
+
+      # NOTE:ロールは自動で作成されるので、それを使うように設定する
+      # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)
+      # role: arn:aws:iam::123456:role
+      # Whether the API Gateway CloudWatch Logs role setting is not managed by Serverless (default: false)
+      roleManagedExternally: false 
 
 functions:
   user_function:
