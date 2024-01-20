@@ -6,6 +6,7 @@ from httpx import Response
 
 from app.functions.retrospective_method.comment import app as app_comment
 from app.functions.user import app as app_user
+from tests.test_helpers.function.cors import assert_cors_headers
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
@@ -64,7 +65,7 @@ def add_comment_api():
             },
         )
         assert response.status_code == 201
-        assert response.headers["Access-Control-Allow-Origin"] == "*"  # CORSのテスト
+        assert_cors_headers(response)
         return response
 
     return _method

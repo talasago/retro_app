@@ -9,6 +9,7 @@ from sqlalchemy import select
 from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
+from tests.test_helpers.function.cors import assert_cors_headers
 from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport
@@ -103,14 +104,14 @@ class TestUserFunction:
 
             response_1st = add_user_api(user_data=user_data, option=option)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
-            assert response_1st.headers["Access-Control-Allow-Origin"] == "*"
+            assert_cors_headers(response_1st)
 
             response_2nd = add_user_api(
                 user_data=user_data, is_assert_response_code_2xx=False, option=option
             )
             assert response_2nd.status_code == 409
             assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
-            assert response_1st.headers["Access-Control-Allow-Origin"] == "*"
+            assert_cors_headers(response_2nd)
 
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
