@@ -92,21 +92,25 @@ class TestUserFunction:
             テスト観点
             1.ユーザーが登録できること
             2.同じメールアドレスで登録できないこと
+            3.CORS設定が正しいこと(最低限の確認)
             """
             user_data: dict = {
                 "email": "testuser@example.com",
                 "name": "Test User",
                 "password": "testpassword",
             }
+            option = {"headers": {"Origin": "http://testserver"}}
 
-            response_1st = add_user_api(user_data=user_data)
+            response_1st = add_user_api(user_data=user_data, option=option)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
+            assert response_1st.headers["Access-Control-Allow-Origin"] == "*"
 
             response_2nd = add_user_api(
-                user_data=user_data, is_assert_response_code_2xx=False
+                user_data=user_data, is_assert_response_code_2xx=False, option=option
             )
             assert response_2nd.status_code == 409
             assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
+            assert response_1st.headers["Access-Control-Allow-Origin"] == "*"
 
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
