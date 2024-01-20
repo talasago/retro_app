@@ -90,10 +90,14 @@ class TestUserFunction:
                 "password": "testpassword",
             }
 
-            response = client.post("/api/v1/sign_up", json=user_data)
+            response_1st = client.post("/api/v1/sign_up", json=user_data)
+            assert response_1st.status_code == 201
+            assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
 
-            assert response.status_code == 201
-            assert response.json() == {"message": "ユーザー登録が成功しました。"}
+            response_2nd = client.post("/api/v1/sign_up", json=user_data)
+            assert response_2nd.status_code == 409
+            assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
+
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
             # パスワードのバリデーションがすり抜けている気がする...
