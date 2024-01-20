@@ -61,7 +61,7 @@ def add_comment_api():
             headers={
                 "accept": "application/json",
                 "Authorization": f"Bearer {access_token}",
-                "Origin": "http://testserver",
+                "Origin": "http://localhost",
             },
         )
         assert response.status_code == 201

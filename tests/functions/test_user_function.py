@@ -100,7 +100,7 @@ class TestUserFunction:
                 "name": "Test User",
                 "password": "testpassword",
             }
-            option = {"headers": {"Origin": "http://testserver"}}
+            option = {"headers": {"Origin": "http://127.0.0.1"}}
 
             response_1st = add_user_api(user_data=user_data, option=option)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
