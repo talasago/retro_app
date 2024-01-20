@@ -150,16 +150,18 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
+      - name: load environment variables file
+        run: |
+          export $(cat .env.ci)
+
       - name: Exceute alembic migrations
         if: ${{ !cancelled() }}
         run: |
-          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run alembic upgrade head
 
       - name: Execute unit tests and component integration tests
         if: ${{ !cancelled() }}
         run: |
-          export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"
           pipenv run pytest
 
       - name: Post comments
