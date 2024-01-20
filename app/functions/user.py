@@ -10,6 +10,7 @@ from mangum import Mangum
 
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
+    RetroAppColmunUniqueError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
@@ -73,7 +74,14 @@ def signup_user(
     user: UserModel = UserModel(
         name=user_params.name, email=user_params.email, password=user_params.password
     )
-    user_repo.save(user=user)
+    try:
+        user_repo.save(user=user)
+    except RetroAppColmunUniqueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
