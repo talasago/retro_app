@@ -21,9 +21,13 @@ client = TestClient(app)
 
 @pytest.fixture
 def add_user_api():
-    def _method(user_data) -> None:
-        response = client.post("/api/v1/sign_up", json=user_data)
-        assert response.status_code == 201
+    def _method(
+        user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
+    ) -> Response:
+        response = client.post("/api/v1/sign_up", json=user_data, **option)
+        if is_assert_response_code_2xx:
+            assert response.status_code == 201
+        return response
 
     return _method
 
@@ -83,18 +87,24 @@ def logout_api():
 @pytest.mark.usefixtures("db")
 class TestUserFunction:
     class TestSignUp:
-        def test_register_user(self):
+        def test_register_user(self, add_user_api):
+            """
+            テスト観点
+            1.ユーザーが登録できること
+            2.同じメールアドレスで登録できないこと
+            """
             user_data: dict = {
                 "email": "testuser@example.com",
                 "name": "Test User",
                 "password": "testpassword",
             }
 
-            response_1st = client.post("/api/v1/sign_up", json=user_data)
-            assert response_1st.status_code == 201
+            response_1st = add_user_api(user_data=user_data)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
 
-            response_2nd = client.post("/api/v1/sign_up", json=user_data)
+            response_2nd = add_user_api(
+                user_data=user_data, is_assert_response_code_2xx=False
+            )
             assert response_2nd.status_code == 409
             assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
 
