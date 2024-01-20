@@ -1,16 +1,16 @@
 # このリポジトリは何か
 ふりかえりアプリ用
 
-# 実行環境(バックエンド)
+# バックエンドの主な仕様技術
 |  |  |
 | - | - |
-| Python | 3.10 |
-| PostgreSQL |  |
+| Python | AWS Lambdaのバージョン3.10 |
+| PostgreSQL | リレーショナルデータベース |
+| SQLAlchemy | O/Rマッパー |
 | FastAPI | PythonのWebAPIフレームワーク |
 | Mangum | FastAPIをLambdaで使いやすくする |
-| SQLAlchemy | O/Rマッパー |
-| alembic | DBのテーブル定義の変更履歴を管理 |
-| pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
+| Alembic | DBのテーブル定義の変更履歴を管理 |
+| Pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
 
 # ディレクトリ構成
 ```
