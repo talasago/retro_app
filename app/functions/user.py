@@ -19,6 +19,7 @@ from app.functions.dependencies import (
     get_user_repo,
     oauth2_scheme,
 )
+from app.functions.middleware import add_cors_middleware
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     ApiResponseBodyBase,
@@ -28,8 +29,6 @@ from app.schemas.http_response_body_user_schema import (
 )
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate
-
-from .middleware import add_cors_middleware
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
