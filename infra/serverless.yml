@@ -65,7 +65,7 @@ provider:
     restApi:
       accessLogging: true
       # Log format to use for access logs
-      format: 'requestId: $context.requestId'
+      # format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status", "protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
       
       executionLogging: true
       # Log level to use for execution logging
