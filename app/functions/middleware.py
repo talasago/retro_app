@@ -8,11 +8,11 @@ pj_root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../"
 env_file_path = os.path.join(pj_root_path, ".env.local")
 
 
-# MEMO:環境変数ファイルが存在する場合は読み込む
 if os.path.isfile(env_file_path):
     from dotenv import load_dotenv
 
-    # ローカル環境だけ読み込む。CIはGithubActionsのyml、dev/prodはserverless.ymlで環境変数を設定する
+    # MEMO:ローカル環境だけ読み込む。
+    # CIはGithubActions上で環境変数を読み込み、dev/prodはserverless.yml空設定した値を読み込む。
     load_dotenv(env_file_path)
 
 
