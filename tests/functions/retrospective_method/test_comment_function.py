@@ -6,6 +6,7 @@ from httpx import Response
 
 from app.functions.retrospective_method.comment import app as app_comment
 from app.functions.user import app as app_user
+from tests.test_helpers.function.cors import assert_cors_headers
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
@@ -49,17 +50,23 @@ def login_api():
 @pytest.fixture
 def add_comment_api():
     def _method(
-        comment_data: dict, access_token: str, retrospective_method_id=1
-    ) -> None:
+        comment_data: dict,
+        access_token: str,
+        retrospective_method_id=1,
+        option: dict = {},
+    ) -> Response:
         response = client_comment.post(
             f"/api/v1/retrospective_method/{retrospective_method_id}/comment",
             json=comment_data,
             headers={
                 "accept": "application/json",
                 "Authorization": f"Bearer {access_token}",
+                "Origin": "http://localhost",
             },
         )
         assert response.status_code == 201
+        assert_cors_headers(response)
+        return response
 
     return _method
 
@@ -71,6 +78,7 @@ class TestCommentFunction:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
         class TestValidParam:
             def test_return_201(self, add_user_api, login_api, add_comment_api):
+                # 前処理
                 user_data: dict = {
                     "email": "testcomment1@example.com",
                     "name": "Test Comment1",
@@ -87,8 +95,10 @@ class TestCommentFunction:
                 res_body = response.json()
                 assert response.status_code == 200
 
+                # 実行/検証
                 comment_data: dict = {
                     "comment": "test comment",
                 }
                 add_comment_api(comment_data, res_body["access_token"])
-                # APIを実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
+
+                # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する

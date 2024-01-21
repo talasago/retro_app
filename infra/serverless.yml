@@ -58,6 +58,7 @@ provider:
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
+    ORIGINS: ${ssm:origins}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties

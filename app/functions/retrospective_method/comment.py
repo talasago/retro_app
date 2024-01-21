@@ -2,7 +2,6 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, status
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 
@@ -10,6 +9,7 @@ from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
 )
+from app.functions.middleware import add_cors_middleware
 from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
@@ -25,16 +25,7 @@ if TYPE_CHECKING:
 
 
 app = FastAPI()
-# TODO:originとMethodを可変にしたい。そして外だししたい。
-# TODO:その他の設定は適切に設定したい。
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 許可するフロントエンドのオリジン
-    allow_credentials=True,  # 資格情報の共有の可否
-    allow_methods=["*"],  # 許可するHTTPリクエストメソッド
-    allow_headers=["*"],  # フロントエンドからの認可するHTTPヘッダー情報
-    expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
-)
+add_cors_middleware(app)
 
 
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase

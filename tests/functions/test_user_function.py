@@ -9,6 +9,7 @@ from sqlalchemy import select
 from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
+from tests.test_helpers.function.cors import assert_cors_headers
 from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport
@@ -21,9 +22,13 @@ client = TestClient(app)
 
 @pytest.fixture
 def add_user_api():
-    def _method(user_data) -> None:
-        response = client.post("/api/v1/sign_up", json=user_data)
-        assert response.status_code == 201
+    def _method(
+        user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
+    ) -> Response:
+        response = client.post("/api/v1/sign_up", json=user_data, **option)
+        if is_assert_response_code_2xx:
+            assert response.status_code == 201
+        return response
 
     return _method
 
@@ -83,20 +88,30 @@ def logout_api():
 @pytest.mark.usefixtures("db")
 class TestUserFunction:
     class TestSignUp:
-        def test_register_user(self):
+        def test_register_user(self, add_user_api):
+            """
+            テスト観点
+            1.ユーザーが登録できること
+            2.同じメールアドレスで登録できないこと
+            3.CORS設定が正しいこと(最低限の確認)
+            """
             user_data: dict = {
                 "email": "testuser@example.com",
                 "name": "Test User",
                 "password": "testpassword",
             }
+            option = {"headers": {"Origin": "http://127.0.0.1"}}
 
-            response_1st = client.post("/api/v1/sign_up", json=user_data)
-            assert response_1st.status_code == 201
+            response_1st = add_user_api(user_data=user_data, option=option)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
+            assert_cors_headers(response_1st)
 
-            response_2nd = client.post("/api/v1/sign_up", json=user_data)
+            response_2nd = add_user_api(
+                user_data=user_data, is_assert_response_code_2xx=False, option=option
+            )
             assert response_2nd.status_code == 409
             assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
+            assert_cors_headers(response_2nd)
 
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
