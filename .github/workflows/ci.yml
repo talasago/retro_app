@@ -150,9 +150,12 @@ jobs:
       - name: install dependencies
         run: pipenv sync --dev
 
-      - name: load environment variables file
+      - name: Set environment variables from .env.ci
         run: |
-          export $(cat .env.ci)
+          while read -r line
+          do
+            echo "$line" >> $GITHUB_ENV
+          done < .env.ci
 
       - name: Exceute alembic migrations
         if: ${{ !cancelled() }}
