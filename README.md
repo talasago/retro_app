@@ -75,7 +75,7 @@ libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
 $ cd ${このリポジトリが存在するディレクトリに移動}
-$ export PIPENV_VENV_IN_PROJECT=1
+$ export PIPENV_VENV_IN_PROJECT=1 #プロジェクトの直下に仮想環境を作る
 $ pyenv install 3.10.11
 $ python --version
 # 3.1.11となればOK!!
@@ -102,7 +102,7 @@ $ brew install postgresql
 ```
 
 ### テスト実行
-`export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"`を実行後、`$ pytest`を実行すると、pytestが実行されます。
+`$ pytest`を実行すると、pytestが実行されます。
 
 ### テーブル定義の反映
 初回実行 または テーブルに変更があった(`database/versions`にファイルが追加・更新された)場合、ローカル環境にテーブル定義を反映させるために以下のコマンドを実行してください
