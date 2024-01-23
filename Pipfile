@@ -29,7 +29,6 @@ black = "*"
 pytest-mock = "*"
 pydeps = "*"
 python-dotenv = "*"
-moto = "*"
 
 [requires]
 python_version = "3.10"
