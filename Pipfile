@@ -14,6 +14,7 @@ python-multipart = "*"
 python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
 pydantic-i18n = "*"
+boto3 = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -28,6 +29,7 @@ black = "*"
 pytest-mock = "*"
 pydeps = "*"
 python-dotenv = "*"
+moto = "*"
 
 [requires]
 python_version = "3.10"
