@@ -4,12 +4,11 @@ pj_root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../"
 env_file_path = os.path.join(pj_root_path, ".env.local")
 
 
-# 後で外だし
-def is_local_execution():
+def is_local_execution() -> bool:
     return os.path.isfile(env_file_path)
 
 
-def load_env_for_local():
+def load_env_for_local() -> None:
     from dotenv import load_dotenv
 
     # MEMO:ローカル環境だけ読み込む。
