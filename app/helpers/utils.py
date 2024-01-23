@@ -4,6 +4,7 @@ pj_root_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../"
 env_file_path = os.path.join(pj_root_path, ".env.local")
 
 
+# 後で外だし
 def is_local_execution():
     return os.path.isfile(env_file_path)
 
