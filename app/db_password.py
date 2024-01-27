@@ -7,14 +7,13 @@ import boto3
 import botocore
 from mypy_boto3_ssm.client import SSMClient
 
-from app.helpers.utils import is_local_execution
+from app.helpers.utils import is_ci_execution, is_local_execution
 
 
 class DbPasswordFactory:
     @staticmethod
     def create_db_password():
-        if is_local_execution():
-            # FIXME: ローカルとCIで動かせるようにする必要あり。
+        if is_local_execution() or is_ci_execution():
             return DbPasswordFromEnv()
         else:
             return DbPasswordFromSSM()
