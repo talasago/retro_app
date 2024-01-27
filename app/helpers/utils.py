@@ -5,7 +5,11 @@ env_file_path = os.path.join(pj_root_path, ".env.local")
 
 
 def is_local_execution() -> bool:
-    return os.path.isfile(env_file_path)
+    return os.path.isfile(env_file_path) and is_ci_execution() is False
+
+
+def is_ci_execution() -> bool:
+    return os.getenv("GITHUB_ACTIONS") is True
 
 
 def load_env_for_local() -> None:
