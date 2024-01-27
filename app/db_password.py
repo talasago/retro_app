@@ -53,6 +53,13 @@ class DbPasswordFromSSM(DbPassword):
                 ) and i < self.MAX_RETRY - 1:
                     time.sleep(1)
                 else:
+                    # 呼び出し元で何もエラーハンドリングしないことで、500エラーになる想定
                     raise
 
         return response["Parameter"]["Value"]
+
+    # 将来、boto3使わずともlambda拡張でparameterstoreの値を取得できるかも。
+    # 現在はARMサポートされてないらしい。
+    # Lambda拡張にすることでコストが削減できるかもしれないのでメモ
+    # https://docs.aws.amazon.com/systems-manager/latest/userguide/ps-integration-lambda-extensions.html
+    # https://dev.classmethod.jp/articles/lambda-get-paramater/
