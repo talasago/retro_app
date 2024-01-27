@@ -43,6 +43,8 @@ provider:
         - ec2:CreateNetworkInterface # VPC設定のために必要
         - ec2:DescribeNetworkInterfaces # VPC設定のために必要
         - ec2:DeleteNetworkInterface # VPC設定のために必要
+        - ssm:GetParameter # SSMから環境変数を取得するために必要
+        - kms:DecryptSecureString # SSMから環境変数を取得するために必要
       Resource: "*"
   vpc:
     securityGroupIds:
