@@ -73,14 +73,17 @@ class TestUserSchema:
         with pytest.raises(ValidationError) as e1:
             UserSchema(**user_data)
         assert (
-            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"] == "有効な文字を入力してください。"
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "有効な文字を入力してください。"
         )
 
         del user_data["name"]
 
         with pytest.raises(ValidationError) as e2:
             UserSchema(**user_data)
-        assert I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        )
 
 
 class TestUserCreate:
@@ -94,14 +97,17 @@ class TestUserCreate:
         with pytest.raises(ValidationError) as e1:
             UserCreate(**user_data)
         assert (
-            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"] == "有効な文字を入力してください。"
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "有効な文字を入力してください。"
         )
 
         del user_data["name"]
 
         with pytest.raises(ValidationError) as e2:
             UserCreate(**user_data)
-        assert I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        )
 
     def test_password_invalid_length(self):
         user_data: dict = {

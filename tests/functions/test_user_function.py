@@ -110,7 +110,9 @@ class TestUserFunction:
                 user_data=user_data, is_assert_response_code_2xx=False, option=option
             )
             assert response_2nd.status_code == 409
-            assert response_2nd.json() == {"detail": "指定されたメールアドレスはすでに登録されています。"}
+            assert response_2nd.json() == {
+                "detail": "指定されたメールアドレスはすでに登録されています。"
+            }
             assert_cors_headers(response_2nd)
 
             # TODO:異常系のテストを追加する
@@ -128,7 +130,9 @@ class TestUserFunction:
             response = client.post("/api/v1/sign_up", json=user_data)
 
             assert response.status_code == 422
-            assert response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
+            assert (
+                response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
+            )
 
     class TestLogin:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
@@ -166,7 +170,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "メールアドレスまたはパスワードが間違っています。"
+                assert (
+                    res_body["detail"]
+                    == "メールアドレスまたはパスワードが間違っています。"
+                )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
         class TestWhenUnmatchPassword:
@@ -187,7 +194,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "メールアドレスまたはパスワードが間違っています。"
+                assert (
+                    res_body["detail"]
+                    == "メールアドレスまたはパスワードが間違っています。"
+                )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
     class TestLogout:
@@ -266,7 +276,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                assert (
+                    res_body["detail"]
+                    == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                )
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidParam:
@@ -370,7 +383,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                assert (
+                    res_body["detail"]
+                    == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                )
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidParam:

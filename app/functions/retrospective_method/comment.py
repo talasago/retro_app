@@ -1,4 +1,5 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
+
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, status
@@ -51,7 +52,9 @@ def add_comment(
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content=ApiResponseBodyBase(message="コメント登録が完了しました。").model_dump(),
+        content=ApiResponseBodyBase(
+            message="コメント登録が完了しました。"
+        ).model_dump(),
     )
 
 
