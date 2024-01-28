@@ -1,13 +1,15 @@
 import os
 import time
 from abc import ABC, abstractmethod
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import boto3
 import botocore
-from mypy_boto3_ssm.client import SSMClient
 
 from app.helpers.utils import is_ci_execution, is_local_execution
+
+if TYPE_CHECKING:
+    from mypy_boto3_ssm.client import SSMClient
 
 
 class DbPasswordFactory:
