@@ -12,7 +12,7 @@ from app.helpers.utils import is_ci_execution, is_local_execution
 
 class DbPasswordFactory:
     @staticmethod
-    def create_db_password():
+    def create() -> "DbPassword":
         if is_local_execution() or is_ci_execution():
             return DbPasswordFromEnv()
         else:

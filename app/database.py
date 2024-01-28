@@ -11,7 +11,7 @@ from .db_password import DbPasswordFactory
 if is_local_execution():
     load_env_for_local()
 
-POSTGRES_PASSWORD = DbPasswordFactory.create_db_password().get_db_password()
+POSTGRES_PASSWORD = DbPasswordFactory.create().get_db_password()
 POSTGRES_USER = os.environ["POSTGRES_USER"]
 POSTGRES_HOST = os.environ["POSTGRES_HOST"]
 POSTGRES_DATABASE = os.environ["POSTGRES_DATABASE"]
