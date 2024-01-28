@@ -36,6 +36,7 @@ provider:
   stage: dev # TODO:オプション引数で変更できるように変更したい
   runtime: python3.10
   region: ap-northeast-1
+  timeout: 30 # seconds
   iamRoleStatements:
     - Effect: Allow
       Action:
