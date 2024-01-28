@@ -1,4 +1,5 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
+
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
@@ -82,7 +83,11 @@ def signup_user(
 
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
-@app.post("/token", summary="ログインしてトークンを発行します。", response_model=TokenApiResponseBody)
+@app.post(
+    "/token",
+    summary="ログインしてトークンを発行します。",
+    response_model=TokenApiResponseBody,
+)
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
     auth_service: "AuthService" = Depends(get_auth_service),
@@ -159,7 +164,9 @@ def refresh_token(
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
-@app.post("/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase)
+@app.post(
+    "/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase
+)
 def logout(
     current_user: "UserModel" = Depends(get_current_user),
     auth_service: "AuthService" = Depends(get_auth_service),

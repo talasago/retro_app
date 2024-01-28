@@ -12,9 +12,13 @@ class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
     email: EmailStr = Field(
-        max_length=50, description="ユーザーのメールアドレス", examples=["testuser@example.com"]
+        max_length=50,
+        description="ユーザーのメールアドレス",
+        examples=["testuser@example.com"],
     )
-    name: str = Field(max_length=50, description="ユーザーの名前", examples=["Test User"])
+    name: str = Field(
+        max_length=50, description="ユーザーの名前", examples=["Test User"]
+    )
 
     # emailについて
     # NOTE:emailのバリデーションはコチラ
@@ -35,11 +39,12 @@ class UserSchema(BaseModel):
 
 
 class UserCreate(UserSchema):
-    PASSWARD_REGEX: ClassVar[
-        str
-    ] = r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
+    PASSWARD_REGEX: ClassVar[str] = (
+        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
+    )
     password: SecretStr = Field(
-        description=f"ユーザーのパスワード。regex_prttern: {PASSWARD_REGEX}", examples=["password"]
+        description=f"ユーザーのパスワード。regex_prttern: {PASSWARD_REGEX}",
+        examples=["password"],
     )
 
     # NOTE:半角英数字記号をそれぞれ1種類以上含む8文字以上50文字じゃないと登録できないようにしようと考えたが、
@@ -52,5 +57,7 @@ class UserCreate(UserSchema):
     def check_password_format(cls, password: SecretStr) -> str:
         reveal_password: str = password.get_secret_value()
         if not re.match(UserCreate.PASSWARD_REGEX, reveal_password):
-            raise ValueError("パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。")
+            raise ValueError(
+                "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+            )
         return reveal_password
