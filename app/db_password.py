@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from abc import ABC, abstractmethod
@@ -10,6 +11,9 @@ from app.helpers.utils import is_ci_execution, is_local_execution
 
 if TYPE_CHECKING:
     from mypy_boto3_ssm.client import SSMClient
+
+
+logger = logging.getLogger()
 
 
 class DbPasswordFactory:
@@ -45,17 +49,23 @@ class DbPasswordFromSSM(DbPassword):
             try:
                 # TODO: 本番環境と開発環境でパラメータ名が違うので修正する必要あり
                 # 環境変数でnameを切り替えるとか
+                logger.info("try get parameter from ssm")
                 response = ssm.get_parameter(
                     Name="postgres_database", WithDecryption=True
                 )
-                return response["Parameter"]["Value"]
+                logger.info("success get parameter from ssm")
             except botocore.exceptions.ClientError as e:
                 if (
                     e.response["Error"]["Code"] == "InternalServerError"
                 ) and i < self.MAX_RETRY - 1:
+                    logger.error("InternalServerError. retrying...")
                     time.sleep(1)
+                    # FIXME: リトライ処理を書いていない
+
                 else:
                     # 呼び出し元で何もエラーハンドリングしないことで、500エラーになる想定
+                    logger.error("fail get parameter from ssm.")
+                    logger.error(e)
                     raise
 
         return response["Parameter"]["Value"]
