@@ -43,6 +43,8 @@ provider:
         - ec2:CreateNetworkInterface # VPC設定のために必要
         - ec2:DescribeNetworkInterfaces # VPC設定のために必要
         - ec2:DeleteNetworkInterface # VPC設定のために必要
+        - ssm:GetParameter # SSMから環境変数を取得するために必要
+        - kms:DecryptSecureString # SSMから環境変数を取得するために必要
       Resource: "*"
   vpc:
     securityGroupIds:
@@ -57,7 +59,6 @@ provider:
     POSTGRES_HOST: ${ssm:postgres_host}
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
-    POSTGRES_DATABASE: ${ssm:postgres_database}
     ORIGINS: ${ssm:origins}
   logs:
     # Enable REST API logs

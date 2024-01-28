@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.helpers.env_loader import is_local_execution, load_env_for_local
+from app.helpers.utils import is_local_execution, load_env_for_local
 
 if is_local_execution():
     load_env_for_local()
