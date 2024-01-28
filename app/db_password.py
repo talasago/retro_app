@@ -1,3 +1,7 @@
+"""
+VPC内のLambdaからSSMに接続できないことが判明したため、このモジュールは使用していない。
+"""
+
 import logging
 import os
 import time
