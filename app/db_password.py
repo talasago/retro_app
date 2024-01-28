@@ -43,7 +43,7 @@ class DbPasswordFromSSM(DbPassword):
     # 開発環境 or 本番環境用
     def get_db_password(self) -> str:
         # パスワードを環境変数の平文に設定したくないのでparameter storeから取得する
-        ssm: SSMClient = boto3.client("ssm", region_name="ap-northeast-1")
+        ssm: "SSMClient" = boto3.client("ssm", region_name="ap-northeast-1")
 
         for i in range(self.MAX_RETRY):
             try:
