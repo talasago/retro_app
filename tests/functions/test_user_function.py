@@ -9,7 +9,7 @@ from sqlalchemy import select
 from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
-from tests.test_helpers.function.cors import assert_cors_headers
+from tests.test_helpers.functions.cors import assert_cors_headers
 from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport

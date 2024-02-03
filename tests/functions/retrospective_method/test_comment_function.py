@@ -6,7 +6,7 @@ from httpx import Response
 
 from app.functions.retrospective_method.comment import app as app_comment
 from app.functions.user import app as app_user
-from tests.test_helpers.function.cors import assert_cors_headers
+from tests.test_helpers.functions.cors import assert_cors_headers
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
