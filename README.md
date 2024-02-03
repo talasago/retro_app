@@ -1,16 +1,16 @@
 # このリポジトリは何か
 ふりかえりアプリ用
 
-# 実行環境(バックエンド)
+# バックエンドの主な仕様技術
 |  |  |
 | - | - |
-| Python | 3.10 |
-| PostgreSQL |  |
+| Python | AWS Lambdaのバージョン3.10 |
+| PostgreSQL | リレーショナルデータベース |
+| SQLAlchemy | O/Rマッパー |
 | FastAPI | PythonのWebAPIフレームワーク |
 | Mangum | FastAPIをLambdaで使いやすくする |
-| SQLAlchemy | O/Rマッパー |
-| alembic | DBのテーブル定義の変更履歴を管理 |
-| pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
+| Alembic | DBのテーブル定義の変更履歴を管理 |
+| Pydantic | パラメタのバリデーション管理 + OpenAPIの定義用 |
 
 # ディレクトリ構成
 ```
@@ -19,23 +19,27 @@
 ├── app/ => デプロイするコード。
 │   ├── database.py => databaseへの接続情報を管理
 │   ├── errors/ => カスタムエラークラスを管理
-│   ├── functions/ => Lambdaで実行されるエントリポイントとしてのコードを管理
-│   ├── helpers/ => 共通化したコードを管理
-│   ├── models/ => SQLAlchemy用のコードを管理。基本的に1テーブルに1ファイル作成する。
-│   ├── repository/ => データベースへの更新処理や登録処理など、データベースとのやり取りを行うコード。
-│   ├── schemas/ => pydantic用のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
-│   └── services/ => ビジネスロジックを管理。
+│   ├── functions/ => ※1
+│   ├── models/ => ※1
+│   ├── repository/ => ※1
+│   ├── schemas/ => pydantic用(パラメタのバリデーション管理 + OpenAPIの定義用)のコードを管理。基本的に1テーブルに1ファイル作成する(はず)。
+│   │   └── translations/ 
+|   |       └── ja_JP.json => エラーメッセージを日本語するためのファイル
+│   └── services/ => ※1
 ├── client/ => フロントエンド用
 ├── database/ => alembic用
 │   └── versions => テーブル定義の変更履歴を管理
 ├── debug/ => 検証のための一時コード。デプロイしない。
 ├── docker-compose.yml => ローカル実行用
-├── test/ => テストコード
+├── infla/ => インフラ関連のコード。主にIaCを保存。
+├── tests/ => テストコード
 │   ├── conftest.py => テスト実行時に必ず呼ばれる親ファイルみたいなもの
 │   ├── feature/ => テストデータを管理
 │   └── それ以外のディレクトリ => app/配下と同じレイヤーのテストを管理
 └── tools/ => 便利なツール。デプロイしない。
 ```
+※1[こちら](/docs/各レイヤーについて.md)を参照
+
 
 # 設計方針(コーディング規約)
 - エンドユーザーに返す可能性があるエラーメッセージは日本語、そうでない内部的なエラーメッセージは英語とする。
@@ -71,7 +75,7 @@ libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
 libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 
 $ cd ${このリポジトリが存在するディレクトリに移動}
-$ export PIPENV_VENV_IN_PROJECT=1
+$ export PIPENV_VENV_IN_PROJECT=1 #プロジェクトの直下に仮想環境を作る
 $ pyenv install 3.10.11
 $ python --version
 # 3.1.11となればOK!!
@@ -98,7 +102,7 @@ $ brew install postgresql
 ```
 
 ### テスト実行
-`export POSTGRES_DATABASE="postgres"; export POSTGRES_HOST="localhost"; export POSTGRES_PASSWORD="postgres_password"; export POSTGRES_USER="postgres"`を実行後、`$ pytest`を実行すると、pytestが実行されます。
+`$ pytest`を実行すると、pytestが実行されます。
 
 ### テーブル定義の反映
 初回実行 または テーブルに変更があった(`database/versions`にファイルが追加・更新された)場合、ローカル環境にテーブル定義を反映させるために以下のコマンドを実行してください

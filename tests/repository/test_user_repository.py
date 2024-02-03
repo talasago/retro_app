@@ -115,7 +115,9 @@ class TestUserRepository:
                         "Simulated OperationalError", None, None  # type: ignore
                     ),
                 )
-                mocker.patch.object(db, "rollback")  # rollbackメソッドを呼び出されたか確認したいためモック
+                mocker.patch.object(
+                    db, "rollback"
+                )  # rollbackメソッドを呼び出されたか確認したいためモック
 
                 user_data: dict = {
                     "name": "commit error",

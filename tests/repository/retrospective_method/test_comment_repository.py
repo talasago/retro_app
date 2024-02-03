@@ -45,7 +45,9 @@ class TestCommentRepository:
                         "Simulated OperationalError", None, None  # type: ignore
                     ),
                 )
-                mocker.patch.object(db, "rollback")  # rollbackメソッドを呼び出されたか確認したいためモック
+                mocker.patch.object(
+                    db, "rollback"
+                )  # rollbackメソッドを呼び出されたか確認したいためモック
 
                 comment_data = {
                     "retrospective_method_id": 1,

@@ -80,7 +80,9 @@ class AuthService:
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
-            raise RetroAppAuthenticationError(message="リフレッシュトークンが間違っています。")
+            raise RetroAppAuthenticationError(
+                message="リフレッシュトークンが間違っています。"
+            )
         return user
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要

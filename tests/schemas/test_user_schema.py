@@ -1,10 +1,8 @@
 import pytest
 from pydantic import ValidationError
 
+from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate, UserSchema
-
-# FIXME:バリデーションのエラーメッセージも確認した方が良い
-# ValidationErrorが返ってきているのはわかるが、なぜそうなったかの確認が足りない
 
 
 class TestUserSchema:
@@ -26,9 +24,7 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
     def test_email_null(self):
         user_data: dict = {
@@ -36,16 +32,12 @@ class TestUserSchema:
         }
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+            UserSchema(**user_data)
 
         user_data_email_null: dict = {"name": "email null", "email": None}
 
         with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data_email_null)
-
-            assert user_params is None
+            UserSchema(**user_data_email_null)
 
     def test_name_invalid_max_len(self):
         user_data: dict = {
@@ -53,10 +45,13 @@ class TestUserSchema:
             "email": "johndoe1@example.com",
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
+        with pytest.raises(ValidationError) as e:
+            UserSchema(**user_data)
 
-            assert user_params is None
+        assert (
+            I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+            == "50 文字以下で入力してください。"
+        )
 
     def test_name_valid_max_len(self):
         user_data: dict = {
@@ -75,17 +70,20 @@ class TestUserSchema:
             "email": "johndoe1@example.com",
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e1:
+            UserSchema(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "有効な文字を入力してください。"
+        )
 
         del user_data["name"]
 
-        with pytest.raises(ValidationError):
-            user_params = UserSchema(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e2:
+            UserSchema(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        )
 
 
 class TestUserCreate:
@@ -93,19 +91,23 @@ class TestUserCreate:
         user_data: dict = {
             "name": "John Doe",
             "email": "johndoe1@example.com",
+            "password": None,
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
+        with pytest.raises(ValidationError) as e1:
+            UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "有効な文字を入力してください。"
+        )
 
-            assert user_params is None
+        del user_data["name"]
 
-        user_data["password"] = None
-
-        with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e2:
+            UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"] == "必須項目です。"
+        )
 
     def test_password_invalid_length(self):
         user_data: dict = {
@@ -114,17 +116,21 @@ class TestUserCreate:
             "password": "a" * 7,
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e1:
+            UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )
 
         user_data["password"] = "a" * 51
 
-        with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
-
-            assert user_params is None
+        with pytest.raises(ValidationError) as e2:
+            UserCreate(**user_data)
+        assert (
+            I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )
 
     def test_password_valid_length(self):
         user_data: dict = {
@@ -163,7 +169,10 @@ class TestUserCreate:
             "password": "ＰＡＳＳＷＯＲＤ",
         }
 
-        with pytest.raises(ValidationError):
-            user_params = UserCreate(**user_data)
+        with pytest.raises(ValidationError) as e:
+            UserCreate(**user_data)
 
-            assert user_params is None
+        assert (
+            I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+        )

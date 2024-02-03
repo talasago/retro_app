@@ -1,14 +1,16 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
+
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, Header, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
+    RetroAppColmunUniqueError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
@@ -18,6 +20,7 @@ from app.functions.dependencies import (
     get_user_repo,
     oauth2_scheme,
 )
+from app.functions.middleware import add_cors_middleware
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     ApiResponseBodyBase,
@@ -25,24 +28,29 @@ from app.schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
 )
+from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
+    from fastapi import Request
+
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
 app = FastAPI()
-# TODO:originとMethodを可変にしたい。そして外だししたい。
-# TODO:その他の設定は適切に設定したい。
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # 許可するフロントエンドのオリジン
-    allow_credentials=True,  # 資格情報の共有の可否
-    allow_methods=["*"],  # 許可するHTTPリクエストメソッド
-    allow_headers=["*"],  # フロントエンドからの認可するHTTPヘッダー情報
-    expose_headers=["*"],  # フロントエンドがアクセスできるHTTPヘッダー情報
-)
+add_cors_middleware(app)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: "Request", exc: RequestValidationError
+) -> JSONResponse:
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": I18nTranslateWrapper.trans(exc.errors())},  # type: ignore
+        #  type(exc.errors()) => listとなっていることを確認している
+    )
 
 
 @app.post(
@@ -58,8 +66,14 @@ def signup_user(
     user: UserModel = UserModel(
         name=user_params.name, email=user_params.email, password=user_params.password
     )
-    # TODO:重複エラーの時、4xx系を返すようにする
-    user_repo.save(user=user)
+    try:
+        user_repo.save(user=user)
+    except RetroAppColmunUniqueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=e.message,
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
@@ -69,7 +83,11 @@ def signup_user(
 
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
-@app.post("/token", summary="ログインしてトークンを発行します。", response_model=TokenApiResponseBody)
+@app.post(
+    "/token",
+    summary="ログインしてトークンを発行します。",
+    response_model=TokenApiResponseBody,
+)
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
     auth_service: "AuthService" = Depends(get_auth_service),
@@ -146,7 +164,9 @@ def refresh_token(
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
-@app.post("/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase)
+@app.post(
+    "/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase
+)
 def logout(
     current_user: "UserModel" = Depends(get_current_user),
     auth_service: "AuthService" = Depends(get_auth_service),

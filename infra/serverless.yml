@@ -26,23 +26,9 @@ custom:
 
 package:
   patterns:
-    - '../**'
-    - '!../node_modules/**'
-    - '!../.venv/**'
-    - '!../test/**'
-    - '!../tools/**'
-    - '!../pytest_cache/**'
-    - '!../.vscode/**'
-    - '!../Pipfile'
-    - '!../Pipfile.lock'
-    - '!../.python-version'
-    - '!../package.json'
-    - '!../package-lock.json'
-    - '!../.nvmrc'
-    - '!../README.md'
-    - '!../.flake8'
-    - '!../.alembic.ini'
-    - '!../docker-compose.yml'
+    - '!../**'
+    # ホワイトリスト方式
+    - '../app/**'
 
 provider:
   name: aws
@@ -50,6 +36,7 @@ provider:
   stage: dev # TODO:オプション引数で変更できるように変更したい
   runtime: python3.10
   region: ap-northeast-1
+  timeout: 30 # seconds
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -57,6 +44,8 @@ provider:
         - ec2:CreateNetworkInterface # VPC設定のために必要
         - ec2:DescribeNetworkInterfaces # VPC設定のために必要
         - ec2:DeleteNetworkInterface # VPC設定のために必要
+        - ssm:GetParameter # SSMから環境変数を取得するために必要
+        - kms:DecryptSecureString # SSMから環境変数を取得するために必要
       Resource: "*"
   vpc:
     securityGroupIds:
@@ -72,6 +61,27 @@ provider:
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
+    ORIGINS: ${ssm:origins}
+  logs:
+    # Enable REST API logs
+    # This can either be set to `restApi: true` to use defaults, or configured via subproperties
+    # Can only be configured if the API is created by Serverless Framework
+    restApi:
+      accessLogging: true
+      # Log format to use for access logs
+      # format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status", "protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+      
+      executionLogging: true
+      # Log level to use for execution logging
+      level: INFO
+      # Log full requests/responses for execution logging
+      fullExecutionData: true
+
+      # NOTE:ロールは自動で作成されるので、それを使うように設定する
+      # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)
+      # role: arn:aws:iam::123456:role
+      # Whether the API Gateway CloudWatch Logs role setting is not managed by Serverless (default: false)
+      roleManagedExternally: false 
 
 functions:
   user_function:

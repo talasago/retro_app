@@ -2,13 +2,12 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
-from fastapi.testclient import TestClient
 from httpx import Response
 from sqlalchemy import select
 
-from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
+from tests.test_helpers.functions.cors import assert_cors_headers
 from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport
@@ -16,86 +15,54 @@ if TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
 
 
-client = TestClient(app)
-
-
-@pytest.fixture
-def add_user_api():
-    def _method(user_data) -> None:
-        response = client.post("/api/v1/sign_up", json=user_data)
-        assert response.status_code == 201
-
-    return _method
-
-
-# TODO:function用のhelperに移動する
-@pytest.fixture
-def login_api():
-    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
-        response: "Response" = client.post(
-            "/token",
-            headers={
-                "accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data=login_param,
-        )
-
-        if is_return_response:
-            return response
-
-        res_body = response.json()
-        return res_body["access_token"], res_body["refresh_token"]
-
-    return _method
-
-
-@pytest.fixture(scope="session")
-def refresh_token_api():
-    def _method(refresh_token: str) -> "Response":
-        response: "Response" = client.post(
-            "/refresh_token",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {refresh_token}",
-            },
-        )
-        return response
-
-    return _method
-
-
-@pytest.fixture(scope="session")
-def logout_api():
-    def _method(access_token: str) -> "Response":
-        response = client.post(
-            "/api/v1/logout",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            },
-        )
-        return response
-
-    return _method
-
-
 @pytest.mark.usefixtures("db")
 class TestUserFunction:
-    def test_register_user(self):
-        user_data: dict = {
-            "email": "testuser@example.com",
-            "name": "Test User",
-            "password": "testpassword",
-        }
+    class TestSignUp:
+        def test_register_user(self, add_user_api):
+            """
+            テスト観点
+            1.ユーザーが登録できること
+            2.同じメールアドレスで登録できないこと
+            3.CORS設定が正しいこと(最低限の確認)
+            """
+            user_data: dict = {
+                "email": "testuser@example.com",
+                "name": "Test User",
+                "password": "testpassword",
+            }
+            option = {"headers": {"Origin": "http://127.0.0.1"}}
 
-        response = client.post("/api/v1/sign_up", json=user_data)
+            response_1st = add_user_api(user_data=user_data, option=option)
+            assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
+            assert_cors_headers(response_1st)
 
-        assert response.status_code == 201
-        assert response.json() == {"message": "ユーザー登録が成功しました。"}
-        # TODO:異常系のテストを追加する
-        # DBに保存されているかの観点が必要。
-        # パスワードのバリデーションがすり抜けている気がする...
+            response_2nd = add_user_api(
+                user_data=user_data, is_assert_response_code_2xx=False, option=option
+            )
+            assert response_2nd.status_code == 409
+            assert response_2nd.json() == {
+                "detail": "指定されたメールアドレスはすでに登録されています。"
+            }
+            assert_cors_headers(response_2nd)
+
+            # TODO:異常系のテストを追加する
+            # DBに保存されているかの観点が必要。
+            # パスワードのバリデーションがすり抜けている気がする...
+
+        def test_422_be_translated_into_japanese(self, add_user_api):
+            """pydenticのエラーメッセージが日本語化されていること"""
+            user_data: dict = {
+                "email": "test_422_be_translated_into_japanese@example.com",
+                "name": "芳" * 51,
+                "password": "testpassword",
+            }
+
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
+
+            assert response.status_code == 422
+            assert (
+                response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
+            )
 
     class TestLogin:
         # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
@@ -115,7 +82,6 @@ class TestUserFunction:
                 response = login_api(login_user_data, True)
 
                 res_body = response.json()
-                assert response.status_code == 200
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
@@ -129,11 +95,14 @@ class TestUserFunction:
                     "username": "APITestWhenNotExistEmail@example.com",
                     "password": "testpassword",
                 }
-                response = login_api(user_data, True)
+                response = login_api(user_data, True, is_assert_response_code_2xx=False)
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "メールアドレスまたはパスワードが間違っています。"
+                assert (
+                    res_body["detail"]
+                    == "メールアドレスまたはパスワードが間違っています。"
+                )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
         class TestWhenUnmatchPassword:
@@ -150,11 +119,16 @@ class TestUserFunction:
                     "username": user_data["email"],
                     "password": "hogehoge",
                 }
-                response = login_api(login_user_data, True)
+                response = login_api(
+                    login_user_data, True, is_assert_response_code_2xx=False
+                )
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "メールアドレスまたはパスワードが間違っています。"
+                assert (
+                    res_body["detail"]
+                    == "メールアドレスまたはパスワードが間違っています。"
+                )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
     class TestLogout:
@@ -233,7 +207,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                assert (
+                    res_body["detail"]
+                    == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                )
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidParam:
@@ -337,7 +314,10 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                assert (
+                    res_body["detail"]
+                    == "ログイン有効期間を過ぎています。再度ログインしてください。"
+                )
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidParam:
