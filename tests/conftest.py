@@ -20,7 +20,10 @@ from app.models.retrospective_method.comment_model import (  # noqa: F401,E402
 )
 from app.repository.user_repository import UserRepository  # noqa: E402
 
-pytest_plugins = ["test_helpers.functions.conftest_user_api"]
+pytest_plugins = [
+    "test_helpers.functions.conftest_user_api",
+    "test_helpers.functions.retrospective_method.conftest_comment_api",
+]
 
 
 @pytest.fixture(scope="session")
