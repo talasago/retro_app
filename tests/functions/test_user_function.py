@@ -2,11 +2,9 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
-from fastapi.testclient import TestClient
 from httpx import Response
 from sqlalchemy import select
 
-from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
 from tests.test_helpers.functions.cors import assert_cors_headers
@@ -15,9 +13,6 @@ from tests.test_helpers.token import generate_test_token
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
-
-
-client = TestClient(app)
 
 
 @pytest.mark.usefixtures("db")
@@ -54,7 +49,7 @@ class TestUserFunction:
             # DBに保存されているかの観点が必要。
             # パスワードのバリデーションがすり抜けている気がする...
 
-        def test_422_be_translated_into_japanese(self):
+        def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
             user_data: dict = {
                 "email": "test_422_be_translated_into_japanese@example.com",
@@ -62,7 +57,7 @@ class TestUserFunction:
                 "password": "testpassword",
             }
 
-            response = client.post("/api/v1/sign_up", json=user_data)
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
             assert response.status_code == 422
             assert (
