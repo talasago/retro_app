@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from httpx import Response
 
 from app.functions.user import app as app_user
+from app.schemas.token_schema import TokenType
 
 # MEMO:clientもどこかで共通化した方が良いかもしれない
 client_user = TestClient(app_user)
@@ -30,11 +31,10 @@ def add_user_api():
 def login_api():
     # MEMO: is_return_responseは削除してもいいんじゃないか感
     # responseが欲しいのか、それともtokenが欲しいかで関心ごとが違うのか
-    # MEMO: tupleで返すときは何を返すかの型ヒントが良いかもしれない。TokenType
     # FIXME:is_return_responseの引数名とデフォルト引数を考える。他のapi()に合わせて、通常はresponseを返すようにする
     def _method(
         login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
-    ) -> Response | tuple:
+    ) -> Response | tuple[str, str]:
         response: Response = client_user.post(
             "/token",
             headers={
@@ -50,7 +50,10 @@ def login_api():
         if is_return_response:
             return response
 
-        return res_body["access_token"], res_body["refresh_token"]
+        return (
+            res_body[TokenType.ACCESS_TOKEN.value],
+            res_body[TokenType.REFRESH_TOKEN.value],
+        )
 
     return _method
 
