@@ -29,9 +29,17 @@ def add_user_api():
 
 @pytest.fixture(scope="session")
 def login_api():
-    # MEMO: is_return_responseは削除してもいいんじゃないか感
-    # responseが欲しいのか、それともtokenが欲しいかで関心ごとが違うのか
-    # FIXME:is_return_responseの引数名とデフォルト引数を考える。他のapi()に合わせて、通常はresponseを返すようにする
+    """
+    ログインパラメータを使用して '/token' エンドポイントに対して POST リクエストを実行します。
+
+    Args:
+        login_param (dict): リクエストで送信するログインパラメータ。
+        is_return_response (bool, optional): レスポンスオブジェクトを返すかどうか。デフォルトは False です。
+        is_assert_response_code_2xx (bool, optional): レスポンスのステータスコードが 2xx であることをassertするかどうか。デフォルトは True です。
+
+    Returns:
+        Response | tuple[str, str]: 'is_return_response' が True の場合はレスポンスオブジェクト、それ以外の場合はアクセストークンとリフレッシュトークンを含むタプルを返します。
+    """
     def _method(
         login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
     ) -> Response | tuple[str, str]:
@@ -49,11 +57,11 @@ def login_api():
 
         if is_return_response:
             return response
-
-        return (
-            res_body[TokenType.ACCESS_TOKEN.value],
-            res_body[TokenType.REFRESH_TOKEN.value],
-        )
+        else:
+            return (
+                res_body[TokenType.ACCESS_TOKEN.value],
+                res_body[TokenType.REFRESH_TOKEN.value],
+            )
 
     return _method
 
