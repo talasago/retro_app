@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 
 import pytest
 from fastapi.testclient import TestClient
@@ -7,11 +6,6 @@ from httpx import Response
 from app.functions.retrospective_method.comment import app as app_comment
 from app.functions.user import app as app_user
 from tests.test_helpers.functions.cors import assert_cors_headers
-
-# 型アノテーションだけのimport
-if TYPE_CHECKING:
-    pass
-
 
 client_user = TestClient(app_user)
 client_comment = TestClient(app_comment)
