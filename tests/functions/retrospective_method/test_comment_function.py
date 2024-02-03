@@ -11,27 +11,6 @@ client_comment = TestClient(app_comment)
 
 
 @pytest.fixture
-def login_api():
-    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
-        response: "Response" = client_user.post(
-            "/token",
-            headers={
-                "accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data=login_param,
-        )
-
-        if is_return_response:
-            return response
-
-        res_body = response.json()
-        return res_body["access_token"], res_body["refresh_token"]
-
-    return _method
-
-
-@pytest.fixture
 def add_comment_api():
     def _method(
         comment_data: dict,

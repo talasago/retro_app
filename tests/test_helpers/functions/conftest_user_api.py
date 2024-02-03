@@ -21,3 +21,26 @@ def add_user_api():
         return response
 
     return _method
+
+
+@pytest.fixture(scope="session")
+def login_api():
+    # MEMO: is_return_responseは削除してもいいんじゃないか感
+    # responseが欲しいのか、それともtokenが欲しいかで関心ごとが違うのか
+    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
+        response: "Response" = client_user.post(
+            "/token",
+            headers={
+                "accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            data=login_param,
+        )
+
+        if is_return_response:
+            return response
+
+        res_body = response.json()
+        return res_body["access_token"], res_body["refresh_token"]
+
+    return _method

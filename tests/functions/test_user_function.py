@@ -20,28 +20,6 @@ if TYPE_CHECKING:
 client = TestClient(app)
 
 
-# TODO:function用のhelperに移動する
-@pytest.fixture
-def login_api():
-    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
-        response: "Response" = client.post(
-            "/token",
-            headers={
-                "accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data=login_param,
-        )
-
-        if is_return_response:
-            return response
-
-        res_body = response.json()
-        return res_body["access_token"], res_body["refresh_token"]
-
-    return _method
-
-
 @pytest.fixture(scope="session")
 def refresh_token_api():
     def _method(refresh_token: str) -> "Response":
