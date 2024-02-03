@@ -20,36 +20,6 @@ if TYPE_CHECKING:
 client = TestClient(app)
 
 
-@pytest.fixture(scope="session")
-def refresh_token_api():
-    def _method(refresh_token: str) -> "Response":
-        response: "Response" = client.post(
-            "/refresh_token",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {refresh_token}",
-            },
-        )
-        return response
-
-    return _method
-
-
-@pytest.fixture(scope="session")
-def logout_api():
-    def _method(access_token: str) -> "Response":
-        response = client.post(
-            "/api/v1/logout",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            },
-        )
-        return response
-
-    return _method
-
-
 @pytest.mark.usefixtures("db")
 class TestUserFunction:
     class TestSignUp:
