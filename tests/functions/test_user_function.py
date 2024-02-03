@@ -2,87 +2,17 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
-from fastapi.testclient import TestClient
 from httpx import Response
 from sqlalchemy import select
 
-from app.functions.user import app
 from app.models.user_model import UserModel
 from app.schemas.token_schema import TokenType
-from tests.test_helpers.function.cors import assert_cors_headers
+from tests.test_helpers.functions.cors import assert_cors_headers
 from tests.test_helpers.token import generate_test_token
 
 # 型アノテーションだけのimport
 if TYPE_CHECKING:
     from sqlalchemy.orm.session import Session
-
-
-client = TestClient(app)
-
-
-@pytest.fixture
-def add_user_api():
-    def _method(
-        user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
-    ) -> Response:
-        response = client.post("/api/v1/sign_up", json=user_data, **option)
-        if is_assert_response_code_2xx:
-            assert response.status_code == 201
-        return response
-
-    return _method
-
-
-# TODO:function用のhelperに移動する
-@pytest.fixture
-def login_api():
-    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
-        response: "Response" = client.post(
-            "/token",
-            headers={
-                "accept": "application/json",
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            data=login_param,
-        )
-
-        if is_return_response:
-            return response
-
-        res_body = response.json()
-        return res_body["access_token"], res_body["refresh_token"]
-
-    return _method
-
-
-@pytest.fixture(scope="session")
-def refresh_token_api():
-    def _method(refresh_token: str) -> "Response":
-        response: "Response" = client.post(
-            "/refresh_token",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {refresh_token}",
-            },
-        )
-        return response
-
-    return _method
-
-
-@pytest.fixture(scope="session")
-def logout_api():
-    def _method(access_token: str) -> "Response":
-        response = client.post(
-            "/api/v1/logout",
-            headers={
-                "accept": "application/json",
-                "Authorization": f"Bearer {access_token}",
-            },
-        )
-        return response
-
-    return _method
 
 
 @pytest.mark.usefixtures("db")
@@ -119,7 +49,7 @@ class TestUserFunction:
             # DBに保存されているかの観点が必要。
             # パスワードのバリデーションがすり抜けている気がする...
 
-        def test_422_be_translated_into_japanese(self):
+        def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
             user_data: dict = {
                 "email": "test_422_be_translated_into_japanese@example.com",
@@ -127,7 +57,7 @@ class TestUserFunction:
                 "password": "testpassword",
             }
 
-            response = client.post("/api/v1/sign_up", json=user_data)
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
             assert response.status_code == 422
             assert (
@@ -152,7 +82,6 @@ class TestUserFunction:
                 response = login_api(login_user_data, True)
 
                 res_body = response.json()
-                assert response.status_code == 200
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
@@ -166,7 +95,7 @@ class TestUserFunction:
                     "username": "APITestWhenNotExistEmail@example.com",
                     "password": "testpassword",
                 }
-                response = login_api(user_data, True)
+                response = login_api(user_data, True, is_assert_response_code_2xx=False)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -190,7 +119,9 @@ class TestUserFunction:
                     "username": user_data["email"],
                     "password": "hogehoge",
                 }
-                response = login_api(login_user_data, True)
+                response = login_api(
+                    login_user_data, True, is_assert_response_code_2xx=False
+                )
 
                 res_body = response.json()
                 assert response.status_code == 401
