@@ -82,7 +82,6 @@ class TestUserFunction:
                 response = login_api(login_user_data, True)
 
                 res_body = response.json()
-                assert response.status_code == 200
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
@@ -96,7 +95,7 @@ class TestUserFunction:
                     "username": "APITestWhenNotExistEmail@example.com",
                     "password": "testpassword",
                 }
-                response = login_api(user_data, True)
+                response = login_api(user_data, True, is_assert_response_code_2xx=False)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -120,7 +119,9 @@ class TestUserFunction:
                     "username": user_data["email"],
                     "password": "hogehoge",
                 }
-                response = login_api(login_user_data, True)
+                response = login_api(
+                    login_user_data, True, is_assert_response_code_2xx=False
+                )
 
                 res_body = response.json()
                 assert response.status_code == 401

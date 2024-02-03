@@ -25,7 +25,6 @@ class TestCommentFunction:
                 response = login_api(login_user_data, True)
 
                 res_body = response.json()
-                assert response.status_code == 200
 
                 # 実行/検証
                 comment_data: dict = {

@@ -22,7 +22,9 @@ def add_user_api():
 
     return _method
 
+
 # responseが200系であることの検証を追加する
+
 
 @pytest.fixture(scope="session")
 def login_api():
@@ -30,7 +32,9 @@ def login_api():
     # responseが欲しいのか、それともtokenが欲しいかで関心ごとが違うのか
     # MEMO: tupleで返すときは何を返すかの型ヒントが良いかもしれない。TokenType
     # FIXME:is_return_responseの引数名とデフォルト引数を考える。他のapi()に合わせて、通常はresponseを返すようにする
-    def _method(login_param: dict, is_return_response=False) -> Response | tuple:
+    def _method(
+        login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
+    ) -> Response | tuple:
         response: Response = client_user.post(
             "/token",
             headers={
@@ -39,11 +43,13 @@ def login_api():
             },
             data=login_param,
         )
+        res_body = response.json()
+        if is_assert_response_code_2xx:
+            assert response.status_code == 200
 
         if is_return_response:
             return response
 
-        res_body = response.json()
         return res_body["access_token"], res_body["refresh_token"]
 
     return _method
