@@ -28,7 +28,6 @@ def add_comment_api():
             },
         )
         assert response.status_code == 201
-        assert_cors_headers(response)
         return response
 
     return _method
@@ -62,6 +61,7 @@ class TestCommentFunction:
                 comment_data: dict = {
                     "comment": "test comment",
                 }
-                add_comment_api(comment_data, res_body["access_token"])
+                response = add_comment_api(comment_data, res_body["access_token"])
+                assert_cors_headers(response)
 
                 # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
