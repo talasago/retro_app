@@ -40,6 +40,7 @@ def login_api():
     Returns:
         Response | tuple[str, str]: 'is_return_response' が True の場合はレスポンスオブジェクト、それ以外の場合はアクセストークンとリフレッシュトークンを含むタプルを返します。
     """
+
     def _method(
         login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
     ) -> Response | tuple[str, str]:
