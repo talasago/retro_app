@@ -1,4 +1,3 @@
-
 import pytest
 from fastapi.testclient import TestClient
 from httpx import Response
@@ -9,15 +8,6 @@ from tests.test_helpers.functions.cors import assert_cors_headers
 
 client_user = TestClient(app_user)
 client_comment = TestClient(app_comment)
-
-
-@pytest.fixture
-def add_user_api():
-    def _method(user_data) -> None:
-        response = client_user.post("/api/v1/sign_up", json=user_data)
-        assert response.status_code == 201
-
-    return _method
 
 
 @pytest.fixture

@@ -20,19 +20,6 @@ if TYPE_CHECKING:
 client = TestClient(app)
 
 
-@pytest.fixture
-def add_user_api():
-    def _method(
-        user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
-    ) -> Response:
-        response = client.post("/api/v1/sign_up", json=user_data, **option)
-        if is_assert_response_code_2xx:
-            assert response.status_code == 201
-        return response
-
-    return _method
-
-
 # TODO:function用のhelperに移動する
 @pytest.fixture
 def login_api():
