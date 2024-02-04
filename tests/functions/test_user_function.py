@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
+from factories.user_factory import ApiCommonUserFactory
 from httpx import Response
 from sqlalchemy import select
 
@@ -51,11 +52,7 @@ class TestUserFunction:
 
         def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
-            user_data: dict = {
-                "email": "test_422_be_translated_into_japanese@example.com",
-                "name": "芳" * 51,
-                "password": "testpassword",
-            }
+            user_data: dict = ApiCommonUserFactory(name="芳" * 51)
 
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
@@ -91,10 +88,10 @@ class TestUserFunction:
         class TestWhenNotExistEmail:
             def test_return_401(self, login_api):
                 """存在しないメアドを指定した場合、エラーとなること"""
-                user_data: dict = {
-                    "username": "APITestWhenNotExistEmail@example.com",
-                    "password": "testpassword",
-                }
+                user_data: dict = ApiCommonUserFactory(
+                    username="APITestWhenNotExistEmail@example.com"
+                )
+
                 response = login_api(user_data, True, is_assert_response_code_2xx=False)
 
                 res_body = response.json()
