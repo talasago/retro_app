@@ -62,28 +62,31 @@ class TestUserFunction:
             )
 
     class TestLogin:
-        # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
-        class TestValidParam:
-            def test_return_200(self, add_user_api, login_api):
-                user_data: dict = {
-                    "email": "testuser1@example.com",
-                    "name": "Test User1",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": user_data["password"],
-                }
-                response = login_api(login_user_data, True)
+        @pytest.fixture(scope="module", autouse=True)
+        def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
+            add_user_api(user_data_for_login)
+
+        @pytest.fixture(scope="module")
+        def user_data_for_login(self) -> dict:
+            return {
+                "email": "user_data_for_login@example.com",
+                "name": "user_data_for_login",
+                "username": "user_data_for_login@example.com",
+                "password": "testpassword!1",
+            }
+
+        class TestValidParam:
+
+            def test_return_200(self, login_api, user_data_for_login):
+                response = login_api(user_data_for_login, True)
 
                 res_body = response.json()
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
                 assert res_body["token_type"] == "bearer"
-                assert res_body["name"] == "Test User1"
+                assert res_body["name"] == "user_data_for_login"
 
         class TestWhenNotExistEmail:
             def test_return_401(self, login_api):
@@ -103,19 +106,12 @@ class TestUserFunction:
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
         class TestWhenUnmatchPassword:
-            def test_return_401(self, add_user_api, login_api):
-                """パスワードが一致しない場合、エラーとなること"""
-                user_data: dict = {
-                    "email": "apiTestWhenUnmatchPassword@example.com",
-                    "name": "apiTestWhenUnmatchPassword",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": "hogehoge",
-                }
+            def test_return_401(self, login_api, user_data_for_login):
+                """パスワードが一致しない場合、エラーとなること"""
+                login_user_data = dict(user_data_for_login)
+                login_user_data["password"] = "hogehoge"
+
                 response = login_api(
                     login_user_data, True, is_assert_response_code_2xx=False
                 )
