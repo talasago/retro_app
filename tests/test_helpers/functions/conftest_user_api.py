@@ -81,7 +81,11 @@ def refresh_token_api():
 
 @pytest.fixture(scope="session")
 def logout_api():
-    def _method(access_token: str) -> Response:
+
+    def _method(
+        access_token: str,
+        is_assert_response_code_2xx: bool = True,
+    ) -> Response:
         response = client_user.post(
             "/api/v1/logout",
             headers={
@@ -89,6 +93,8 @@ def logout_api():
                 "Authorization": f"Bearer {access_token}",
             },
         )
+        if is_assert_response_code_2xx:
+            assert response.status_code == 200
         return response
 
     return _method

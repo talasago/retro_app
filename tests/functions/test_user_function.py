@@ -149,8 +149,7 @@ class TestUserFunction:
                 }
                 access_token, refresh_token = login_api(login_param)
 
-                logout_response: "Response" = logout_api(access_token)
-                assert logout_response.status_code == 200
+                logout_response: "Response" = logout_api(access_token, False)
                 assert logout_response.json() == {"message": "ログアウトしました"}
 
                 stmt = select(UserModel).where(UserModel.email == user_data["email"])
@@ -184,7 +183,7 @@ class TestUserFunction:
                 """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
                 access_token: str = generate_test_token(TokenType.ACCESS_TOKEN)
 
-                response = response = logout_api(access_token)
+                response = response = logout_api(access_token, False)
 
                 assert response.status_code == 401
                 assert response.json() == {"detail": "ユーザーが存在しません。"}
@@ -198,7 +197,7 @@ class TestUserFunction:
                     exp=datetime.utcnow() - timedelta(minutes=10),
                 )
 
-                response = logout_api(access_token)
+                response = logout_api(access_token, False)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -211,7 +210,7 @@ class TestUserFunction:
         class TestWhenInvalidParam:
             def test_return_401(self, logout_api):
                 """トークンが不正な値の場合401を返す"""
-                response = logout_api("hoge")
+                response = logout_api("hoge", False)
 
                 res_body = response.json()
                 assert response.status_code == 401
