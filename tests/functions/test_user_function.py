@@ -216,7 +216,7 @@ class TestUserFunction:
                 assert res_body["detail"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
 
-    # ログアウトのテスト観点
+    # ログアウトのテスト観点(未対応分)
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため

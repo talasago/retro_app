@@ -15,7 +15,6 @@ def add_user_api():
     def _method(
         user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
     ) -> Response:
-        # TODO:user_dataが無ければこのメソッドで適当に作るようにしたい→呼び出し元で毎回dictを作りたくない。
         response = client_user.post("/api/v1/sign_up", json=user_data, **option)
 
         if is_assert_response_code_2xx:
