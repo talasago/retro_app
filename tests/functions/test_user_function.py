@@ -62,7 +62,6 @@ class TestUserFunction:
             )
 
     class TestLogin:
-
         @pytest.fixture(scope="module", autouse=True)
         def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
             add_user_api(user_data_for_login)
@@ -77,7 +76,6 @@ class TestUserFunction:
             }
 
         class TestValidParam:
-
             def test_return_200(self, login_api, user_data_for_login):
                 response = login_api(user_data_for_login, True)
 
