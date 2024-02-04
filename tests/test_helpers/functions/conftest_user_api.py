@@ -24,9 +24,6 @@ def add_user_api():
     return _method
 
 
-# responseが200系であることの検証を追加する
-
-
 @pytest.fixture(scope="session")
 def login_api():
     """
