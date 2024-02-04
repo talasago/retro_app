@@ -6,7 +6,7 @@ from httpx import Response
 from tests.test_helpers.token import generate_test_token
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def call_api_with_invalid_access_token_assert_401():
     """
     テスト用の無効なアクセストークンを生成し、API呼び出しのためのメソッドを実行し、401エラーが返ってくることを確認する。
@@ -21,7 +21,9 @@ def call_api_with_invalid_access_token_assert_401():
     def _method(method_for_calling_api: Callable) -> None:
         token: str = generate_test_token("dummy", "dummy")  # type: ignore
         # token: str = generate_test_token(TokenType.ACCESS_TOKEN, "dummy")
-        response: Response = method_for_calling_api(access_token=token)
+        response: Response = method_for_calling_api(
+            access_token=token, is_assert_response_code_2xx=False
+        )
 
         assert response.status_code == 401
         assert response.json() == {"detail": "Tokenが間違っています。"}
