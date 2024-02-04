@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 
 import pytest
+from factories.user_factory import ApiCommonUserFactory
 from httpx import Response
 from sqlalchemy import select
 
@@ -51,11 +52,7 @@ class TestUserFunction:
 
         def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
-            user_data: dict = {
-                "email": "test_422_be_translated_into_japanese@example.com",
-                "name": "芳" * 51,
-                "password": "testpassword",
-            }
+            user_data: dict = ApiCommonUserFactory(name="芳" * 51)
 
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
@@ -65,36 +62,37 @@ class TestUserFunction:
             )
 
     class TestLogin:
-        # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
-        class TestValidParam:
-            def test_return_200(self, add_user_api, login_api):
-                user_data: dict = {
-                    "email": "testuser1@example.com",
-                    "name": "Test User1",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
+        @pytest.fixture(scope="module", autouse=True)
+        def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
+            add_user_api(user_data_for_login)
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": user_data["password"],
-                }
-                response = login_api(login_user_data, True)
+        @pytest.fixture(scope="module")
+        def user_data_for_login(self) -> dict:
+            return {
+                "email": "user_data_for_login@example.com",
+                "name": "user_data_for_login",
+                "username": "user_data_for_login@example.com",
+                "password": "testpassword!1",
+            }
+
+        class TestValidParam:
+            def test_return_200(self, login_api, user_data_for_login):
+                response = login_api(user_data_for_login, True)
 
                 res_body = response.json()
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
                 assert res_body["token_type"] == "bearer"
-                assert res_body["name"] == "Test User1"
+                assert res_body["name"] == "user_data_for_login"
 
         class TestWhenNotExistEmail:
             def test_return_401(self, login_api):
                 """存在しないメアドを指定した場合、エラーとなること"""
-                user_data: dict = {
-                    "username": "APITestWhenNotExistEmail@example.com",
-                    "password": "testpassword",
-                }
+                user_data: dict = ApiCommonUserFactory(
+                    username="APITestWhenNotExistEmail@example.com"
+                )
+
                 response = login_api(user_data, True, is_assert_response_code_2xx=False)
 
                 res_body = response.json()
@@ -106,19 +104,12 @@ class TestUserFunction:
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
         class TestWhenUnmatchPassword:
-            def test_return_401(self, add_user_api, login_api):
-                """パスワードが一致しない場合、エラーとなること"""
-                user_data: dict = {
-                    "email": "apiTestWhenUnmatchPassword@example.com",
-                    "name": "apiTestWhenUnmatchPassword",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": "hogehoge",
-                }
+            def test_return_401(self, login_api, user_data_for_login):
+                """パスワードが一致しない場合、エラーとなること"""
+                login_user_data = dict(user_data_for_login)
+                login_user_data["password"] = "hogehoge"
+
                 response = login_api(
                     login_user_data, True, is_assert_response_code_2xx=False
                 )
@@ -223,7 +214,7 @@ class TestUserFunction:
                 assert res_body["detail"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
 
-    # ログアウトのテスト観点
+    # ログアウトのテスト観点(未対応分)
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
