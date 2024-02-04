@@ -164,16 +164,20 @@ class TestUserFunction:
                 assert ref_token_res.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidToken:
-            def test_return_401(self, logout_api):
+
+            def test_return_401(
+                self, logout_api, call_api_with_invalid_access_token_assert_401
+            ):
                 """access_tokenが無効な値の場合、401を返すこと"""
-                token: str = generate_test_token("dummy", "dummy")  # type: ignore
+                # token: str = generate_test_token("dummy", "dummy")  # type: ignore
 
-                response = logout_api(token)
+                # response = logout_api(token)
 
-                res_body = response.json()
-                assert response.status_code == 401
-                assert res_body["detail"] == "Tokenが間違っています。"
-                assert response.headers["www-authenticate"] == "Bearer"
+                # res_body = response.json()
+                # assert response.status_code == 401
+                # assert res_body["detail"] == "Tokenが間違っています。"
+                # assert response.headers["www-authenticate"] == "Bearer"
+                call_api_with_invalid_access_token_assert_401(logout_api)
 
         class TestWhenNotExistUser:
             def test_return_401(self, logout_api):

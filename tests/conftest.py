@@ -23,6 +23,7 @@ from app.repository.user_repository import UserRepository  # noqa: E402
 pytest_plugins = [
     "test_helpers.functions.conftest_user_api",
     "test_helpers.functions.retrospective_method.conftest_comment_api",
+    "test_helpers.functions.conftest_invalid_token",
 ]
 
 
