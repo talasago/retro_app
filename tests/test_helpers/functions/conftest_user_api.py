@@ -1,4 +1,5 @@
 import pytest
+from factories.user_factory import ApiCommonUserFactory
 from fastapi.testclient import TestClient
 from httpx import Response
 
@@ -92,3 +93,14 @@ def logout_api():
         return response
 
     return _method
+
+
+@pytest.fixture(scope="session")
+def tokens_of_logged_in_api_common_user(add_user_api, login_api) -> tuple[str, str]:
+    """
+    ログイン済みのAPI共通ユーザーのアクセストークンとリフレッシュトークンを返します。
+    """
+    api_common_user: dict = ApiCommonUserFactory()
+    add_user_api(user_data=api_common_user)
+    access_token, refresh_token = login_api(login_param=api_common_user)
+    return (access_token, refresh_token)
