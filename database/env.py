@@ -1,19 +1,18 @@
 # appディレクトリの実行パスを追加
 # TODO:テストコードのファイル毎に書くのはめんどいので共通化したい気持ち
 # direnvとか使おうかな...それかsite-packagesとか使うか
-import sys
 import os
+import sys
+
 app_path = os.path.join(os.path.dirname(__file__), '../..')
 sys.path.append(app_path)
 
 from logging.config import fileConfig
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from alembic import context
-from app.database import Base, DATABASE_URL
+from sqlalchemy import engine_from_config, pool
 
+from app.database import DATABASE_URL, Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
