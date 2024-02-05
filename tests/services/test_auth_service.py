@@ -64,6 +64,17 @@ class TestAuthService:
                     auth_service.get_current_user(token=refresh_token)
                 assert str(e.value) == "TokenTypeが一致しません。"
 
+        class TestWhenInvalidTokenWithNotUuid:
+            def test_raise_error(self, auth_service: AuthService):
+                """デコードしたペイロードのuuidがuuidの形式でない場合、例外を返す"""
+                invalid_token = generate_test_token(
+                    token_type=TokenType.ACCESS_TOKEN, user_uuid="hoge"
+                )
+
+                with pytest.raises(RetroAppAuthenticationError) as e:
+                    auth_service.get_current_user(token=invalid_token)
+                assert str(e.value) == "uuidの形式が正しくありません。"
+
         class TestWhenNotExistUserUUID:
             def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""

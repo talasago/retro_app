@@ -3,6 +3,7 @@ from typing import Callable
 import pytest
 from httpx import Response
 
+from app.schemas.token_schema import TokenType
 from tests.test_helpers.token import generate_test_token
 
 
@@ -19,8 +20,8 @@ def call_api_with_invalid_access_token_assert_401():
     """
 
     def _method(method_for_calling_api: Callable) -> None:
-        token: str = generate_test_token("dummy", "dummy")  # type: ignore
-        # token: str = generate_test_token(TokenType.ACCESS_TOKEN, "dummy")
+        """デコードしたペイロードのuuidがuuidの形式でない場合、エラーを返す"""
+        token: str = generate_test_token(TokenType.ACCESS_TOKEN, "dummy")
         response: Response = method_for_calling_api(
             access_token=token, is_assert_response_code_2xx=False
         )

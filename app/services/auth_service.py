@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from jose import exceptions as jwt_exceptions
 from jose import jwt
@@ -51,6 +51,9 @@ class AuthService:
 
         if payload.token_type != expect_token_type.value:
             raise RetroAppAuthenticationError("TokenTypeが一致しません。")
+
+        if self.__is_uuid(payload.uid) is False:
+            raise RetroAppAuthenticationError("uuidの形式が正しくありません。")
 
         # DBからユーザーを取得
         try:
@@ -149,3 +152,10 @@ class AuthService:
     def delete_refresh_token(self, user: "UserModel") -> None:
         user.refresh_token = None
         self.__user_repo.save(user)
+
+    def __is_uuid(self, value: str) -> bool:
+        try:
+            UUID(value)
+            return True
+        except ValueError:
+            return False
