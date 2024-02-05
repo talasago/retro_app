@@ -21,3 +21,11 @@ class TestCommentFunction:
                 assert_cors_headers(response)
 
                 # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
+
+        class TestInvalidParam:
+            def test_return_401_when_invalid_access_token(
+                self,
+                call_api_with_invalid_access_token_assert_401,
+                add_comment_api,
+            ):
+                call_api_with_invalid_access_token_assert_401(add_comment_api)

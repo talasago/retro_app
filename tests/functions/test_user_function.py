@@ -149,8 +149,7 @@ class TestUserFunction:
                 }
                 access_token, refresh_token = login_api(login_param)
 
-                logout_response: "Response" = logout_api(access_token)
-                assert logout_response.status_code == 200
+                logout_response: "Response" = logout_api(access_token, False)
                 assert logout_response.json() == {"message": "ログアウトしました"}
 
                 stmt = select(UserModel).where(UserModel.email == user_data["email"])
@@ -164,23 +163,27 @@ class TestUserFunction:
                 assert ref_token_res.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidToken:
-            def test_return_401(self, logout_api):
+
+            def test_return_401(
+                self, logout_api, call_api_with_invalid_access_token_assert_401
+            ):
                 """access_tokenが無効な値の場合、401を返すこと"""
-                token: str = generate_test_token("dummy", "dummy")  # type: ignore
+                # token: str = generate_test_token("dummy", "dummy")  # type: ignore
 
-                response = logout_api(token)
+                # response = logout_api(token)
 
-                res_body = response.json()
-                assert response.status_code == 401
-                assert res_body["detail"] == "Tokenが間違っています。"
-                assert response.headers["www-authenticate"] == "Bearer"
+                # res_body = response.json()
+                # assert response.status_code == 401
+                # assert res_body["detail"] == "Tokenが間違っています。"
+                # assert response.headers["www-authenticate"] == "Bearer"
+                call_api_with_invalid_access_token_assert_401(logout_api)
 
         class TestWhenNotExistUser:
             def test_return_401(self, logout_api):
                 """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
                 access_token: str = generate_test_token(TokenType.ACCESS_TOKEN)
 
-                response = response = logout_api(access_token)
+                response = response = logout_api(access_token, False)
 
                 assert response.status_code == 401
                 assert response.json() == {"detail": "ユーザーが存在しません。"}
@@ -194,7 +197,7 @@ class TestUserFunction:
                     exp=datetime.utcnow() - timedelta(minutes=10),
                 )
 
-                response = logout_api(access_token)
+                response = logout_api(access_token, False)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -207,7 +210,7 @@ class TestUserFunction:
         class TestWhenInvalidParam:
             def test_return_401(self, logout_api):
                 """トークンが不正な値の場合401を返す"""
-                response = logout_api("hoge")
+                response = logout_api("hoge", False)
 
                 res_body = response.json()
                 assert response.status_code == 401
