@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Home from '../components/presenter/Home';
 import RegistrationForm from '../features/SignUp/components/container/RegistrationForm';
+import LoginForm from '../features/Login/components/container/LoginForm';
 
 const IndexRoutes: FC = () => {
   const { hash, pathname } = useLocation();
@@ -17,6 +18,7 @@ const IndexRoutes: FC = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="sign_up" element={<RegistrationForm />} />
+      <Route path="login" element={<LoginForm />} />
       <Route path="*" element={<Home />} />
     </Routes>
   );
