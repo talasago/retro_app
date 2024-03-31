@@ -1,4 +1,6 @@
 import type { FC } from 'react';
+import axios from 'axios';
+import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import AppBar from '@mui/material/AppBar';
@@ -23,6 +25,9 @@ const Header: FC = () => {
           <Link component={RouterLink} to={ROUTES_LISTS.LOGIN} color="inherit">
             ログイン
           </Link>
+          <Link color="inherit" onClick={handleLogout}>
+            ログアウト
+          </Link>
         </Toolbar>
       </AppBar>
     </Box>
@@ -31,3 +36,13 @@ const Header: FC = () => {
 // TODO:ログイン済みかどうかでヘッダー表示を変更する
 
 export default Header;
+
+const handleLogout = async () => {
+  return await axios.post(LOGOUT_URL);
+  // TODO:POSTするときのデータは後で実装
+  // return await axios.post(LOGOUT_URL, data, {
+  //  headers: {
+  //    'Content-Type': 'application/json',
+  //  },
+  // });
+};
