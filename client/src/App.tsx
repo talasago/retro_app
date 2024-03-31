@@ -1,17 +1,19 @@
 import type { FC } from 'react';
 import { Helmet } from 'react-helmet-async';
-
-import RegistrationForm from './features/SignUp/components/container/RegistrationForm';
+import IndexRoutes from 'routes';
+import Header from 'components/container/Header';
+import Providers from './Providers';
 
 const appTitle = import.meta.env.VITE_APP_TITLE;
 
 const App: FC = () => (
-  <div>
+  <Providers>
     <Helmet>
       <title>{appTitle}</title>
     </Helmet>
-    <RegistrationForm />
-  </div>
+    <Header />
+    <IndexRoutes />
+  </Providers>
 );
 
 export default App;
