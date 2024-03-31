@@ -2,13 +2,13 @@ import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Home from '../components/presenter/Home';
-import RegistrationForm from '../features/SignUp/components/container/RegistrationForm';
 import LoginForm from '../features/Login/components/container/LoginForm';
+import RegistrationForm from '../features/SignUp/components/container/RegistrationForm';
 
-export const ROUTES_LISTS = Object.freeze({
+export const ROUTES_LISTS = {
   SIGN_UP: 'sign_up',
   LOGIN: 'login',
-});
+} as const;
 
 const IndexRoutes: FC = () => {
   const { hash, pathname } = useLocation();
