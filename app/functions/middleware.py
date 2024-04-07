@@ -11,13 +11,14 @@ if is_local_execution():
 
 def add_cors_middleware(app: FastAPI):
     origins: list = os.environ["ORIGINS"].split(",")
-
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
         allow_credentials=True,
         allow_methods=("DELETE", "GET", "OPTIONS", "POST", "PUT"),
-        allow_headers=("Accept, Accept-Language, Content-Language, Content-Type"),
+        allow_headers=(
+            "Accept, Accept-Language, Content-Language, Content-Type, Authorization, accept"
+        ),
         # アクセスできるHTTPヘッダー情報
         expose_headers=["*"],
     )
