@@ -26,9 +26,9 @@ const RegistrationForm: FC = () => {
     useRegistrationForm();
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
-  const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
+  const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
     try {
-      const response = await loginUser(data);
+      const response = await loginUser(loginFormData);
 
       setAlert({ message: 'ログインが成功したで', type: 'success' });
       console.log('Response:', response.data);
@@ -72,10 +72,14 @@ const RegistrationForm: FC = () => {
 
 export default RegistrationForm;
 
-const loginUser = async (data: LoginFormSchema) => {
-  return await axios.post(LOGIN_URL, data, {
+const loginUser = async (requestBody: LoginFormSchema) => {
+  const params = new URLSearchParams();
+  params.append('username', requestBody.email);
+  params.append('password', requestBody.password);
+
+  return await axios.post(LOGIN_URL, params, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 };
