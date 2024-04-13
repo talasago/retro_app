@@ -1,11 +1,13 @@
 import type { FC } from 'react';
 import axios from 'axios';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
-import type { AppDispatch } from 'stores/store';
+import { authSlice } from 'stores/auth';
+import type { AuthState } from 'stores/auth';
+import type { RootState, AppDispatch } from 'stores/store';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -14,17 +16,17 @@ import Toolbar from '@mui/material/Toolbar';
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
+  const auth: AuthState = useSelector((state: RootState) => state.auth);
+  const { resetToken } = authSlice.actions;
 
   const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
-    // TODO:POSTするときのデータは後で実装
-
     event.preventDefault(); // リンクをクリックするとページの最上部にスクロールしないようにする
 
     try {
-      // ヘッダーデータは後で対応
-      const response = await axios.post(LOGOUT_URL, {
+      const response = await axios.post(LOGOUT_URL, '', {
         headers: {
-          'Content-Type': 'application/json',
+          accept: 'application/json',
+          Authorization: `Bearer ${auth.accessToken}`,
         },
       });
       dispatch(
@@ -34,6 +36,7 @@ const Header: FC = () => {
           severity: 'success',
         }),
       );
+      dispatch(resetToken());
       console.log('Response:', response.data);
     } catch (error) {
       dispatch(
@@ -57,6 +60,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.SIGN_UP}
             color="inherit"
             sx={{ margin: '10px' }}
+            hidden={auth.isLogined}
           >
             ユーザー登録
           </Link>
@@ -65,6 +69,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.LOGIN}
             color="inherit"
             sx={{ margin: '10px' }}
+            hidden={auth.isLogined}
           >
             ログイン
           </Link>
@@ -74,6 +79,7 @@ const Header: FC = () => {
             color="inherit"
             onClick={handleLogout}
             sx={{ margin: '10px' }}
+            hidden={!auth.isLogined}
           >
             ログアウト
           </Link>
@@ -82,6 +88,5 @@ const Header: FC = () => {
     </Box>
   );
 };
-// TODO:ログイン済みかどうかでヘッダー表示を変更する
 
 export default Header;
