@@ -15,10 +15,16 @@ import axios from 'axios';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { authSlice } from 'stores/auth';
+import type { AppDispatch } from 'stores/store';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
 const LoginForm: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { setToken } = authSlice.actions;
+
   const [alert, setAlert] = useState<{
     message: string | null;
     type: AlertColor;
@@ -40,6 +46,12 @@ const LoginForm: FC = () => {
     try {
       const response = await loginUser(loginFormData);
 
+      dispatch(
+        setToken({
+          accessToken: response.data.access_token,
+          refreshToken: response.data.refresh_token,
+        }),
+      );
       setAlert({ message: 'ログインが成功したで', type: 'success' });
       console.log('Response:', response.data);
     } catch (error) {
