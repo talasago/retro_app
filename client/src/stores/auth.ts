@@ -18,7 +18,7 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setToken: (state, action: PayloadAction<AuthState>) => {
-      state.isLogined = true;
+      state.isLogined = action.payload.isLogined;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
     },

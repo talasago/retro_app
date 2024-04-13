@@ -48,6 +48,7 @@ const LoginForm: FC = () => {
 
       dispatch(
         setToken({
+          isLogined: true,
           accessToken: response.data.access_token,
           refreshToken: response.data.refresh_token,
         }),

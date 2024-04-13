@@ -18,7 +18,7 @@ export const alertSlice = createSlice({
   initialState,
   reducers: {
     setAlert: (state, action: PayloadAction<AlertState>) => {
-      state.open = action.payload.open; // FIXME:ここtrue固定でいいはず
+      state.open = action.payload.open;
       state.message = action.payload.message;
       state.severity = action.payload.severity;
     },
