@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Helmet } from 'react-helmet-async';
 import IndexRoutes from 'routes';
+import Alert from 'components/container/Alert';
 import Header from 'components/container/Header';
 import Providers from './Providers';
 
@@ -13,6 +14,7 @@ const App: FC = () => (
     </Helmet>
     <Header />
     <IndexRoutes />
+    <Alert />
   </Providers>
 );
 

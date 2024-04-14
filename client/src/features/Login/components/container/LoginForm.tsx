@@ -1,53 +1,74 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
   Button,
   FormControl,
   TextField,
   FormHelperText,
-  Alert,
   CircularProgress,
 } from '@mui/material';
-import type { AlertColor } from '@mui/material';
 import axios from 'axios';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import type { SubmitHandler } from 'react-hook-form';
-import { useRegistrationForm } from '../../hooks/useLoginForm';
+import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { alertSlice } from 'stores/alert';
+import { authSlice } from 'stores/auth';
+import type { AppDispatch } from 'stores/store';
+import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
-const RegistrationForm: FC = () => {
-  const [alert, setAlert] = useState<{
-    message: string | null;
-    type: AlertColor;
-  }>({ message: null, type: 'success' });
+const LoginForm: FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { setToken } = authSlice.actions;
+  const { setAlert } = alertSlice.actions;
 
-  const { register, handleSubmit, errors, isSubmitting } =
-    useRegistrationForm();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormSchema>({
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+    shouldFocusError: true,
+    resolver: yupResolver(loginFormSchema),
+  });
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
-  const onSubmit: SubmitHandler<LoginFormSchema> = async (data) => {
+  const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
     try {
-      const response = await loginUser(data);
+      const response = await loginUser(loginFormData);
 
-      setAlert({ message: 'ログインが成功したで', type: 'success' });
+      dispatch(
+        setToken({
+          isLogined: true,
+          accessToken: response.data.access_token,
+          refreshToken: response.data.refresh_token,
+        }),
+      );
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインが成功したで',
+          severity: 'success',
+        }),
+      );
       console.log('Response:', response.data);
     } catch (error) {
-      setAlert({ message: 'ログインAPIエラーになってるで', type: 'error' });
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインAPIがエラーになってるで',
+          severity: 'error',
+        }),
+      );
       console.error('Error:', error);
     }
   };
 
   return (
     <Box padding={3}>
-      {
-        // アラートはformではなくもっと上位のコンポーネントに実装してもいいかも。共通的に使うものだし。
-      }
-      {alert.message !== null && !isSubmitting && (
-        <Alert severity={alert.type} sx={{ mb: 3 }}>
-          {alert.message}
-        </Alert>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
           <FormControl error={errors.email !== undefined}>
@@ -70,12 +91,16 @@ const RegistrationForm: FC = () => {
   );
 };
 
-export default RegistrationForm;
+export default LoginForm;
 
-const loginUser = async (data: LoginFormSchema) => {
-  return await axios.post(LOGIN_URL, data, {
+const loginUser = async (requestBody: LoginFormSchema) => {
+  const params = new URLSearchParams();
+  params.append('username', requestBody.email);
+  params.append('password', requestBody.password);
+
+  return await axios.post(LOGIN_URL, params, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
 };

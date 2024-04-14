@@ -26,7 +26,7 @@ class TokenApiResponseBody(BaseModel):
         examples=["ログインしました"],
     )
     name: str = Field(description="ユーザー名", examples=["test_user"])
-    token_type: str = Field(description="トークンタイプ", examples=["test_user"])
+    token_type: str = Field(description="トークンタイプ", examples=["bearer"])
     access_token: str = Field(description="アクセストークン")
     refresh_token: str = Field(description="リフレッシュトークン")
 
