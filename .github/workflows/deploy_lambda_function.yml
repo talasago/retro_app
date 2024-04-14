@@ -75,3 +75,7 @@ jobs:
         pipenv requirements > requirements.txt
         npx sls deploy
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
+
+    - name: Debug
+      if: ${{ always() }}
+      uses: mxschmitt/action-tmate@v3.17
