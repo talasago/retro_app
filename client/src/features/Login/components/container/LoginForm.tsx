@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import {
   Box,
@@ -7,15 +6,14 @@ import {
   FormControl,
   TextField,
   FormHelperText,
-  Alert,
   CircularProgress,
 } from '@mui/material';
-import type { AlertColor } from '@mui/material';
 import axios from 'axios';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
+import { alertSlice } from 'stores/alert';
 import { authSlice } from 'stores/auth';
 import type { AppDispatch } from 'stores/store';
 import { loginFormSchema } from '../schemas/loginFormSchema';
@@ -24,11 +22,7 @@ import type { LoginFormSchema } from '../schemas/loginFormSchema';
 const LoginForm: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setToken } = authSlice.actions;
-
-  const [alert, setAlert] = useState<{
-    message: string | null;
-    type: AlertColor;
-  }>({ message: null, type: 'success' });
+  const { setAlert } = alertSlice.actions;
 
   const {
     register,
@@ -53,24 +47,28 @@ const LoginForm: FC = () => {
           refreshToken: response.data.refresh_token,
         }),
       );
-      setAlert({ message: 'ログインが成功したで', type: 'success' });
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインが成功したで',
+          severity: 'success',
+        }),
+      );
       console.log('Response:', response.data);
     } catch (error) {
-      setAlert({ message: 'ログインAPIエラーになってるで', type: 'error' });
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインAPIがエラーになってるで',
+          severity: 'error',
+        }),
+      );
       console.error('Error:', error);
     }
   };
 
   return (
     <Box padding={3}>
-      {
-        // アラートはformではなくもっと上位のコンポーネントに実装してもいいかも。共通的に使うものだし。
-      }
-      {alert.message !== null && !isSubmitting && (
-        <Alert severity={alert.type} sx={{ mb: 3 }}>
-          {alert.message}
-        </Alert>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
           <FormControl error={errors.email !== undefined}>

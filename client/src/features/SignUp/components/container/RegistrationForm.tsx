@@ -1,26 +1,24 @@
 import type { FC } from 'react';
-import { useState } from 'react';
 import {
   Box,
   Button,
   FormControl,
   TextField,
   FormHelperText,
-  Alert,
   CircularProgress,
 } from '@mui/material';
-import type { AlertColor } from '@mui/material';
 import axios from 'axios';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import type { SubmitHandler } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { alertSlice } from 'stores/alert';
+import type { AppDispatch } from 'stores/store';
 import { useRegistrationForm } from '../../hooks/useRegistrationForm';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
 const RegistrationForm: FC = () => {
-  const [alert, setAlert] = useState<{
-    message: string | null;
-    type: AlertColor;
-  }>({ message: null, type: 'success' });
+  const { setAlert } = alertSlice.actions;
+  const dispatch = useDispatch<AppDispatch>();
 
   const { register, handleSubmit, errors, isSubmitting } =
     useRegistrationForm();
@@ -29,25 +27,28 @@ const RegistrationForm: FC = () => {
   const onSubmit: SubmitHandler<RegistrationFormSchema> = async (data) => {
     try {
       const response = await registUser(data);
-
-      setAlert({ message: 'ユーザー登録が成功したで', type: 'success' });
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ユーザー登録が成功したで',
+          severity: 'success',
+        }),
+      );
       console.log('Response:', response.data);
     } catch (error) {
-      setAlert({ message: 'ユーザー登録APIエラーになってるで', type: 'error' });
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ユーザー登録APIがエラーになってるで',
+          severity: 'error',
+        }),
+      );
       console.error('Error:', error);
     }
   };
 
   return (
     <Box padding={3}>
-      {
-        // アラートはformではなくもっと上位のコンポーネントに実装してもいいかも。共通的に使うものだし。
-      }
-      {alert.message !== null && !isSubmitting && (
-        <Alert severity={alert.type} sx={{ mb: 3 }}>
-          {alert.message}
-        </Alert>
-      )}
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
           <FormControl error={errors.email !== undefined}>
