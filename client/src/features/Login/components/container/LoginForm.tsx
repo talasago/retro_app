@@ -76,7 +76,11 @@ const LoginForm: FC = () => {
             <FormHelperText>{errors.email?.message}</FormHelperText>
           </FormControl>
           <FormControl error={errors.password !== undefined}>
-            <TextField label="パスワード" {...register('password')} />
+            <TextField
+              label="パスワード"
+              {...register('password')}
+              type="password"
+            />
             <FormHelperText>{errors.password?.message}</FormHelperText>
           </FormControl>
           {

@@ -60,7 +60,11 @@ const RegistrationForm: FC = () => {
             <FormHelperText>{errors.name?.message}</FormHelperText>
           </FormControl>
           <FormControl error={errors.password !== undefined}>
-            <TextField label="パスワード" {...register('password')} />
+            <TextField
+              label="パスワード"
+              {...register('password')}
+              type="password"
+            />
             <FormHelperText>{errors.password?.message}</FormHelperText>
           </FormControl>
           {
