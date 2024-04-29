@@ -8,6 +8,14 @@ import { AppDispatch } from 'stores/store';
 import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 
+// TODO: レスポンス定義のinterfaceを作成する
+// swaggerからうまく連動できないものかなあ
+
+const GENERIC_ERROR_MESSAGE =
+  'エラーが発生しました。時間をおいて再実行してください。';
+const EXPIRED_TOKEN_MESSAGE =
+  'ログイン有効期間を過ぎています。再度ログインしてください。';
+
 export const useProtectedApi = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -19,7 +27,9 @@ export const useProtectedApi = () => {
     method: Method,
     data = '',
   ): Promise<[AxiosResponse<any, any> | null, Error | null]> => {
-    // await/catchの方が良いかもなあ。それかthenとかcatchの方が居良いかも
+    // HACK: try/catchが多すぎて、何とかしたい...
+    // 先にテスト書いておいた方が良さげ
+
     try {
       const response = await axios({
         method,
@@ -31,13 +41,7 @@ export const useProtectedApi = () => {
       return [response, null];
     } catch (error) {
       if (!isTokenExpired(error)) {
-        return [
-          null,
-          new Error(
-            'エラーが発生しました。時間をおいて再実行してください。',
-            error as Error,
-          ),
-        ];
+        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
       }
 
       let updatedAccessToken: string = '';
@@ -49,25 +53,13 @@ export const useProtectedApi = () => {
         );
       } catch (error) {
         if (!isTokenExpired(error)) {
-          return [
-            null,
-            new Error(
-              'エラーが発生しました。時間をおいて再実行してください。',
-              error as Error,
-            ),
-          ];
+          return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
         }
 
         dispatch(resetToken());
         navigate('/login');
 
-        return [
-          null,
-          new Error(
-            'ログイン有効期間を過ぎています。再度ログインしてください。',
-            error as Error,
-          ),
-        ];
+        return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
       }
 
       try {
@@ -80,13 +72,7 @@ export const useProtectedApi = () => {
 
         return [response, null];
       } catch (error) {
-        return [
-          null,
-          new Error(
-            'エラーが発生しました。時間をおいて再実行してください。',
-            error as Error,
-          ),
-        ];
+        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
       }
     }
   };
@@ -99,8 +85,7 @@ const isTokenExpired = (error: unknown): boolean => {
     axios.isAxiosError(error) &&
     error.response?.status === 401 &&
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    error.response?.data?.detail ===
-      'ログイン有効期間を過ぎています。再度ログインしてください。'
+    error.response?.data?.detail === EXPIRED_TOKEN_MESSAGE
   );
 };
 
