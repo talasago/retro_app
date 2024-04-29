@@ -1,8 +1,7 @@
 import type { FC } from 'react';
-import axios from 'axios';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
 import { authSlice } from 'stores/auth';
@@ -12,42 +11,41 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
+import { useProtectedApi } from 'hooks/useProtectedApi';
 
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
   const auth: AuthState = useSelector((state: RootState) => state.auth);
   const { resetToken } = authSlice.actions;
+  const callProtectedApi = useProtectedApi();
 
   const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault(); // リンクをクリックするとページの最上部にスクロールしないようにする
 
-    try {
-      const response = await axios.post(LOGOUT_URL, '', {
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${auth.accessToken}`,
-        },
-      });
+    const [response, error] = await callProtectedApi(LOGOUT_URL, 'POST');
+
+    if (error) {
       dispatch(
         setAlert({
           open: true,
-          message: 'ログアウトが成功したで',
-          severity: 'success',
-        }),
-      );
-      dispatch(resetToken());
-      console.log('Response:', response.data);
-    } catch (error) {
-      dispatch(
-        setAlert({
-          open: true,
-          message: 'ログアウトAPIエラーになってるで',
+          message: error.message,
           severity: 'error',
         }),
       );
       console.error('Error:', error);
+      return;
     }
+
+    dispatch(
+      setAlert({
+        open: true,
+        message: 'ログアウトが成功したで',
+        severity: 'success',
+      }),
+    );
+    dispatch(resetToken());
+    console.log('Response:', response?.data);
   };
 
   return (
