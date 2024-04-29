@@ -30,7 +30,7 @@ const RegistrationForm: FC = () => {
       dispatch(
         setAlert({
           open: true,
-          message: 'ユーザー登録が成功したで',
+          message: 'ユーザー登録が成功しました。ログイン画面でログインしてください。',
           severity: 'success',
         }),
       );

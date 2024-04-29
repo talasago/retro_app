@@ -1,12 +1,7 @@
-import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import type { AuthState } from 'stores/auth';
-import { authSlice } from 'stores/auth';
-import type { RootState, AppDispatch } from 'stores/store';
-
+import { AuthToken } from 'utils/AuthToken';
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 
@@ -14,6 +9,7 @@ const GENERIC_ERROR_MESSAGE =
   'エラーが発生しました。時間をおいて再実行してください。';
 const EXPIRED_TOKEN_MESSAGE =
   'ログイン有効期間を過ぎています。再度ログインしてください。';
+const NOT_LOGINED_MESSAGE = 'ログインしてください。';
 
 export const useProtectedApi = (): ((
   url: string,
@@ -21,9 +17,6 @@ export const useProtectedApi = (): ((
   data?: string,
 ) => Promise<[AxiosResponse | null, Error | null]>) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const auth: AuthState = useSelector((state: RootState) => state.auth);
-  const { resetToken, setToken } = authSlice.actions;
 
   const callProtectedApi = async (
     url: string,
@@ -33,12 +26,22 @@ export const useProtectedApi = (): ((
     // HACK: try/catchが多すぎて、何とかしたい...
     // 先にテスト書いておいた方が良さげ
 
+    if (!AuthToken.isLoginedCheck()) {
+      return [null, new Error(NOT_LOGINED_MESSAGE)];
+    }
+
+    const tokens = AuthToken.getTokens();
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const accessToken = tokens.accessToken!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const refreshToken = tokens.refreshToken!;
+
     try {
       const response = await axios({
         method,
         url,
         data,
-        headers: apiHeaders(auth.accessToken),
+        headers: apiHeaders(accessToken),
       });
 
       return [response, null];
@@ -49,17 +52,13 @@ export const useProtectedApi = (): ((
 
       let updatedAccessToken: string = '';
       try {
-        updatedAccessToken = await updateTokenUseRefreshToken(
-          auth.refreshToken,
-          dispatch,
-          setToken,
-        );
+        updatedAccessToken = await updateTokenUseRefreshToken(refreshToken);
       } catch (error) {
         if (!isTokenExpired(error)) {
           return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
         }
 
-        dispatch(resetToken());
+        AuthToken.resetTokens();
         navigate('/login');
 
         return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
@@ -101,26 +100,14 @@ const apiHeaders = (token: string) => {
 
 const updateTokenUseRefreshToken = async (
   refreshToken: string,
-  dispatch: AppDispatch,
-  setToken: ActionCreatorWithPayload<AuthState, 'auth/setToken'>,
 ): Promise<string> => {
-  let updatedAccessToken = '';
-
   const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
     headers: apiHeaders(refreshToken),
   });
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  updatedAccessToken = responseRefToken.data.access_token;
+  const updatedAccessToken: string = responseRefToken.data.access_token;
 
-  dispatch(
-    setToken({
-      isLogined: true,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      accessToken: responseRefToken.data.access_token,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-      refreshToken: responseRefToken.data.refresh_token,
-    }),
-  );
+  AuthToken.setTokens(updatedAccessToken, refreshToken);
 
   return updatedAccessToken;
 };
