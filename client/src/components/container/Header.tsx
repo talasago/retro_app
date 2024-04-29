@@ -1,7 +1,8 @@
 import type { FC } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
+import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
 import { authSlice } from 'stores/auth';
@@ -11,7 +12,6 @@ import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
-import { useProtectedApi } from 'hooks/useProtectedApi';
 
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,6 +34,7 @@ const Header: FC = () => {
         }),
       );
       console.error('Error:', error);
+
       return;
     }
 
