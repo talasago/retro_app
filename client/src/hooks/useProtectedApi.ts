@@ -1,12 +1,11 @@
-import { useNavigate } from 'react-router-dom'; // react-routerからuseNavigateをインポート
-import type { AuthState } from 'stores/auth';
-import type { RootState } from 'stores/store';
-import axios, { Method, AxiosResponse } from 'axios';
-import { useDispatch, useSelector } from 'react-redux';
-import { authSlice } from 'stores/auth';
-import { AppDispatch } from 'stores/store';
-import { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import type { AuthState } from 'stores/auth';
+import { authSlice } from 'stores/auth';
+import type { RootState, AppDispatch } from 'stores/store';
 
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
@@ -16,7 +15,11 @@ const GENERIC_ERROR_MESSAGE =
 const EXPIRED_TOKEN_MESSAGE =
   'ログイン有効期間を過ぎています。再度ログインしてください。';
 
-export const useProtectedApi = () => {
+export const useProtectedApi = (): ((
+  url: string,
+  method: Method,
+  data?: string,
+) => Promise<[AxiosResponse | null, Error | null]>) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const auth: AuthState = useSelector((state: RootState) => state.auth);
@@ -26,7 +29,7 @@ export const useProtectedApi = () => {
     url: string,
     method: Method,
     data = '',
-  ): Promise<[AxiosResponse<any, any> | null, Error | null]> => {
+  ): Promise<[AxiosResponse | null, Error | null]> => {
     // HACK: try/catchが多すぎて、何とかしたい...
     // 先にテスト書いておいた方が良さげ
 
