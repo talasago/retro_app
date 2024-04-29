@@ -14,14 +14,13 @@ import type { SubmitHandler } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
-import { authSlice } from 'stores/auth';
 import type { AppDispatch } from 'stores/store';
+import { setTokens } from 'utils/auth';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
 const LoginForm: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { setToken } = authSlice.actions;
   const { setAlert } = alertSlice.actions;
 
   const {
@@ -40,13 +39,8 @@ const LoginForm: FC = () => {
     try {
       const response = await loginUser(loginFormData);
 
-      dispatch(
-        setToken({
-          isLogined: true,
-          accessToken: response.data.access_token,
-          refreshToken: response.data.refresh_token,
-        }),
-      );
+      setTokens(response.data.access_token, response.data.refresh_token);
+
       dispatch(
         setAlert({
           open: true,

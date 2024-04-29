@@ -1,13 +1,12 @@
 import type { FC } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
-import { authSlice } from 'stores/auth';
-import type { AuthState } from 'stores/auth';
-import type { RootState, AppDispatch } from 'stores/store';
+import type { AppDispatch } from 'stores/store';
+import { resetTokens, isLogined } from 'utils/auth';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -16,8 +15,7 @@ import Toolbar from '@mui/material/Toolbar';
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
-  const auth: AuthState = useSelector((state: RootState) => state.auth);
-  const { resetToken } = authSlice.actions;
+
   const callProtectedApi = useProtectedApi();
 
   const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
@@ -45,10 +43,11 @@ const Header: FC = () => {
         severity: 'success',
       }),
     );
-    dispatch(resetToken());
+    resetTokens();
     console.log('Response:', response?.data);
   };
 
+  // FIXME:クッキーが変わっても、動的に表示非表示を変えてくれない
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -59,7 +58,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.SIGN_UP}
             color="inherit"
             sx={{ margin: '10px' }}
-            hidden={auth.isLogined}
+            hidden={isLogined()}
           >
             ユーザー登録
           </Link>
@@ -68,7 +67,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.LOGIN}
             color="inherit"
             sx={{ margin: '10px' }}
-            hidden={auth.isLogined}
+            hidden={isLogined()}
           >
             ログイン
           </Link>
@@ -78,7 +77,7 @@ const Header: FC = () => {
             color="inherit"
             onClick={handleLogout}
             sx={{ margin: '10px' }}
-            hidden={!auth.isLogined}
+            hidden={!isLogined()}
           >
             ログアウト
           </Link>
