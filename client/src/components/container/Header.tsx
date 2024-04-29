@@ -6,7 +6,8 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
-import { resetTokens, isLogined } from 'utils/auth';
+import { resetTokens, useAuthTokenObserver } from 'utils/auth';
+
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
@@ -15,8 +16,8 @@ import Toolbar from '@mui/material/Toolbar';
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
-
   const callProtectedApi = useProtectedApi();
+  const isLogined: boolean = useAuthTokenObserver() as boolean;
 
   const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault(); // リンクをクリックするとページの最上部にスクロールしないようにする
@@ -47,7 +48,6 @@ const Header: FC = () => {
     console.log('Response:', response?.data);
   };
 
-  // FIXME:クッキーが変わっても、動的に表示非表示を変えてくれない
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
@@ -58,7 +58,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.SIGN_UP}
             color="inherit"
             sx={{ margin: '10px' }}
-            hidden={isLogined()}
+            hidden={isLogined}
           >
             ユーザー登録
           </Link>
@@ -67,7 +67,7 @@ const Header: FC = () => {
             to={ROUTES_LISTS.LOGIN}
             color="inherit"
             sx={{ margin: '10px' }}
-            hidden={isLogined()}
+            hidden={isLogined}
           >
             ログイン
           </Link>
@@ -77,7 +77,7 @@ const Header: FC = () => {
             color="inherit"
             onClick={handleLogout}
             sx={{ margin: '10px' }}
-            hidden={!isLogined()}
+            hidden={!isLogined}
           >
             ログアウト
           </Link>
