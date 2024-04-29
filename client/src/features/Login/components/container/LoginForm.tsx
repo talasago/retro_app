@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
-import { setTokens } from 'utils/auth';
+import { AuthToken } from 'utils/AuthToken';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
@@ -39,7 +39,10 @@ const LoginForm: FC = () => {
     try {
       const response = await loginUser(loginFormData);
 
-      setTokens(response.data.access_token, response.data.refresh_token);
+      AuthToken.setTokens(
+        response.data.access_token,
+        response.data.refresh_token,
+      );
 
       dispatch(
         setAlert({

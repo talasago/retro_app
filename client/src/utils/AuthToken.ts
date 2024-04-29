@@ -25,6 +25,7 @@ export class AuthTokenSubject {
 // Create a single instance of AuthTokenSubject
 const authTokenSubject = new AuthTokenSubject();
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
   /**
@@ -33,7 +34,7 @@ export class AuthToken {
    */
 
   static isLoginedCheck(): boolean {
-    const { accessToken, refreshToken } = getTokens();
+    const { accessToken, refreshToken } = this.getTokens();
 
     return !(
       accessToken === null ||
@@ -80,7 +81,7 @@ export class AuthToken {
     authTokenSubject.notifyObservers();
   }
 
-  resetTokens(): void {
+  static resetTokens(): void {
     Cookies.remove('accessToken');
     Cookies.remove('refreshToken');
 
@@ -118,62 +119,3 @@ export function useAuthTokenObserver(): boolean {
 
   return isLogined;
 }
-
-/**
- * Checks if the user is logged in.
- * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
- */
-export const isLoginedCheck = (): boolean => {
-  const { accessToken, refreshToken } = getTokens();
-
-  return !(
-    accessToken === null ||
-    refreshToken === null ||
-    accessToken === '' ||
-    refreshToken === '' ||
-    accessToken === undefined ||
-    refreshToken === undefined
-  );
-};
-
-export const getTokens = (): {
-  accessToken: string | undefined;
-  refreshToken: string | undefined;
-} => {
-  return {
-    accessToken: Cookies.get('accessToken'),
-    refreshToken: Cookies.get('refreshToken'),
-  };
-};
-
-export const setTokens = (accessToken: string, refreshToken: string): void => {
-  const accessTokenExpireDateAfter10Minutes = new Date(
-    new Date().getTime() + 10 * 60 * 1000,
-  );
-  const REFRESH_TOKEN_EXPIRE_DAYS = 10;
-
-  Cookies.set('accessToken', accessToken, {
-    expires: accessTokenExpireDateAfter10Minutes,
-    path: '/',
-    // domain: // TODO: 本番公開前までに修正する
-    secure: true,
-    sameSite: 'Strict',
-  });
-
-  Cookies.set('refreshToken', refreshToken, {
-    expires: REFRESH_TOKEN_EXPIRE_DAYS,
-    path: '/',
-    // domain: '*', // TODO: 本番公開前までに修正する
-    secure: true,
-    sameSite: 'Strict',
-  });
-
-  authTokenSubject.notifyObservers();
-};
-
-export const resetTokens = (): void => {
-  Cookies.remove('accessToken');
-  Cookies.remove('refreshToken');
-
-  authTokenSubject.notifyObservers();
-};

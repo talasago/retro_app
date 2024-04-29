@@ -1,7 +1,7 @@
 import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 import { useNavigate } from 'react-router-dom';
-import { setTokens, isLoginedCheck, resetTokens, getTokens } from 'utils/auth';
+import { AuthToken } from 'utils/AuthToken';
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 
@@ -26,11 +26,11 @@ export const useProtectedApi = (): ((
     // HACK: try/catchが多すぎて、何とかしたい...
     // 先にテスト書いておいた方が良さげ
 
-    if (!isLoginedCheck()) {
+    if (!AuthToken.isLoginedCheck()) {
       return [null, new Error(NOT_LOGINED_MESSAGE)];
     }
 
-    const tokens = getTokens();
+    const tokens = AuthToken.getTokens();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const accessToken = tokens.accessToken!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -58,7 +58,7 @@ export const useProtectedApi = (): ((
           return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
         }
 
-        resetTokens();
+        AuthToken.resetTokens();
         navigate('/login');
 
         return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
@@ -107,7 +107,7 @@ const updateTokenUseRefreshToken = async (
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
   const updatedAccessToken: string = responseRefToken.data.access_token;
 
-  setTokens(updatedAccessToken, refreshToken);
+  AuthToken.setTokens(updatedAccessToken, refreshToken);
 
   return updatedAccessToken;
 };

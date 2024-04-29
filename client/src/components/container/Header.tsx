@@ -6,12 +6,12 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
-import { resetTokens, useAuthTokenObserver } from 'utils/auth';
 
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Toolbar from '@mui/material/Toolbar';
+import { AuthToken, useAuthTokenObserver } from 'utils/AuthToken';
 
 const Header: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -44,7 +44,7 @@ const Header: FC = () => {
         severity: 'success',
       }),
     );
-    resetTokens();
+    AuthToken.resetTokens();
     console.log('Response:', response?.data);
   };
 
