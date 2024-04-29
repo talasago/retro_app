@@ -1,13 +1,14 @@
-import Cookies from 'js-cookie';
+// TODO: Singletonパターンのオブジェクトにしてもいいかも??
 
-const accessToken: string | undefined = Cookies.get('accessToken');
-const refreshToken: string | undefined = Cookies.get('refreshToken');
+import Cookies from 'js-cookie';
 
 /**
  * Checks if the user is logged in.
  * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
  */
-export const isLogined = (): boolean => {
+export const isLoginedCheck = (): boolean => {
+  const { accessToken, refreshToken } = getTokens();
+
   return !(
     accessToken === null ||
     refreshToken === null ||
@@ -16,6 +17,16 @@ export const isLogined = (): boolean => {
     accessToken === undefined ||
     refreshToken === undefined
   );
+};
+
+export const getTokens = (): {
+  accessToken: string | undefined;
+  refreshToken: string | undefined;
+} => {
+  return {
+    accessToken: Cookies.get('accessToken'),
+    refreshToken: Cookies.get('refreshToken'),
+  };
 };
 
 export const setTokens = (accessToken: string, refreshToken: string): void => {

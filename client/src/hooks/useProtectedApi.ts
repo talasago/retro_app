@@ -1,8 +1,7 @@
 import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
-import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import { setTokens, isLogined, resetTokens } from 'utils/auth';
+import { setTokens, isLoginedCheck, resetTokens, getTokens } from 'utils/auth';
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 
@@ -27,13 +26,15 @@ export const useProtectedApi = (): ((
     // HACK: try/catchが多すぎて、何とかしたい...
     // 先にテスト書いておいた方が良さげ
 
-    if (!isLogined()) {
+    if (!isLoginedCheck()) {
       return [null, new Error(NOT_LOGINED_MESSAGE)];
     }
+
+    const tokens = getTokens();
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const accessToken: string = Cookies.get('accessToken')!;
+    const accessToken = tokens.accessToken!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const refreshToken: string = Cookies.get('refreshToken')!;
+    const refreshToken = tokens.refreshToken!;
 
     try {
       const response = await axios({
