@@ -37,7 +37,7 @@ export const useProtectedApi = (): ((
     const refreshToken = tokens.refreshToken!;
 
     try {
-      const response = await axios({
+      const response = await axios.request({
         method,
         url,
         data,

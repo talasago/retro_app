@@ -1,6 +1,11 @@
 import { type ReactNode } from 'react';
 import { renderHook } from '@testing-library/react';
-import axios, { type AxiosResponse, type Method } from 'axios';
+import axios, {
+  type AxiosResponse,
+  type Method,
+  type InternalAxiosRequestConfig,
+  type AxiosResponseHeaders,
+} from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthToken } from 'utils/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
@@ -54,33 +59,37 @@ describe('#useProtectedApi', () => {
     });
   });
 
-  //  it.skip('should return response and error when API call is successful', async () => {
-  //    const mockResponse: AxiosResponse = {
-  //      data: {},
-  //      status: 200,
-  //      statusText: 'OK',
-  //      headers: {},
-  //      config: {},
-  //    };
-  //
-  //    mockIsLoginedCheck.mockReturnValue(true);
-  //    mockGetTokens.mockReturnValue({
-  //      accessToken: mockAccessToken,
-  //      refreshToken: mockRefreshToken,
-  //    });
-  //    axios.mockResolvedValue(mockResponse);
-  //
-  //    const { result } = renderHook(() => useProtectedApi());
-  //
-  //    const [response, error] = await result.current(
-  //      'https://api.example.com',
-  //      'GET',
-  //    );
-  //
-  //    expect(response).toEqual(mockResponse);
-  //    expect(error).toBeNull();
-  //  });
-  //
+  describe('When user is logged in', () => {
+    beforeAll(() => {
+      jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => true);
+    });
+
+    describe('When accessToken has not expired', () => {
+      it('Response have result and error must be null', async () => {
+        const mockResponse: AxiosResponse = {
+          data: {},
+          status: 200,
+          statusText: 'OK',
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          headers: {} as AxiosResponseHeaders,
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          config: {} as InternalAxiosRequestConfig,
+        };
+        jest
+          .spyOn(axios, 'request')
+          .mockImplementation(async () => await Promise.resolve(mockResponse));
+
+        const [response, error] = await callProtectedApi(
+          'https://api.example.com',
+          'POST',
+        );
+
+        expect(response).toEqual(mockResponse);
+        expect(error).toBeNull();
+      });
+    });
+  });
+
   //  it.skip('should return error when API call fails with non-expired token', async () => {
   //    const mockError = new Error('API call failed');
   //
