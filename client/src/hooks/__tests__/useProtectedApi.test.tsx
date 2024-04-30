@@ -1,11 +1,9 @@
 import { type ReactNode } from 'react';
 import { renderHook } from '@testing-library/react';
-
 import axios, { type AxiosResponse } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { AuthToken } from 'utils/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
-
-jest.mock('axios');
 
 describe('#useProtectedApi', () => {
   const mockIsLoginedCheck = jest.fn();
@@ -28,16 +26,11 @@ describe('#useProtectedApi', () => {
   beforeEach(() => {
     // jest.clearAllMocks();
     // jest.resetModules();
-
-    jest.mock('utils/AuthToken', () => ({
-      // isLoginedCheck: mockIsLoginedCheck,
-      getTokens: mockGetTokens,
-      resetTokens: mockResetTokens,
-      updateTokenUseRefreshToken: mockUpdateTokenUseRefreshToken,
-    }));
   });
 
   it('should return response and error as null when user is not logged in', async () => {
+    jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => false);
+
     const wrapper = ({ children }: { children: ReactNode }) => (
       <Router>{children}</Router>
     );
