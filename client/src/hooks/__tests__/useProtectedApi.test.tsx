@@ -12,28 +12,11 @@ import { AuthToken } from 'domains/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
 
 describe('#useProtectedApi', () => {
-  const mockIsLoginedCheck = jest.fn();
-  const mockGetTokens = jest.fn();
-  const mockResetTokens = jest.fn();
-  const mockUpdateTokenUseRefreshToken = jest.fn();
-
-  const mockAccessToken = 'mockAccessToken';
-  const mockRefreshToken = 'mockRefreshToken';
-
-  const NOT_LOGINED_MESSAGE = 'Not logged in';
-  const GENERIC_ERROR_MESSAGE = 'Generic error';
-  const EXPIRED_TOKEN_MESSAGE = 'Expired token';
-
   let callProtectedApi: (
     url: string,
     method: Method,
     data?: string | undefined,
   ) => Promise<[AxiosResponse | null, Error | null]>;
-
-  // beforeAll(() => {
-  //   jest.spyOn(window, 'alert').mockImplementation(() => {});
-  //   jest.spyOn(console, 'error').mockImplementation(() => {});
-  // });
 
   beforeAll(() => {
     const wrapper = ({ children }: { children: ReactNode }) => (
