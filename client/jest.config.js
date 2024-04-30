@@ -8,11 +8,12 @@ module.exports = {
       },
     ],
   },
-  extensionsToTreatAsEsm: ['.ts'],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   moduleNameMapper: {
     '^src/(.*)$': '<rootDir>/src/$1',
     '^domains/(.*)$': '<rootDir>/src/domains/$1',
     '^utils/(.*)$': '<rootDir>/src/utils/$1',
   },
   setupFiles: ['<rootDir>/jestSetup.ts'],
+  testEnvironment: 'jsdom',
 };
