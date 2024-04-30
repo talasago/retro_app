@@ -7,11 +7,6 @@ import { useProtectedApi } from '../useProtectedApi';
 
 jest.mock('axios');
 
-const mockNavigate = jest.fn();
-jest.mock('react-router-dom', () => ({
-  useNavigate: () => mockNavigate,
-}));
-
 describe('#useProtectedApi', () => {
   const mockIsLoginedCheck = jest.fn();
   const mockGetTokens = jest.fn();
