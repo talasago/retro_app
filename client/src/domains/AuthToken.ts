@@ -36,20 +36,18 @@ export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
   static readonly ACCESS_TOKEN_KEY = 'accessToken';
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
+
   /**
    * Checks if the user is logged in.
    * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
    */
-
   static isLoginedCheck(): boolean {
-    const { accessToken, refreshToken } = this.getTokens();
+    const { refreshToken } = this.getTokens();
 
+    // accessTokenが先に有効期限切れになる。refreshTokenの有無で、ログイン状態かどうかを判断する。
     return !(
-      accessToken === null ||
       refreshToken === null ||
-      accessToken === '' ||
       refreshToken === '' ||
-      accessToken === undefined ||
       refreshToken === undefined
     );
   }
@@ -65,13 +63,13 @@ export class AuthToken {
   }
 
   static setTokens(accessToken: string, refreshToken: string): void {
-    const accessTokenExpireDateAfter10Minutes = new Date(
-      new Date().getTime() + 10 * 60 * 1000,
+    const accessTokenExpireDateAfter9Minutes = new Date(
+      new Date().getTime() + 9 * 60 * 1000,
     );
     const REFRESH_TOKEN_EXPIRE_DAYS = 10;
 
     Cookies.set(this.ACCESS_TOKEN_KEY, accessToken, {
-      expires: accessTokenExpireDateAfter10Minutes,
+      expires: accessTokenExpireDateAfter9Minutes,
       path: '/',
       // domain: // TODO: 本番公開前までに修正する
       secure: true,
