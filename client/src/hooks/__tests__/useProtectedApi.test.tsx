@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
 import { renderHook } from '@testing-library/react';
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse, type Method } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthToken } from 'utils/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
@@ -18,34 +18,40 @@ describe('#useProtectedApi', () => {
   const GENERIC_ERROR_MESSAGE = 'Generic error';
   const EXPIRED_TOKEN_MESSAGE = 'Expired token';
 
+  let callProtectedApi: (
+    url: string,
+    method: Method,
+    data?: string | undefined,
+  ) => Promise<[AxiosResponse | null, Error | null]>;
+
   // beforeAll(() => {
   //   jest.spyOn(window, 'alert').mockImplementation(() => {});
   //   jest.spyOn(console, 'error').mockImplementation(() => {});
   // });
 
-  beforeEach(() => {
-    // jest.clearAllMocks();
-    // jest.resetModules();
-  });
-
-  it('should return response and error as null when user is not logged in', async () => {
-    jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => false);
-
+  beforeAll(() => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <Router>{children}</Router>
     );
-
     // eslint-enable @typescript-eslint/no-unsafe-assignment @typescript-eslint/no-unsafe-call
     const { result } = renderHook(() => useProtectedApi(), { wrapper });
+    callProtectedApi = result.current;
+  });
 
-    const callProtectedApi = result.current;
-    const [resultResponse, resultError] = await callProtectedApi(
-      'https://api.example.com',
-      'POST',
-    );
+  describe('When user is not logged in', () => {
+    beforeEach(() => {
+      jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => false);
+    });
 
-    expect(resultResponse).toBeNull();
-    expect(resultError).toEqual(new Error('ログインしてください。'));
+    it('Response must be null and error must have a message', async () => {
+      const [resultResponse, resultError] = await callProtectedApi(
+        'https://api.example.com',
+        'POST',
+      );
+
+      expect(resultResponse).toBeNull();
+      expect(resultError).toEqual(new Error('ログインしてください。'));
+    });
   });
 
   //  it.skip('should return response and error when API call is successful', async () => {
