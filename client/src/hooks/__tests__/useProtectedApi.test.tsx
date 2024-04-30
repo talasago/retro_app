@@ -1,8 +1,6 @@
 import { type ReactNode } from 'react';
-import {
-  renderHook,
-  type WrapperComponent,
-} from '@testing-library/react-hooks';
+import { renderHook } from '@testing-library/react';
+
 import axios, { type AxiosResponse } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { useProtectedApi } from '../useProtectedApi';
@@ -45,10 +43,11 @@ describe('#useProtectedApi', () => {
   });
 
   it('should return response and error as null when user is not logged in', async () => {
-    const wrapper: WrapperComponent<{ children: ReactNode }> = ({
-      children,
-    }) => <Router>{children}</Router>;
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <Router>{children}</Router>
+    );
 
+    // eslint-enable @typescript-eslint/no-unsafe-assignment @typescript-eslint/no-unsafe-call
     const { result } = renderHook(() => useProtectedApi(), { wrapper });
 
     const callProtectedApi = result.current;
