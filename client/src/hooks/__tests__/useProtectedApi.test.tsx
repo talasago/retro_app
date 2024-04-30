@@ -65,28 +65,38 @@ describe('#useProtectedApi', () => {
     });
 
     describe('When accessToken has not expired', () => {
-      it('Response have result and error must be null', async () => {
-        const mockResponse: AxiosResponse = {
-          data: {},
-          status: 200,
-          statusText: 'OK',
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          headers: {} as AxiosResponseHeaders,
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          config: {} as InternalAxiosRequestConfig,
-        };
-        jest
-          .spyOn(axios, 'request')
-          .mockImplementation(async () => await Promise.resolve(mockResponse));
+      describe('When protected API call success', () => {
+        let mockSuccessResponse: AxiosResponse;
 
-        const [response, error] = await callProtectedApi(
-          'https://api.example.com',
-          'POST',
-        );
+        beforeAll(() => {
+          mockSuccessResponse = {
+            data: {},
+            status: 200,
+            statusText: 'OK',
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            headers: {} as AxiosResponseHeaders,
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            config: {} as InternalAxiosRequestConfig,
+          };
 
-        expect(response).toEqual(mockResponse);
-        expect(error).toBeNull();
+          jest
+            .spyOn(axios, 'request')
+            .mockImplementation(
+              async () => await Promise.resolve(mockSuccessResponse),
+            );
+        });
+        it('Response have result and error must be null', async () => {
+          const [response, error] = await callProtectedApi(
+            'https://api.example.com',
+            'POST',
+          );
+
+          expect(response).toEqual(mockSuccessResponse);
+          expect(error).toBeNull();
+        });
       });
+
+      describe('When protected API call failed', () => {});
     });
   });
 
