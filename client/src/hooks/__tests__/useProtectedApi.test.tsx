@@ -5,6 +5,7 @@ import axios, {
   type Method,
   type InternalAxiosRequestConfig,
   type AxiosResponseHeaders,
+  type AxiosError,
 } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
@@ -85,6 +86,7 @@ describe('#useProtectedApi', () => {
               async () => await Promise.resolve(mockSuccessResponse),
             );
         });
+
         it('Response have result and error must be null', async () => {
           const [response, error] = await callProtectedApi(
             'https://api.example.com',
@@ -96,81 +98,99 @@ describe('#useProtectedApi', () => {
         });
       });
 
-      describe('When protected API call failed', () => {});
+      describe('When protected API call failed', () => {
+        let mockResponseError: AxiosError;
+
+        beforeAll(() => {
+          mockResponseError = {
+            name: 'Error',
+            message: 'API call failed',
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            config: {} as InternalAxiosRequestConfig,
+            response: {
+              status: 401,
+              statusText: 'Unauthorized',
+              headers: {},
+              data: {},
+              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+              config: {} as InternalAxiosRequestConfig,
+            },
+            isAxiosError: true,
+            toJSON: () => ({}),
+          };
+
+          jest.spyOn(axios, 'request').mockRejectedValue(mockResponseError);
+        });
+
+        it('Response must be null and error must have a message', async () => {
+          const [response, error] = await callProtectedApi(
+            'https://api.example.com',
+            'POST',
+          );
+
+          expect(response).toBeNull();
+          expect(error).toEqual(
+            new Error(
+              'エラーが発生しました。時間をおいて再実行してください。',
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              error!,
+            ),
+          );
+        });
+      });
     });
   });
-
-  //  it.skip('should return error when API call fails with non-expired token', async () => {
-  //    const mockError = new Error('API call failed');
-  //
-  //    mockIsLoginedCheck.mockReturnValue(true);
-  //    mockGetTokens.mockReturnValue({
-  //      accessToken: mockAccessToken,
-  //      refreshToken: mockRefreshToken,
-  //    });
-  //    axios.mockRejectedValue(mockError);
-  //
-  //    const { result } = renderHook(() => useProtectedApi());
-  //
-  //    const [response, error] = await result.current(
-  //      'https://api.example.com',
-  //      'GET',
-  //    );
-  //
-  //    expect(response).toBeNull();
-  //    expect(error).toEqual(new Error(GENERIC_ERROR_MESSAGE));
-  //  });
-  //
-  //  it.skip('should return error when API call fails with expired token and token refresh fails', async () => {
-  //    const mockError = new Error('API call failed');
-  //
-  //    mockIsLoginedCheck.mockReturnValue(true);
-  //    mockGetTokens.mockReturnValue({
-  //      accessToken: mockAccessToken,
-  //      refreshToken: mockRefreshToken,
-  //    });
-  //    axios.mockRejectedValueOnce({ response: { status: 401 } });
-  //    mockUpdateTokenUseRefreshToken.mockRejectedValue(mockError);
-  //
-  //    const { result } = renderHook(() => useProtectedApi());
-  //
-  //    const [response, error] = await result.current(
-  //      'https://api.example.com',
-  //      'GET',
-  //    );
-  //
-  //    expect(response).toBeNull();
-  //    expect(error).toEqual(new Error(EXPIRED_TOKEN_MESSAGE));
-  //    expect(mockResetTokens).toHaveBeenCalled();
-  //    expect(mockNavigate).toHaveBeenCalledWith('/login');
-  //  });
-  //
-  //  it.skip('should return response and error when API call fails with expired token and token refresh succeeds', async () => {
-  //    const mockResponse: AxiosResponse = {
-  //      data: {},
-  //      status: 200,
-  //      statusText: 'OK',
-  //      headers: {},
-  //      config: {},
-  //    };
-  //
-  //    mockIsLoginedCheck.mockReturnValue(true);
-  //    mockGetTokens.mockReturnValue({
-  //      accessToken: mockAccessToken,
-  //      refreshToken: mockRefreshToken,
-  //    });
-  //    axios.mockRejectedValueOnce({ response: { status: 401 } });
-  //    mockUpdateTokenUseRefreshToken.mockResolvedValue(mockAccessToken);
-  //    axios.mockResolvedValue(mockResponse);
-  //
-  //    const { result } = renderHook(() => useProtectedApi());
-  //
-  //    const [response, error] = await result.current(
-  //      'https://api.example.com',
-  //      'GET',
-  //    );
-  //
-  //    expect(response).toEqual(mockResponse);
-  //    expect(error).toBeNull();
-  //  });
 });
+
+//  it.skip('should return error when API call fails with expired token and token refresh fails', async () => {
+//    const mockError = new Error('API call failed');
+//
+//    mockIsLoginedCheck.mockReturnValue(true);
+//    mockGetTokens.mockReturnValue({
+//      accessToken: mockAccessToken,
+//      refreshToken: mockRefreshToken,
+//    });
+//    axios.mockRejectedValueOnce({ response: { status: 401 } });
+//    mockUpdateTokenUseRefreshToken.mockRejectedValue(mockError);
+//
+//    const { result } = renderHook(() => useProtectedApi());
+//
+//    const [response, error] = await result.current(
+//      'https://api.example.com',
+//      'GET',
+//    );
+//
+//    expect(response).toBeNull();
+//    expect(error).toEqual(new Error(EXPIRED_TOKEN_MESSAGE));
+//    expect(mockResetTokens).toHaveBeenCalled();
+//    expect(mockNavigate).toHaveBeenCalledWith('/login');
+//  });
+//
+//  it.skip('should return response and error when API call fails with expired token and token refresh succeeds', async () => {
+//    const mockResponse: AxiosResponse = {
+//      data: {},
+//      status: 200,
+//      statusText: 'OK',
+//      headers: {},
+//      config: {},
+//    };
+//
+//    mockIsLoginedCheck.mockReturnValue(true);
+//    mockGetTokens.mockReturnValue({
+//      accessToken: mockAccessToken,
+//      refreshToken: mockRefreshToken,
+//    });
+//    axios.mockRejectedValueOnce({ response: { status: 401 } });
+//    mockUpdateTokenUseRefreshToken.mockResolvedValue(mockAccessToken);
+//    axios.mockResolvedValue(mockResponse);
+//
+//    const { result } = renderHook(() => useProtectedApi());
+//
+//    const [response, error] = await result.current(
+//      'https://api.example.com',
+//      'GET',
+//    );
+//
+//    expect(response).toEqual(mockResponse);
+//    expect(error).toBeNull();
+//  });
