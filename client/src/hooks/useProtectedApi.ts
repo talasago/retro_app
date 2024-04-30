@@ -1,7 +1,7 @@
 import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 import { useNavigate } from 'react-router-dom';
-import { AuthToken } from 'utils/AuthToken';
+import { AuthToken } from 'domains/AuthToken';
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 

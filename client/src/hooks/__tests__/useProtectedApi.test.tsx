@@ -7,7 +7,7 @@ import axios, {
   type AxiosResponseHeaders,
 } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { AuthToken } from 'utils/AuthToken';
+import { AuthToken } from 'domains/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
 
 describe('#useProtectedApi', () => {
