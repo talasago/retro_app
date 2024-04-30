@@ -65,7 +65,7 @@ describe('#useProtectedApi', () => {
       jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => true);
     });
 
-    describe('When accessToken has not expired', () => {
+    describe('When accessToken exist in cookies(accessToken in cookie is not expired)', () => {
       describe('When protected API call success', () => {
         let mockSuccessResponse: AxiosResponse;
 
@@ -98,7 +98,13 @@ describe('#useProtectedApi', () => {
         });
       });
 
-      describe('When protected API call failed', () => {
+      describe('When accessToken do not exist in cookies(accessToken in cookie is expired)', () => {
+        describe('When refresh_token API call failed for reasons other than accessToken', () => {
+          it.skip('WIP', async () => {});
+        });
+      });
+
+      describe('When protected API call failed for reasons other than accessToken expired', () => {
         let mockResponseError: AxiosError;
 
         beforeAll(() => {
@@ -108,8 +114,8 @@ describe('#useProtectedApi', () => {
             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             config: {} as InternalAxiosRequestConfig,
             response: {
-              status: 401,
-              statusText: 'Unauthorized',
+              status: 404,
+              statusText: 'Not found',
               headers: {},
               data: {},
               // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -137,6 +143,10 @@ describe('#useProtectedApi', () => {
             ),
           );
         });
+      });
+
+      describe('When protected API call failed for reason accessToken is expired', () => {
+        it.skip('エラーになって..', async () => {});
       });
     });
   });

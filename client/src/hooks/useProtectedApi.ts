@@ -31,6 +31,16 @@ export const useProtectedApi = (): ((
     }
 
     const tokens = AuthToken.getTokens();
+
+    // TODO:accessTokenが無かったら(アクセストークンの有効期限が切れていたら削除されるので)、
+    // リフレッシュトークンでリクエストする。
+
+    // 理想的には、アクセストークンの有効期限切れでリクエストが失敗した場合は、リフレッシュトークンでリクエストした方が良い。
+    // しかし、アクセストークンの有効期限＞クッキーの有効期限とすることで、「アクセストークンの有効期限切れでリクエストが失敗した場合」という
+    // 可能性が減る。
+    // なので、この場合の処理はエラーにだけして、リフレッシュトークンでアクセストークン更新→保護されているAPIを叩くようにはしない。
+    // どういうエラーにするかは要検討。最低限、ログアウト出来ずに「ログインしてください」といった詰み状態にはしないようにする。
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const accessToken = tokens.accessToken!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
