@@ -38,7 +38,9 @@
     "lint": "npm run --silent lint:style; npm run --silent lint:es",
     "lint:fix": "npm run --silent lint:style:fix; npm run --silent lint:es:fix",
     "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}'",
-    "preinstall": "npx typesync || :"
+    "preinstall": "npx typesync || :",
+    "test": "NODE_OPTIONS='--experimental-vm-modules' npx jest",
+    "test:debug": "NODE_OPTIONS='--experimental-vm-modules' node --inspect-brk ./node_modules/jest/bin/jest.js"
   },
   "eslintConfig": {
     "extends": [
