@@ -59,8 +59,11 @@
     ]
   },
   "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "@testing-library/react-hooks": "^8.0.1",
     "@types/eslint": "~8.56.1",
     "@types/eslint-config-prettier": "~6.11.3",
+    "@types/jest": "^29.5.12",
     "@types/js-cookie": "^3.0.6",
     "@typescript-eslint/eslint-plugin": "^6.4.0",
     "eslint": "^8.0.1",
@@ -79,6 +82,7 @@
     "stylelint": "^16.1.0",
     "stylelint-config-recess-order": "^4.4.0",
     "stylelint-config-standard": "^36.0.0",
-    "stylelint-order": "^6.0.4"
+    "stylelint-order": "^6.0.4",
+    "ts-jest": "^29.1.2"
   }
 }
