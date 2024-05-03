@@ -10,7 +10,7 @@ import axios, {
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
 import { useProtectedApi } from '../useProtectedApi';
-
+//
 describe('#useProtectedApi', () => {
   let callProtectedApi: (
     url: string,
@@ -184,7 +184,31 @@ describe('#useProtectedApi', () => {
           });
 
           describe('When refresh_token API call failed for reasons refreshToken is expired', () => {
-            it.skip('WIP', async () => {});
+            let mockResetTokens: jest.SpyInstance;
+
+            beforeAll(() => {
+              // リフレッシュトークンAPIはエラー。トークンが期限切れを想定。
+              jest
+                .spyOn(axios, 'post')
+                .mockRejectedValue(mockResponseError401TokenExpired);
+
+              mockResetTokens = jest.spyOn(AuthToken, 'resetTokens');
+            });
+
+            it('Error must have a message and go to login page', async () => {
+              const [response, error] = await callProtectedApi(
+                'https://api.example.com',
+                'POST',
+              );
+
+              expect(response).toBeNull();
+              expect(error).toEqual(
+                new Error(
+                  'ログイン有効期間を過ぎています。再度ログインしてください。',
+                ),
+              );
+              expect(mockResetTokens).toHaveBeenCalled();
+            });
           });
         });
       });
@@ -192,30 +216,6 @@ describe('#useProtectedApi', () => {
   });
 });
 
-//  it.skip('should return error when API call fails with expired token and token refresh fails', async () => {
-//    const mockError = new Error('API call failed');
-//
-//    mockIsLoginedCheck.mockReturnValue(true);
-//    mockGetTokens.mockReturnValue({
-//      accessToken: mockAccessToken,
-//      refreshToken: mockRefreshToken,
-//    });
-//    axios.mockRejectedValueOnce({ response: { status: 401 } });
-//    mockUpdateTokenUseRefreshToken.mockRejectedValue(mockError);
-//
-//    const { result } = renderHook(() => useProtectedApi());
-//
-//    const [response, error] = await result.current(
-//      'https://api.example.com',
-//      'GET',
-//    );
-//
-//    expect(response).toBeNull();
-//    expect(error).toEqual(new Error(EXPIRED_TOKEN_MESSAGE));
-//    expect(mockResetTokens).toHaveBeenCalled();
-//    expect(mockNavigate).toHaveBeenCalledWith('/login');
-//  });
-//
 //  it.skip('should return response and error when API call fails with expired token and token refresh succeeds', async () => {
 //    const mockResponse: AxiosResponse = {
 //      data: {},
