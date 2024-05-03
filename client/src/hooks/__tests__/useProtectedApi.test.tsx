@@ -208,8 +208,7 @@ describe('#useProtectedApi', () => {
                 ),
               );
               expect(mockResetTokens).toHaveBeenCalled();
-              // TODO: ログインページに遷移しているか確認
-              // locationとか使えばいいかも
+              expect(window.location.pathname).toBe('/login');
             });
           });
 
