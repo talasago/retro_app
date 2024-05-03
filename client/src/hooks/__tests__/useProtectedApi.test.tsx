@@ -208,6 +208,56 @@ describe('#useProtectedApi', () => {
                 ),
               );
               expect(mockResetTokens).toHaveBeenCalled();
+              // TODO: ログインページに遷移しているか確認
+              // locationとか使えばいいかも
+            });
+          });
+
+          describe('When refresh_token API call successed', () => {
+            let mockSetTokens: jest.SpyInstance;
+            beforeAll(() => {
+              // リフレッシュトークンAPIは成功
+              jest
+                .spyOn(axios, 'post')
+                .mockImplementation(
+                  async () => await Promise.resolve(mockSuccessResponse),
+                );
+              mockSetTokens = jest.spyOn(AuthToken, 'setTokens');
+            });
+            // FIXME:トークンを更新していることは、下のit内どちらも確認することなので共通化したい
+
+            describe('When protected API call success with updatedAccessToken', () => {
+              // TODO:mockRejectedValueOnceとか使える？2回目のAPIコールは成功させないといけない。
+
+              it.skip('トークンを更新していることそして、', async () => {
+                const [response, error] = await callProtectedApi(
+                  'https://api.example.com',
+                  'POST',
+                );
+
+                expect(mockSetTokens).toHaveBeenCalled();
+                expect(response).toEqual(mockSuccessResponse);
+                expect(error).toBeNull();
+              });
+            });
+
+            describe('When protected API call failed with updatedAccessToken', () => {
+              it('Token is updated and error must have a message', async () => {
+                const [response, error] = await callProtectedApi(
+                  'https://api.example.com',
+                  'POST',
+                );
+
+                expect(mockSetTokens).toHaveBeenCalled();
+                expect(response).toBeNull();
+                expect(error).toEqual(
+                  new Error(
+                    'エラーが発生しました。時間をおいて再実行してください。',
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    error!,
+                  ),
+                );
+              });
             });
           });
         });
