@@ -227,9 +227,15 @@ describe('#useProtectedApi', () => {
             // FIXME:トークンを更新していることは、下のit内どちらも確認することなので共通化したい
 
             describe('When protected API call success with updatedAccessToken', () => {
-              // TODO:mockRejectedValueOnceとか使える？2回目のAPIコールは成功させないといけない。
+              beforeAll(() => {
+                // 2回目のAPIコールは成功
+                jest
+                  .spyOn(axios, 'request')
+                  .mockRejectedValueOnce(mockResponseError401TokenExpired)
+                  .mockResolvedValueOnce(mockSuccessResponse);
+              });
 
-              it.skip('トークンを更新していることそして、', async () => {
+              it('Token is updated and response must have result', async () => {
                 const [response, error] = await callProtectedApi(
                   'https://api.example.com',
                   'POST',
@@ -265,32 +271,3 @@ describe('#useProtectedApi', () => {
     });
   });
 });
-
-//  it.skip('should return response and error when API call fails with expired token and token refresh succeeds', async () => {
-//    const mockResponse: AxiosResponse = {
-//      data: {},
-//      status: 200,
-//      statusText: 'OK',
-//      headers: {},
-//      config: {},
-//    };
-//
-//    mockIsLoginedCheck.mockReturnValue(true);
-//    mockGetTokens.mockReturnValue({
-//      accessToken: mockAccessToken,
-//      refreshToken: mockRefreshToken,
-//    });
-//    axios.mockRejectedValueOnce({ response: { status: 401 } });
-//    mockUpdateTokenUseRefreshToken.mockResolvedValue(mockAccessToken);
-//    axios.mockResolvedValue(mockResponse);
-//
-//    const { result } = renderHook(() => useProtectedApi());
-//
-//    const [response, error] = await result.current(
-//      'https://api.example.com',
-//      'GET',
-//    );
-//
-//    expect(response).toEqual(mockResponse);
-//    expect(error).toBeNull();
-//  });
