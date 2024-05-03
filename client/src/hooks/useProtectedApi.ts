@@ -24,27 +24,54 @@ export const useProtectedApi = (): ((
     data = '',
   ): Promise<[AxiosResponse | null, Error | null]> => {
     // HACK: try/catchが多すぎて、何とかしたい...
-    // 先にテスト書いておいた方が良さげ
-
     if (!AuthToken.isLoginedCheck()) {
       return [null, new Error(NOT_LOGINED_MESSAGE)];
     }
 
     const tokens = AuthToken.getTokens();
-
-    // TODO:accessTokenが無かったら(アクセストークンの有効期限が切れていたら削除されるので)、
-    // リフレッシュトークンでリクエストする。
-
-    // 理想的には、アクセストークンの有効期限切れでリクエストが失敗した場合は、リフレッシュトークンでリクエストした方が良い。
-    // しかし、アクセストークンの有効期限＞クッキーの有効期限とすることで、「アクセストークンの有効期限切れでリクエストが失敗した場合」という
-    // 可能性が減る。
-    // なので、この場合の処理はエラーにだけして、リフレッシュトークンでアクセストークン更新→保護されているAPIを叩くようにはしない。
-    // どういうエラーにするかは要検討。最低限、ログアウト出来ずに「ログインしてください」といった詰み状態にはしないようにする。
-
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const accessToken = tokens.accessToken!;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const refreshToken = tokens.refreshToken!;
+
+    if (
+      (accessToken === '' ||
+        accessToken === undefined ||
+        accessToken === null) &&
+      refreshToken !== '' &&
+      refreshToken !== undefined &&
+      refreshToken !== null
+    ) {
+      // accessTokenが無かったら(アクセストークンの有効期限が切れていたら削除されるので)、
+      // リフレッシュトークンでリクエストする。
+
+      let updatedAccessToken: string = '';
+      try {
+        updatedAccessToken = await updateTokenUseRefreshToken(refreshToken);
+      } catch (error) {
+        if (!isTokenExpired(error)) {
+          return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
+        }
+
+        AuthToken.resetTokens();
+        navigate('/login');
+
+        return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
+      }
+
+      try {
+        const response = await axios.request({
+          method,
+          url,
+          data,
+          headers: apiHeaders(updatedAccessToken),
+        });
+
+        return [response, null];
+      } catch (error) {
+        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
+      }
+    }
 
     try {
       const response = await axios.request({

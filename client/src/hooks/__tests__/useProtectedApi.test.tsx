@@ -57,6 +57,8 @@ const mockResponseError404: AxiosError = {
   toJSON: () => ({}),
 };
 
+// FIXME: BeforeAllとか、モックのクリアとかを見直す。テストケース間に依存があるので、それをなくすようにする。
+
 describe('#useProtectedApi', () => {
   let callProtectedApi: (
     url: string,
@@ -95,8 +97,19 @@ describe('#useProtectedApi', () => {
     });
 
     describe('When accessToken exist in cookies(accessToken in cookie is not expired)', () => {
+      const mockGetTokens = jest.spyOn(AuthToken, 'getTokens');
+
+      beforeEach(() => {
+        mockGetTokens.mockImplementationOnce(() => {
+          return {
+            accessToken: 'accessToken',
+            refreshToken: 'refreshToken',
+          };
+        });
+      });
+
       describe('When protected API call success', () => {
-        beforeAll(() => {
+        beforeEach(() => {
           jest
             .spyOn(axios, 'request')
             .mockImplementation(
@@ -139,7 +152,128 @@ describe('#useProtectedApi', () => {
     });
 
     describe('When accessToken do not exist in cookies(accessToken in cookie is expired)', () => {
-      it.skip('何か書く', async () => {});
+      const mockGetTokens = jest.spyOn(AuthToken, 'getTokens');
+
+      beforeEach(() => {
+        mockGetTokens.mockImplementation(() => {
+          return {
+            accessToken: undefined,
+            refreshToken: 'refreshToken',
+          };
+        });
+      });
+
+      describe('When refresh_token API call failed for reasons other refreshToken is expired', () => {
+        beforeAll(() => {
+          jest.spyOn(axios, 'post').mockRejectedValue(mockResponseError404);
+        });
+
+        it('Response must be null and error must have a message', async () => {
+          const mockAxiosForProtectedApiCall = jest.spyOn(axios, 'request');
+          mockAxiosForProtectedApiCall.mockReset();
+
+          const [response, error] = await callProtectedApi(
+            'https://api.example.com',
+            'POST',
+          );
+
+          expect(mockAxiosForProtectedApiCall).not.toHaveBeenCalled();
+          expect(response).toBeNull();
+          expect(error).toEqual(
+            new Error(
+              'エラーが発生しました。時間をおいて再実行してください。',
+              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              error!,
+            ),
+          );
+        });
+      });
+
+      describe('When refresh_token API call failed for reasons refreshToken is expired', () => {
+        let mockResetTokens: jest.SpyInstance;
+
+        beforeAll(() => {
+          // リフレッシュトークンAPIはエラー。トークンが期限切れを想定。
+          jest
+            .spyOn(axios, 'post')
+            .mockRejectedValue(mockResponseError401TokenExpired);
+
+          mockResetTokens = jest.spyOn(AuthToken, 'resetTokens');
+        });
+
+        it('Error must have a message and go to login page', async () => {
+          const [response, error] = await callProtectedApi(
+            'https://api.example.com',
+            'POST',
+          );
+
+          expect(response).toBeNull();
+          expect(error).toEqual(
+            new Error(
+              'ログイン有効期間を過ぎています。再度ログインしてください。',
+            ),
+          );
+          expect(mockResetTokens).toHaveBeenCalled();
+          expect(window.location.pathname).toBe('/login');
+          // expect(mockAxiosForProtectedApiCall).not.toHaveBeenCalled();
+        });
+      });
+
+      describe('When refresh_token API call successed', () => {
+        let mockSetTokens: jest.SpyInstance;
+        beforeAll(() => {
+          // リフレッシュトークンAPIは成功
+          jest
+            .spyOn(axios, 'post')
+            .mockImplementation(
+              async () => await Promise.resolve(mockSuccessResponse),
+            );
+          mockSetTokens = jest.spyOn(AuthToken, 'setTokens');
+        });
+
+        describe('When protected API call success with updatedAccessToken', () => {
+          beforeAll(() => {
+            // 1回目のAPIコールは成功
+            jest.spyOn(axios, 'request').mockResolvedValue(mockSuccessResponse);
+          });
+
+          it('Token is updated and response must have result', async () => {
+            const [response, error] = await callProtectedApi(
+              'https://api.example.com',
+              'POST',
+            );
+
+            expect(mockSetTokens).toHaveBeenCalled();
+            expect(response).toEqual(mockSuccessResponse);
+            expect(error).toBeNull();
+          });
+        });
+
+        describe('When protected API call failed with updatedAccessToken', () => {
+          beforeAll(() => {
+            jest
+              .spyOn(axios, 'request')
+              .mockRejectedValue(mockResponseError404);
+          });
+
+          it('Token is updated and error must have a message', async () => {
+            const [response, error] = await callProtectedApi(
+              'https://api.example.com',
+              'POST',
+            );
+
+            expect(mockSetTokens).toHaveBeenCalled();
+            expect(response).toBeNull();
+            expect(error).toEqual(
+              new Error(
+                'エラーが発生しました。時間をおいて再実行してください。',
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                error!,
+              ),
+            );
+          });
+        });
+      });
     });
 
     describe('When protected API call failed for reason accessToken is expired', () => {
@@ -148,6 +282,13 @@ describe('#useProtectedApi', () => {
         jest
           .spyOn(axios, 'request')
           .mockRejectedValue(mockResponseError401TokenExpired);
+
+        jest.spyOn(AuthToken, 'getTokens').mockImplementation(() => {
+          return {
+            accessToken: 'accessToken',
+            refreshToken: 'refreshToken',
+          };
+        });
       });
 
       describe('When refresh_token API call failed for reasons other refreshToken is expired', () => {
