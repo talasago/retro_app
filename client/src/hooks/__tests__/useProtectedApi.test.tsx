@@ -161,7 +161,7 @@ describe('#useProtectedApi', () => {
       beforeEach(() => {
         mockGetTokens.mockImplementation(() => {
           return {
-            accessToken: undefined,
+            accessToken: '',
             refreshToken: 'refreshToken',
           };
         });

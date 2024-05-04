@@ -6,11 +6,11 @@ import { AuthToken } from 'domains/AuthToken';
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 
-const GENERIC_ERROR_MESSAGE =
-  'エラーが発生しました。時間をおいて再実行してください。';
-const EXPIRED_TOKEN_MESSAGE =
-  'ログイン有効期間を過ぎています。再度ログインしてください。';
-const NOT_LOGINED_MESSAGE = 'ログインしてください。';
+const ERROR_MESSAGES = {
+  GENERIC: 'エラーが発生しました。時間をおいて再実行してください。',
+  EXPIRED_TOKEN: 'ログイン有効期間を過ぎています。再度ログインしてください。',
+  NOT_LOGINED: 'ログインしてください。',
+};
 
 export const useProtectedApi = (): ((
   url: string,
@@ -25,17 +25,12 @@ export const useProtectedApi = (): ((
     data = '',
   ): Promise<[AxiosResponse | null, Error | null]> => {
     // HACK: 結構複雑なので、何とかしたい...
-    if (!AuthToken.isLoginedCheck()) {
-      return [null, new Error(NOT_LOGINED_MESSAGE)];
-    }
-
-    const tokens = AuthToken.getTokens();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const accessToken = tokens.accessToken!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const refreshToken = tokens.refreshToken!;
-
+    const { accessToken, refreshToken } = AuthToken.getTokens();
     let updatedAccessToken: string = '';
+
+    if (!AuthToken.isLoginedCheck()) {
+      return [null, new Error(ERROR_MESSAGES.NOT_LOGINED)];
+    }
 
     if (AuthToken.isExistAccessToken()) {
       const [response, error] = await callProtectedApiWithAxios(
@@ -48,7 +43,7 @@ export const useProtectedApi = (): ((
       if (error === null) {
         return [response, null];
       } else if (error !== null && !isTokenExpired(error)) {
-        return [null, new Error(GENERIC_ERROR_MESSAGE, error)];
+        return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
       }
     }
 
@@ -72,7 +67,7 @@ export const useProtectedApi = (): ((
       return [response, null];
     }
 
-    return [null, new Error(GENERIC_ERROR_MESSAGE, error)];
+    return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
   };
 
   return callProtectedApi;
@@ -83,7 +78,7 @@ const isTokenExpired = (error: unknown): boolean => {
     axios.isAxiosError(error) &&
     error.response?.status === 401 &&
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    error.response?.data?.detail === EXPIRED_TOKEN_MESSAGE
+    error.response?.data?.detail === ERROR_MESSAGES.EXPIRED_TOKEN
   );
 };
 
@@ -110,13 +105,13 @@ const updateTokenUseRefreshToken = async (
     return updatedAccessToken;
   } catch (error) {
     if (!isTokenExpired(error)) {
-      throw new Error(GENERIC_ERROR_MESSAGE);
+      throw new Error(ERROR_MESSAGES.GENERIC);
     }
 
-    AuthToken.resetTokens();
+    AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
     navigate('/login');
 
-    throw new Error(EXPIRED_TOKEN_MESSAGE);
+    throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);
   }
 };
 

@@ -38,6 +38,7 @@ export class AuthToken {
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
   // TODO: tokenたちはプロパティに保存してもいいかも。そうなると、シングルトンにしないとだ。
   // isLoginedCheck()とか、getTokens()せずに、プロパティから取得してもいいと思ったので。
+  // updatedAccessTokenとかも呼び出し元で管理しなくてよくなるかも。
 
   /**
    * Checks if the user is logged in.
@@ -65,12 +66,12 @@ export class AuthToken {
   }
 
   static getTokens(): {
-    accessToken: string | undefined;
-    refreshToken: string | undefined;
+    accessToken: string;
+    refreshToken: string;
   } {
     return {
-      accessToken: Cookies.get(this.ACCESS_TOKEN_KEY),
-      refreshToken: Cookies.get(this.REFRESH_TOKEN_KEY),
+      accessToken: Cookies.get(this.ACCESS_TOKEN_KEY) ?? '',
+      refreshToken: Cookies.get(this.REFRESH_TOKEN_KEY) ?? '',
     };
   }
 
