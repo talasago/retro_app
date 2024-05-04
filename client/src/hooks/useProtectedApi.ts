@@ -1,7 +1,8 @@
 import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
+
 // TODO: レスポンス定義のinterfaceを作成する
 // swaggerからうまく連動できないものかなあ
 
@@ -23,7 +24,8 @@ export const useProtectedApi = (): ((
     method: Method,
     data = '',
   ): Promise<[AxiosResponse | null, Error | null]> => {
-    // HACK: try/catchが多すぎて、何とかしたい...
+    // HACK: 結構複雑なので、何とかしたい...
+
     if (!AuthToken.isLoginedCheck()) {
       return [null, new Error(NOT_LOGINED_MESSAGE)];
     }
@@ -34,86 +36,45 @@ export const useProtectedApi = (): ((
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const refreshToken = tokens.refreshToken!;
 
-    if (
-      (accessToken === '' ||
-        accessToken === undefined ||
-        accessToken === null) &&
-      refreshToken !== '' &&
-      refreshToken !== undefined &&
-      refreshToken !== null
-    ) {
-      // accessTokenが無かったら(アクセストークンの有効期限が切れていたら削除されるので)、
-      // リフレッシュトークンでリクエストする。
+    let updatedAccessToken: string = '';
+    // FIXME:リフレッシュトークンの条件は違和感を感じる...そして、実際にはisLoginedCheckで判定しているので、この条件は不要な気がする。
 
-      let updatedAccessToken: string = '';
-      try {
-        updatedAccessToken = await updateTokenUseRefreshToken(refreshToken);
-      } catch (error) {
-        if (!isTokenExpired(error)) {
-          return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
-        }
+    if (AuthToken.isExistAccessToken() || !AuthToken.isExistRefreshToken()) {
+      const [response, error] = await callProtectedApiWithAxios(
+        url,
+        method,
+        data,
+        accessToken,
+      );
 
-        AuthToken.resetTokens();
-        navigate('/login');
-
-        return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
-      }
-
-      try {
-        const response = await axios.request({
-          method,
-          url,
-          data,
-          headers: apiHeaders(updatedAccessToken),
-        });
-
+      if (error === null) {
         return [response, null];
-      } catch (error) {
-        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
+      } else if (error !== null && !isTokenExpired(error)) {
+        return [null, new Error(GENERIC_ERROR_MESSAGE, error)];
       }
     }
 
     try {
-      const response = await axios.request({
-        method,
-        url,
-        data,
-        headers: apiHeaders(accessToken),
-      });
-
-      return [response, null];
+      updatedAccessToken = await updateTokenUseRefreshToken(
+        refreshToken,
+        navigate,
+      );
     } catch (error) {
-      if (!isTokenExpired(error)) {
-        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
-      }
-
-      let updatedAccessToken: string = '';
-      try {
-        updatedAccessToken = await updateTokenUseRefreshToken(refreshToken);
-      } catch (error) {
-        if (!isTokenExpired(error)) {
-          return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
-        }
-
-        AuthToken.resetTokens();
-        navigate('/login');
-
-        return [null, new Error(EXPIRED_TOKEN_MESSAGE, error as Error)];
-      }
-
-      try {
-        const response = await axios.request({
-          method,
-          url,
-          data,
-          headers: apiHeaders(updatedAccessToken),
-        });
-
-        return [response, null];
-      } catch (error) {
-        return [null, new Error(GENERIC_ERROR_MESSAGE, error as Error)];
-      }
+      return [null, error as Error];
     }
+
+    const [response, error] = await callProtectedApiWithAxios(
+      url,
+      method,
+      data,
+      updatedAccessToken,
+    );
+
+    if (error === null) {
+      return [response, null];
+    }
+
+    return [null, new Error(GENERIC_ERROR_MESSAGE, error)];
   };
 
   return callProtectedApi;
@@ -137,14 +98,46 @@ const apiHeaders = (token: string) => {
 
 const updateTokenUseRefreshToken = async (
   refreshToken: string,
+  navigate: NavigateFunction,
 ): Promise<string> => {
-  const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
-    headers: apiHeaders(refreshToken),
-  });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const updatedAccessToken: string = responseRefToken.data.access_token;
+  try {
+    const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
+      headers: apiHeaders(refreshToken),
+    });
 
-  AuthToken.setTokens(updatedAccessToken, refreshToken);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const updatedAccessToken: string = responseRefToken.data.access_token;
+    AuthToken.setTokens(updatedAccessToken, refreshToken);
 
-  return updatedAccessToken;
+    return updatedAccessToken;
+  } catch (error) {
+    if (!isTokenExpired(error)) {
+      throw new Error(GENERIC_ERROR_MESSAGE);
+    }
+
+    AuthToken.resetTokens();
+    navigate('/login');
+
+    throw new Error(EXPIRED_TOKEN_MESSAGE);
+  }
+};
+
+const callProtectedApiWithAxios = async (
+  url: string,
+  method: Method,
+  data: string,
+  accessToken: string,
+): Promise<[AxiosResponse | null, Error | null]> => {
+  try {
+    const response = await axios.request({
+      method,
+      url,
+      data,
+      headers: apiHeaders(accessToken),
+    });
+
+    return [response, null];
+  } catch (error) {
+    return [null, error as Error];
+  }
 };

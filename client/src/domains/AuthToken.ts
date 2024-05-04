@@ -36,19 +36,31 @@ export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
   static readonly ACCESS_TOKEN_KEY = 'accessToken';
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
+  // TODO: tokenたちはプロパティに保存してもいいかも。そうなると、シングルトンにしないとだ。
+  // isLoginedCheck()とか、getTokens()せずに、プロパティから取得してもいいと思ったので。
 
   /**
    * Checks if the user is logged in.
    * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
    */
   static isLoginedCheck(): boolean {
+    // accessTokenが先に有効期限切れになる。refreshTokenの有無で、ログイン状態かどうかを判断する。
+    return this.isExistRefreshToken();
+  }
+
+  static isExistAccessToken(): boolean {
+    const { accessToken } = this.getTokens();
+
+    return (
+      accessToken !== '' && accessToken !== undefined && accessToken !== null
+    );
+  }
+
+  static isExistRefreshToken(): boolean {
     const { refreshToken } = this.getTokens();
 
-    // accessTokenが先に有効期限切れになる。refreshTokenの有無で、ログイン状態かどうかを判断する。
-    return !(
-      refreshToken === null ||
-      refreshToken === '' ||
-      refreshToken === undefined
+    return (
+      refreshToken !== '' && refreshToken !== undefined && refreshToken !== null
     );
   }
 
