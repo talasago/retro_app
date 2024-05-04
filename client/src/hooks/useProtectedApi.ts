@@ -25,7 +25,6 @@ export const useProtectedApi = (): ((
     data = '',
   ): Promise<[AxiosResponse | null, Error | null]> => {
     // HACK: 結構複雑なので、何とかしたい...
-
     if (!AuthToken.isLoginedCheck()) {
       return [null, new Error(NOT_LOGINED_MESSAGE)];
     }
@@ -37,9 +36,8 @@ export const useProtectedApi = (): ((
     const refreshToken = tokens.refreshToken!;
 
     let updatedAccessToken: string = '';
-    // FIXME:リフレッシュトークンの条件は違和感を感じる...そして、実際にはisLoginedCheckで判定しているので、この条件は不要な気がする。
 
-    if (AuthToken.isExistAccessToken() || !AuthToken.isExistRefreshToken()) {
+    if (AuthToken.isExistAccessToken()) {
       const [response, error] = await callProtectedApiWithAxios(
         url,
         method,
