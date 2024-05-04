@@ -106,6 +106,10 @@ describe('#useProtectedApi', () => {
             refreshToken: 'refreshToken',
           };
         });
+
+        jest
+          .spyOn(AuthToken, 'isExistAccessToken')
+          .mockImplementation(() => true);
       });
 
       describe('When protected API call success', () => {
@@ -161,6 +165,10 @@ describe('#useProtectedApi', () => {
             refreshToken: 'refreshToken',
           };
         });
+
+        jest
+          .spyOn(AuthToken, 'isExistAccessToken')
+          .mockImplementation(() => false);
       });
 
       describe('When refresh_token API call failed for reasons other refreshToken is expired', () => {
@@ -289,6 +297,9 @@ describe('#useProtectedApi', () => {
             refreshToken: 'refreshToken',
           };
         });
+        jest
+          .spyOn(AuthToken, 'isExistAccessToken')
+          .mockImplementation(() => true);
       });
 
       describe('When refresh_token API call failed for reasons other refreshToken is expired', () => {
