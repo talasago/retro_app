@@ -36,42 +36,53 @@ export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
   static readonly ACCESS_TOKEN_KEY = 'accessToken';
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
+  // TODO: tokenたちはプロパティに保存してもいいかも。そうなると、シングルトンにしないとだ。
+  // isLoginedCheck()とか、getTokens()せずに、プロパティから取得してもいいと思ったので。
+  // updatedAccessTokenとかも呼び出し元で管理しなくてよくなるかも。
+
   /**
    * Checks if the user is logged in.
    * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
    */
-
   static isLoginedCheck(): boolean {
-    const { accessToken, refreshToken } = this.getTokens();
+    // accessTokenが先に有効期限切れになる。refreshTokenの有無で、ログイン状態かどうかを判断する。
+    return this.isExistRefreshToken();
+  }
 
-    return !(
-      accessToken === null ||
-      refreshToken === null ||
-      accessToken === '' ||
-      refreshToken === '' ||
-      accessToken === undefined ||
-      refreshToken === undefined
+  static isExistAccessToken(): boolean {
+    const { accessToken } = this.getTokens();
+
+    return (
+      accessToken !== '' && accessToken !== undefined && accessToken !== null
+    );
+  }
+
+  static isExistRefreshToken(): boolean {
+    const { refreshToken } = this.getTokens();
+
+    return (
+      refreshToken !== '' && refreshToken !== undefined && refreshToken !== null
     );
   }
 
   static getTokens(): {
-    accessToken: string | undefined;
-    refreshToken: string | undefined;
+    accessToken: string;
+    refreshToken: string;
   } {
     return {
-      accessToken: Cookies.get(this.ACCESS_TOKEN_KEY),
-      refreshToken: Cookies.get(this.REFRESH_TOKEN_KEY),
+      accessToken: Cookies.get(this.ACCESS_TOKEN_KEY) ?? '',
+      refreshToken: Cookies.get(this.REFRESH_TOKEN_KEY) ?? '',
     };
   }
 
   static setTokens(accessToken: string, refreshToken: string): void {
-    const accessTokenExpireDateAfter10Minutes = new Date(
-      new Date().getTime() + 10 * 60 * 1000,
+    const accessTokenExpireDateAfter9Minutes = new Date(
+      new Date().getTime() + 9 * 60 * 1000,
     );
     const REFRESH_TOKEN_EXPIRE_DAYS = 10;
 
     Cookies.set(this.ACCESS_TOKEN_KEY, accessToken, {
-      expires: accessTokenExpireDateAfter10Minutes,
+      expires: accessTokenExpireDateAfter9Minutes,
       path: '/',
       // domain: // TODO: 本番公開前までに修正する
       secure: true,

@@ -15,7 +15,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
-import { AuthToken } from 'utils/AuthToken';
+import { AuthToken } from 'domains/AuthToken';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
