@@ -1,10 +1,9 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
-    RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
 from app.schemas.token_schema import TokenPayload, TokenType
@@ -36,20 +35,9 @@ class AuthService:
         decoded_token: dict = self.__decode(token)
         payload: TokenPayload = TokenPayload(**decoded_token)
 
-        if payload.token_type != expect_token_type.value:
-            raise RetroAppAuthenticationError("TokenTypeが一致しません。")
-
-        if self.__is_uuid(payload.uid) is False:
-            raise RetroAppAuthenticationError("uuidの形式が正しくありません。")
-
-        # DBからユーザーを取得
-        try:
-            # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
-            user: "UserModel" = self.__user_repo.find_by("uuid", payload.uid)  # type: ignore
-        except RetroAppRecordNotFoundError as e:
-            raise e
-
-        return user
+        self.__validate_payload(payload, expect_token_type)
+        # ログインしててもしていなくても良い機能を作る時は、オプション引数追加して、そのフラグで例外を返すかどうか制御しても良さそうかも
+        return self.__user_repo.find_by("uuid", payload.uid)  # type: ignore
 
     def get_current_user_from_refresh_token(self, refresh_token: str) -> "UserModel":
         """refresh_tokenからユーザーを取得"""
@@ -57,16 +45,9 @@ class AuthService:
         if refresh_token is None:
             raise TypeError("refresh_token must be other than None")
 
-        try:
-            user: "UserModel" = self.get_current_user(
-                token=refresh_token, expect_token_type=TokenType.REFRESH_TOKEN
-            )
-        except (
-            RetroAppRecordNotFoundError,
-            RetroAppAuthenticationError,
-            RetroAppTokenExpiredError,
-        ) as e:
-            raise e
+        user: "UserModel" = self.get_current_user(
+            token=refresh_token, expect_token_type=TokenType.REFRESH_TOKEN
+        )
 
         # リフレッシュトークンの場合、DBに保存されているリフレッシュトークンが一致するか確認する
         if user.refresh_token != refresh_token:
@@ -81,10 +62,7 @@ class AuthService:
         if email is None or password is None:
             raise TypeError("email and password must be other than None")
 
-        try:
-            user: "UserModel" = self.__user_repo.find_by("email", value=email)  # type: ignore
-        except RetroAppRecordNotFoundError as e:
-            raise e
+        user: "UserModel" = self.__user_repo.find_by("email", value=email)  # type: ignore
 
         if not user.is_password_matching(plain_password=password):  # type: ignore
             raise RetroAppAuthenticationError(message="パスワードが一致しません。")
@@ -107,14 +85,15 @@ class AuthService:
         access_payload = TokenPayload(
             token_type=TokenType.ACCESS_TOKEN,
             # FIXME:日本時間に変更する
-            exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            exp=datetime.now(timezone.utc)
+            + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             uid=str(user.uuid),
             jti=str(uuid4()),
         )
 
         refresh_payload = TokenPayload(
             token_type=TokenType.REFRESH_TOKEN,
-            exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+            exp=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             uid=str(user.uuid),
             jti=str(uuid4()),
         )
@@ -136,13 +115,6 @@ class AuthService:
         user.refresh_token = None
         self.__user_repo.save(user)
 
-    def __is_uuid(self, value: str) -> bool:
-        try:
-            UUID(value)
-            return True
-        except ValueError:
-            return False
-
     def __decode(self, token: str) -> dict:
         try:
             decoded_token: dict = JwtWrapper.decode(token)
@@ -152,3 +124,14 @@ class AuthService:
             raise RetroAppAuthenticationError(message=str(e))
 
         return decoded_token
+
+    def __validate_payload(
+        self, payload: TokenPayload, expect_token_type: TokenType
+    ) -> None:
+        if payload.token_type != expect_token_type.value:
+            raise RetroAppAuthenticationError("TokenTypeが一致しません。")
+
+        try:
+            UUID(payload.uid)
+        except ValueError:
+            raise RetroAppAuthenticationError("uuidの形式が正しくありません。")
