@@ -13,7 +13,7 @@ class JwtWrapper:
     def decode(cls, token: str) -> dict:
         try:
             decoded_token: dict = jwt.decode(
-                jwt=token, key=cls.SECRET_KEY, algorithms=cls.ALGORITHM
+                jwt=token, key=cls.SECRET_KEY, algorithms=[cls.ALGORITHM]
             )
         except jwt_exceptions.ExpiredSignatureError as e:
             raise cls.ExpiredSignatureError(e)
