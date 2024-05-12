@@ -2,15 +2,13 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-import jwt
-import jwt.exceptions as jwt_exceptions
-
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppRecordNotFoundError,
     RetroAppTokenExpiredError,
 )
 from app.schemas.token_schema import TokenPayload, TokenType
+from app.utils.jwt_wrapper import JwtWrapper
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
@@ -18,11 +16,6 @@ if TYPE_CHECKING:
     from app.repository.user_repository import UserRepository
 
 
-# JWT関連の設定
-# FIXME:シークレットキーは機密情報なので、本番実行時には環境変数など別の場所に記載する。
-# アルゴリズムも環境変数化しておこう
-SECRET_KEY = "secret_key"
-ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 10
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
@@ -40,13 +33,7 @@ class AuthService:
         if expect_token_type not in TokenType.__members__.values():
             raise ValueError(f"Invalid expect_token_type: {expect_token_type}")
 
-        try:
-            decoded_token: dict = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
-        except jwt_exceptions.ExpiredSignatureError as e:
-            raise RetroAppTokenExpiredError(message=str(e))
-        except jwt_exceptions.PyJWTError as e:
-            raise RetroAppAuthenticationError(message=str(e))
-
+        decoded_token: dict = self.__decode(token)
         payload: TokenPayload = TokenPayload(**decoded_token)
 
         if payload.token_type != expect_token_type.value:
@@ -132,12 +119,8 @@ class AuthService:
             jti=str(uuid4()),
         )
 
-        access_token: str = jwt.encode(
-            payload=access_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
-        )
-        refresh_token: str = jwt.encode(
-            payload=refresh_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
-        )
+        access_token: str = JwtWrapper.encode(payload=access_payload.model_dump())
+        refresh_token: str = JwtWrapper.encode(payload=refresh_payload.model_dump())
 
         # リフレッシュトークンをusersテーブルに保存する
         user.refresh_token = refresh_token
@@ -159,3 +142,13 @@ class AuthService:
             return True
         except ValueError:
             return False
+
+    def __decode(self, token: str) -> dict:
+        try:
+            decoded_token: dict = JwtWrapper.decode(token)
+        except JwtWrapper.ExpiredSignatureError as e:
+            raise RetroAppTokenExpiredError(message=str(e))
+        except JwtWrapper.JwtError as e:
+            raise RetroAppAuthenticationError(message=str(e))
+
+        return decoded_token
