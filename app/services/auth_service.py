@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from jose import exceptions as jwt_exceptions
-from jose import jwt
+import jwt
+import jwt.exceptions as jwt_exceptions
 
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
@@ -44,7 +44,7 @@ class AuthService:
             decoded_token: dict = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         except jwt_exceptions.ExpiredSignatureError as e:
             raise RetroAppTokenExpiredError(message=str(e))
-        except jwt_exceptions.JWTError as e:
+        except jwt_exceptions.PyJWTError as e:
             raise RetroAppAuthenticationError(message=str(e))
 
         payload: TokenPayload = TokenPayload(**decoded_token)
@@ -133,10 +133,10 @@ class AuthService:
         )
 
         access_token: str = jwt.encode(
-            claims=access_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
+            payload=access_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
         )
         refresh_token: str = jwt.encode(
-            claims=refresh_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
+            payload=refresh_payload.model_dump(), key=SECRET_KEY, algorithm=ALGORITHM
         )
 
         # リフレッシュトークンをusersテーブルに保存する
