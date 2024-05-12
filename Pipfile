@@ -11,10 +11,11 @@ alembic = "*" # これはlambdaにデプロイする必要ないからdevでも�
 passlib = {version = "*", extras = ["bcrypt"]}
 email-validator = "*"
 python-multipart = "*"
-python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
 pydantic-i18n = "*"
 boto3 = "*"
+pyjwt = "*"
+cryptography = "*"
 
 [dev-packages]
 flake8 = "*"

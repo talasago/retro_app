@@ -97,7 +97,7 @@ class TestAuthService:
                 with pytest.raises(RetroAppTokenExpiredError) as e:
                     auth_service.get_current_user(token=expired_access_token)
                 # assert str(e.value) == 'ログイン有効期間を過ぎています。再度ログインしてください。'
-                assert str(e.value) == "Signature has expired."
+                assert str(e.value) == "Signature has expired"
 
     class TestGetCurrentUserFromRefreshToken:
         class TestWhenValidParam:
