@@ -1,5 +1,5 @@
 import uuid as _uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from passlib.context import CryptContext
 from sqlalchemy import DateTime, Integer, String, event
@@ -27,10 +27,13 @@ class UserModel(Base):
     refresh_token: Mapped[str | None] = mapped_column(String, nullable=True)
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow()
+        DateTime, nullable=False, default=datetime.now(timezone.utc)
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow()
+        DateTime,
+        nullable=False,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
     )
 
     @property

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
 import pytest
@@ -91,7 +91,7 @@ class TestAuthService:
 
                 expired_access_token = generate_test_token(
                     token_type=TokenType.ACCESS_TOKEN,
-                    exp=datetime.utcnow() - timedelta(minutes=100),
+                    exp=datetime.now(timezone.utc) - timedelta(minutes=100),
                 )
 
                 with pytest.raises(RetroAppTokenExpiredError) as e:

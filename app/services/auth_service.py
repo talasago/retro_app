@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
@@ -85,14 +85,15 @@ class AuthService:
         access_payload = TokenPayload(
             token_type=TokenType.ACCESS_TOKEN,
             # FIXME:日本時間に変更する
-            exp=datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            exp=datetime.now(timezone.utc)
+            + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             uid=str(user.uuid),
             jti=str(uuid4()),
         )
 
         refresh_payload = TokenPayload(
             token_type=TokenType.REFRESH_TOKEN,
-            exp=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+            exp=datetime.now(timezone.utc) + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
             uid=str(user.uuid),
             jti=str(uuid4()),
         )
