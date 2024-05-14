@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 from typing import TYPE_CHECKING, Final, List
 
 from pydantic_i18n import JsonLoader, PydanticI18n
@@ -17,12 +18,15 @@ class I18nTranslateWrapper:
 
     @classmethod
     def trans(cls, errors: list["ErrorDict"]) -> List:
-        translated_errors = tr.translate(errors, locale=DEFAULT_LOCALE)
+        original_errors: list["ErrorDict"] = tr.translate(errors, locale=DEFAULT_LOCALE)
+        translated_errors: list[dict] = deepcopy(original_errors)  # 一応deepcopyしてる
 
         for error in translated_errors:
-            if "email" in error.get("loc"):
+            error.pop("url", None)
+
+            if "email" in error.get("loc", ""):
                 # NOTE: python-email-validatorをgrepして、様々なバリデーションメッセージがあると判明したが、
                 # 1つ一つ対応するのは骨が折れるので対応しない
                 error["msg"] = "有効なメールアドレスではありません。"
-            error.pop("url", None)
+
         return translated_errors
