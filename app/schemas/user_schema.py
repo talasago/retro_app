@@ -40,7 +40,7 @@ class UserSchema(BaseModel):
 
 class UserCreate(UserSchema):
     PASSWARD_REGEX: ClassVar[str] = (
-        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
+        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,.\/=~|[\](){}<>]{8,50}$'
     )
     password: SecretStr = Field(
         description=f"ユーザーのパスワード。regex_prttern: {PASSWARD_REGEX}",
@@ -56,8 +56,6 @@ class UserCreate(UserSchema):
     @classmethod
     def check_password_format(cls, password: SecretStr) -> str:
         reveal_password: str = password.get_secret_value()
-        if not re.match(UserCreate.PASSWARD_REGEX, reveal_password):
-            raise ValueError(
-                "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
-            )
+        if not re.match(cls.PASSWARD_REGEX, reveal_password):
+            raise ValueError("パスワードには8文字以上の文字を入力してください。")
         return reveal_password

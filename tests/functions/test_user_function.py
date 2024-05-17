@@ -48,7 +48,6 @@ class TestUserFunction:
 
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
-            # パスワードのバリデーションがすり抜けている気がする...
 
         def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
@@ -68,6 +67,10 @@ class TestUserFunction:
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
             assert response.status_code == 422
+            assert (
+                response.json()["detail"][0]["msg"]
+                == "パスワードには8文字以上の文字を入力してください。"
+            )
             assert response.json()["detail"][0]["input"] == "[MASKED]"
 
     class TestLogin:

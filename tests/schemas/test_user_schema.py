@@ -120,7 +120,7 @@ class TestUserCreate:
             UserCreate(**user_data)
         assert (
             I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
-            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+            == "パスワードには8文字以上の文字を入力してください。"
         )
 
         user_data["password"] = "a" * 51
@@ -129,7 +129,7 @@ class TestUserCreate:
             UserCreate(**user_data)
         assert (
             I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
-            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+            == "パスワードには8文字以上の文字を入力してください。"
         )
 
     def test_password_valid_length(self):
@@ -174,5 +174,5 @@ class TestUserCreate:
 
         assert (
             I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
-            == "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
+            == "パスワードには8文字以上の文字を入力してください。"
         )
