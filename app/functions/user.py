@@ -57,6 +57,9 @@ async def validation_exception_handler(
             # pydenticのカスタムバリデーションを使ったとき、
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
+        if "loc" in error and (error.get("loc", "") == ("body", "password")):
+            # ユーザーが入力したpasswordをマスク化する
+            error["input"] = "[MASKED]"
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

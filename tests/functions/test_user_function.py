@@ -68,7 +68,8 @@ class TestUserFunction:
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
             assert response.status_code == 422
-            
+            assert response.json()["detail"][0]["input"] == "[MASKED]"
+
     class TestLogin:
         @pytest.fixture(scope="module", autouse=True)
         def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
