@@ -61,6 +61,14 @@ class TestUserFunction:
                 response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
             )
 
+        def test_422_when_password_is_invalid(self, add_user_api):
+            """パスワードのバリデーションでエラーになること、passwordがレスポンスに含まれてないこと"""
+            user_data: dict = ApiCommonUserFactory(password="1234")
+
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
+
+            assert response.status_code == 422
+            
     class TestLogin:
         @pytest.fixture(scope="module", autouse=True)
         def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
