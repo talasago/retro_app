@@ -221,9 +221,7 @@ class TestAuthService:
                 test_user: "UserModel" = create_test_user(user_repo)
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
-                    auth_service.authenticate(
-                        username=test_user.name, password="hoge"
-                    )
+                    auth_service.authenticate(username=test_user.name, password="hoge")
 
                 assert str(e.value) == "パスワードが一致しません。"
 
