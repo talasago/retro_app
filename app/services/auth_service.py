@@ -57,12 +57,12 @@ class AuthService:
         return user
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
-    def authenticate(self, email: str, password: str) -> "UserModel":
+    def authenticate(self, username: str, password: str) -> "UserModel":
         """認証(emailとpasswordが一致するかどうか)し、認証できたuserを返す"""
-        if email is None or password is None:
-            raise TypeError("email and password must be other than None")
+        if username is None or password is None:
+            raise TypeError("username and password must be other than None")
 
-        user: "UserModel" = self.__user_repo.find_by("email", value=email)  # type: ignore
+        user: "UserModel" = self.__user_repo.find_by("name", value=username)  # type: ignore
 
         if not user.is_password_matching(plain_password=password):  # type: ignore
             raise RetroAppAuthenticationError(message="パスワードが一致しません。")

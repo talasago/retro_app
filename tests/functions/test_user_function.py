@@ -81,14 +81,15 @@ class TestUserFunction:
         @pytest.fixture(scope="module")
         def user_data_for_login(self) -> dict:
             return {
+                # TODO: emailを削除する
                 "email": "user_data_for_login@example.com",
                 "name": "user_data_for_login",
-                "username": "user_data_for_login@example.com",
+                "username": "user_data_for_login",
                 "password": "testpassword!1",
             }
 
         class TestValidParam:
-            def test_return_200(self, login_api, user_data_for_login):
+            def test_return_201(self, login_api, user_data_for_login):
                 response = login_api(user_data_for_login, True)
 
                 res_body = response.json()
@@ -100,9 +101,9 @@ class TestUserFunction:
 
         class TestWhenNotExistEmail:
             def test_return_401(self, login_api):
-                """存在しないメアドを指定した場合、エラーとなること"""
+                """存在しないユーザー名を指定した場合、エラーとなること"""
                 user_data: dict = ApiCommonUserFactory(
-                    username="APITestWhenNotExistEmail@example.com"
+                    username="APITestWhenNotExistEmail"
                 )
 
                 response = login_api(user_data, True, is_assert_response_code_2xx=False)
@@ -149,6 +150,7 @@ class TestUserFunction:
                 その状態で/refresh_tokenにアクセスするとエラーとなること
                 """
                 user_data: dict = {
+                    # TODO: emailを削除する
                     "email": "testuserlogout@example.com",
                     "name": "Test Userlogout",
                     "password": "testpassword",
@@ -156,7 +158,7 @@ class TestUserFunction:
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token, refresh_token = login_api(login_param)
@@ -243,6 +245,7 @@ class TestUserFunction:
         class TestWhenValidParam:
             def test_return_200(self, add_user_api, login_api, refresh_token_api):
                 user_data: dict = {
+                    # TODO: emailを削除する
                     "email": "testrefresh_token@example.com",
                     "name": "Test Userrefresh_token",
                     "password": "QG+UJxEdf,T5",
@@ -250,7 +253,7 @@ class TestUserFunction:
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token, refresh_token = login_api(login_param)
@@ -278,7 +281,7 @@ class TestUserFunction:
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token_1st, refresh_token_1st = login_api(login_param)

@@ -22,5 +22,5 @@ class ApiCommonUserFactory(Factory):
 
     name = "api common user"
     email = "api_common_user@example.com"
-    username = email
+    username = name
     password = "Password&1"
