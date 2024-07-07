@@ -69,8 +69,6 @@ class UserRepository:
 
     def __get_column_name_of_unique_error(self, error: IntegrityError) -> str | None:
         col_name = None
-        if "users_email_key" in str(error._message):
-            col_name = "メールアドレス"
-        elif "users_name_key" in str(error._message):
+        if "users_name_key" in str(error._message):
             col_name = "名前"
         return col_name
