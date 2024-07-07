@@ -9,13 +9,11 @@ if TYPE_CHECKING:
 
 def create_test_user(
     user_repo: "UserRepository",
-    email: str | None = None,
     password: str | None = None,
     name: str | None = None,
 ) -> "UserModel":
     test_user_param: dict = {}
 
-    test_user_param.setdefault("email", email) if email else None
     test_user_param.setdefault("password", password) if password else None
     test_user_param.setdefault("name", name) if name else None
     test_user: "UserModel" = TestUserFactory(**test_user_param)

@@ -20,6 +20,5 @@ class ApiCommonUserFactory(Factory):
         model = dict
 
     name = "api common user"
-    email = "api_common_user@example.com"
     username = name
     password = "Password&1"

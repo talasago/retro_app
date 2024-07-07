@@ -79,7 +79,6 @@ class AuthService:
         # ペイロード作成
         # NOTE: uidには、uuidを使用する。
         # uuidを使用する理由：悪意の第三者がtokenを復号できた場合を想定し、以下の懸念がありそれに対応するため。
-        # uidにemailを設定したら => 個人情報が漏れてしまう
         # uidにidを指定したら => ユーザー数がわかってしまう
 
         access_payload = TokenPayload(
