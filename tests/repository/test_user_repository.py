@@ -28,9 +28,7 @@ def create_user():
 class TestUserRepository:
     class TestSave:
         def test_create_user(self, db: Session, create_user):
-            create_user(
-                db=db, name="John Doe", password="password"
-            )
+            create_user(db=db, name="John Doe", password="password")
 
             # ユーザーが正しく作成されたか検証
             # TODO:日付のassertが欲しい。日本時間かどうか。

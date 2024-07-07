@@ -78,9 +78,7 @@ def signup_user(
     user_params: UserCreate, user_repo: "UserRepository" = Depends(get_user_repo)
 ):
     """ユーザー登録のAPIエンドポイント"""
-    user: UserModel = UserModel(
-        name=user_params.name, password=user_params.password
-    )
+    user: UserModel = UserModel(name=user_params.name, password=user_params.password)
     try:
         user_repo.save(user=user)
     except RetroAppColmunUniqueError as e:

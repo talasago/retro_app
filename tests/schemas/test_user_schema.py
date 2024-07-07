@@ -108,7 +108,6 @@ class TestUserCreate:
 
         assert user_params.name == "John Doe"
 
-
     def test_password_valid_format(self):
         user_data: dict = {
             "name": "John Doe",
