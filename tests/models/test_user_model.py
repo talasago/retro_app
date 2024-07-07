@@ -11,7 +11,6 @@ class TestUserModel:
             def test_hashed_password_and_plain_password_do_not_match(self):
                 user_data: dict = {
                     "name": "John Doe",
-                    "email": "invalid_email",
                     "password": "Passw0rd#123",
                 }
                 user = UserModel(**user_data)
@@ -23,7 +22,6 @@ class TestUserModel:
             # fmt: on
                 user_data: dict = {
                     "name": "John Doe",
-                    "email": "invalid_email",
                     "password": "Passw0rd#123",
                 }
                 user = UserModel(**user_data)
@@ -34,7 +32,6 @@ class TestUserModel:
             def test_hashed_password_must_be_verified_and_not_match(self):
                 user_data: dict = {
                     "name": "John Doe",
-                    "email": "invalid_email",
                     "password": "Passw0rd#123",
                 }
                 user = UserModel(**user_data)
@@ -49,7 +46,6 @@ class TestUserModel:
             # fmt: on
                 user_data: dict = {
                     "name": "John Doe",
-                    "email": "invalid_email",
                 }
                 user = UserModel(**user_data)
 
@@ -58,7 +54,6 @@ class TestUserModel:
             def test_raise_error_when_password_is_none(self):
                 user_data: dict = {
                     "name": "John Doe",
-                    "email": "invalid_email",
                     "password": None,
                 }
 
@@ -71,7 +66,6 @@ class TestUserModel:
         def test_set_uuid_expect_error(self):
             user_data: dict = {
                 "name": "John Doe",
-                "email": "invalid_email",
                 "password": "Passw0rd#123",
             }
             user = UserModel(**user_data)
@@ -88,7 +82,6 @@ class TestUserModel:
         def test_set_id_expect_error(self):
             user_data: dict = {
                 "name": "John Doe",
-                "email": "invalid_email",
                 "password": "Passw0rd#123",
             }
             user = UserModel(**user_data)

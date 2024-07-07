@@ -50,6 +50,8 @@ class UserRepository:
     ) -> UserModel | None:
         """条件に合致するレコードを検索して返す"""
 
+        # FIXME:columnはstg型ではなく、Modelのカラム名を指定した方が良いかも
+
         if raise_exception is None:
             raise TypeError("raise_exception must be True or False")
 
@@ -67,8 +69,6 @@ class UserRepository:
 
     def __get_column_name_of_unique_error(self, error: IntegrityError) -> str | None:
         col_name = None
-        if "users_email_key" in str(error._message):
-            col_name = "メールアドレス"
-        elif "users_name_key" in str(error._message):
+        if "users_name_key" in str(error._message):
             col_name = "名前"
         return col_name

@@ -51,10 +51,6 @@ const RegistrationForm: FC = () => {
     <Box padding={3}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
-          <FormControl error={errors.email !== undefined}>
-            <TextField label="メールアドレス" {...register('email')} />
-            <FormHelperText>{errors.email?.message}</FormHelperText>
-          </FormControl>
           <FormControl error={errors.name !== undefined}>
             <TextField label="名前" {...register('name')} />
             <FormHelperText>{errors.name?.message}</FormHelperText>

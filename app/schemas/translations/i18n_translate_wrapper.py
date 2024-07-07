@@ -24,9 +24,4 @@ class I18nTranslateWrapper:
         for error in translated_errors:
             error.pop("url", None)
 
-            if "email" in error.get("loc", ""):
-                # NOTE: python-email-validatorをgrepして、様々なバリデーションメッセージがあると判明したが、
-                # 1つ一つ対応するのは骨が折れるので対応しない
-                error["msg"] = "有効なメールアドレスではありません。"
-
         return translated_errors

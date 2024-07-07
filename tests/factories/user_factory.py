@@ -5,7 +5,6 @@ from app.models.user_model import UserModel
 
 class TestUserFactory(Factory):
     name = Sequence(lambda n: f"common user{n}")
-    email = Sequence(lambda n: f"commmon_user{n}@email.com")
     password: str = "common user"
 
     class Meta:
@@ -21,6 +20,5 @@ class ApiCommonUserFactory(Factory):
         model = dict
 
     name = "api common user"
-    email = "api_common_user@example.com"
-    username = email
+    username = name
     password = "Password&1"

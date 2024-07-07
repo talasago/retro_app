@@ -14,14 +14,13 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class UserModel(Base):
     """SQLAlchemyのモデルクラス"""
 
-    INDEXED_COLUMNS: tuple = ("id", "uuid", "email", "name")
+    INDEXED_COLUMNS: tuple = ("id", "uuid", "name")
 
     __tablename__ = "users"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     uuid: Mapped[_uuid.UUID] = mapped_column(
         UUID(as_uuid=True), default=_uuid.uuid4, nullable=False, unique=True
     )
-    email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     refresh_token: Mapped[str | None] = mapped_column(String, nullable=True)
@@ -52,7 +51,7 @@ class UserModel(Base):
     # strにキャストされたときのformat定義、主にデバッグ用
     def __repr__(self):
         return (
-            f"<User({self.id}, {self.uuid}, {self.email}, {self.name},"
+            f"<User({self.id}, {self.uuid}, {self.name},"
             f"{self.created_at}, {self.updated_at})>"
         )
 
