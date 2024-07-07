@@ -202,7 +202,7 @@ class TestAuthService:
                 assert authenticated_user == test_user
                 assert authenticated_user.name == user_params["name"]
 
-        class TestWhenNotExistEmail:
+        class TestWhenNotExistName:
             def test_raise_exception(self, auth_service: AuthService):
                 """usernameが存在しない場合、エラーを返す"""
                 user_params = {

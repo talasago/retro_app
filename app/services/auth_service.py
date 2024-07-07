@@ -58,7 +58,7 @@ class AuthService:
 
     # TODO:エラー時に平文パスワードが見えないようにする仕組みが必要
     def authenticate(self, username: str, password: str) -> "UserModel":
-        """認証(emailとpasswordが一致するかどうか)し、認証できたuserを返す"""
+        """認証(nameとpasswordが一致するかどうか)し、認証できたuserを返す"""
         if username is None or password is None:
             raise TypeError("username and password must be other than None")
 
