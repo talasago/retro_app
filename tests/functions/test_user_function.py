@@ -23,11 +23,9 @@ class TestUserFunction:
             """
             テスト観点
             1.ユーザーが登録できること
-            2.同じメールアドレスで登録できないこと
-            3.CORS設定が正しいこと(最低限の確認)
+            2.CORS設定が正しいこと(最低限の確認)
             """
             user_data: dict = {
-                "email": "testuser@example.com",
                 "name": "Test User",
                 "password": "testpassword",
             }
@@ -36,15 +34,6 @@ class TestUserFunction:
             response_1st = add_user_api(user_data=user_data, option=option)
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
             assert_cors_headers(response_1st)
-
-            response_2nd = add_user_api(
-                user_data=user_data, is_assert_response_code_2xx=False, option=option
-            )
-            assert response_2nd.status_code == 409
-            assert response_2nd.json() == {
-                "detail": "指定されたメールアドレスはすでに登録されています。"
-            }
-            assert_cors_headers(response_2nd)
 
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
@@ -81,8 +70,6 @@ class TestUserFunction:
         @pytest.fixture(scope="module")
         def user_data_for_login(self) -> dict:
             return {
-                # TODO: emailを削除する
-                "email": "user_data_for_login@example.com",
                 "name": "user_data_for_login",
                 "username": "user_data_for_login",
                 "password": "testpassword!1",
@@ -98,23 +85,6 @@ class TestUserFunction:
                 assert res_body["message"] == "ログインしました"
                 assert res_body["token_type"] == "bearer"
                 assert res_body["name"] == "user_data_for_login"
-
-        class TestWhenNotExistEmail:
-            def test_return_401(self, login_api):
-                """存在しないユーザー名を指定した場合、エラーとなること"""
-                user_data: dict = ApiCommonUserFactory(
-                    username="APITestWhenNotExistEmail"
-                )
-
-                response = login_api(user_data, True, is_assert_response_code_2xx=False)
-
-                res_body = response.json()
-                assert response.status_code == 401
-                assert (
-                    res_body["detail"]
-                    == "メールアドレスまたはパスワードが間違っています。"
-                )
-                assert response.headers["WWW-Authenticate"] == "Bearer"
 
         class TestWhenUnmatchPassword:
 
@@ -150,8 +120,6 @@ class TestUserFunction:
                 その状態で/refresh_tokenにアクセスするとエラーとなること
                 """
                 user_data: dict = {
-                    # TODO: emailを削除する
-                    "email": "testuserlogout@example.com",
                     "name": "Test Userlogout",
                     "password": "testpassword",
                 }
@@ -166,7 +134,7 @@ class TestUserFunction:
                 logout_response: "Response" = logout_api(access_token, False)
                 assert logout_response.json() == {"message": "ログアウトしました"}
 
-                stmt = select(UserModel).where(UserModel.email == user_data["email"])
+                stmt = select(UserModel).where(UserModel.name == user_data["name"])
                 user: UserModel = db.execute(stmt).scalars().first()  # type: ignore
                 assert user  # Noneではないことの確認
                 assert user.refresh_token is None
@@ -245,8 +213,6 @@ class TestUserFunction:
         class TestWhenValidParam:
             def test_return_200(self, add_user_api, login_api, refresh_token_api):
                 user_data: dict = {
-                    # TODO: emailを削除する
-                    "email": "testrefresh_token@example.com",
                     "name": "Test Userrefresh_token",
                     "password": "QG+UJxEdf,T5",
                 }
@@ -274,7 +240,6 @@ class TestUserFunction:
                 それより前に発行されたリフレッシュトークンは無効になること。
                 また、アクセストークンが再発行されること"""
                 user_data: dict = {
-                    "email": "testrefresh_token_invalid_param@example.com",
                     "name": "Test testrefresh_token_invalid_param",
                     "password": "QG+UJxEdf,T5",
                 }

@@ -79,7 +79,7 @@ def signup_user(
 ):
     """ユーザー登録のAPIエンドポイント"""
     user: UserModel = UserModel(
-        name=user_params.name, email=user_params.email, password=user_params.password
+        name=user_params.name, password=user_params.password
     )
     try:
         user_repo.save(user=user)
