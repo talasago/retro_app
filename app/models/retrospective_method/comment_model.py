@@ -9,8 +9,6 @@ from app.database import Base
 class CommentModel(Base):
     """SQLAlchemyのモデルクラス"""
 
-    # INDEXED_COLUMNS: tuple = ("id", "uuid", "email", "name")
-
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     # uuid: Mapped[_uuid.UUID] = mapped_column(
