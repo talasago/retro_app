@@ -68,9 +68,9 @@ const LoginForm: FC = () => {
     <Box padding={3}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Box display="flex" flexDirection="column" sx={{ gap: 2 }}>
-          <FormControl error={errors.email !== undefined}>
-            <TextField label="メールアドレス" {...register('email')} />
-            <FormHelperText>{errors.email?.message}</FormHelperText>
+          <FormControl error={errors.name !== undefined}>
+            <TextField label="名前" {...register('name')} />
+            <FormHelperText>{errors.name?.message}</FormHelperText>
           </FormControl>
           <FormControl error={errors.password !== undefined}>
             <TextField
@@ -96,7 +96,7 @@ export default LoginForm;
 
 const loginUser = async (requestBody: LoginFormSchema) => {
   const params = new URLSearchParams();
-  params.append('username', requestBody.email);
+  params.append('username', requestBody.name);
   params.append('password', requestBody.password);
 
   return await axios.post(LOGIN_URL, params, {
