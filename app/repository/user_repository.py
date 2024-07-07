@@ -50,6 +50,8 @@ class UserRepository:
     ) -> UserModel | None:
         """条件に合致するレコードを検索して返す"""
 
+        # FIXME:columnはstg型ではなく、Modelのカラム名を指定した方が良いかも
+
         if raise_exception is None:
             raise TypeError("raise_exception must be True or False")
 
