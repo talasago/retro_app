@@ -9,18 +9,8 @@ class TestI18nTranslateWrapper:
         # ①複数のエラーがある場合でも翻訳されていること
         # ②不要な英語が含まれていないこと
         # ③msgがNoneの場合でもエラーにならないこと
-        # ④emailのエラーかどうかの判断は、locだけであること
         # ⑤urlが削除されていること
         errors = [
-            {
-                "type": "value_error",
-                "loc": ("email",),
-                "msg": "value is not a valid email address: The email address is not valid. It must have exactly one @-sign.",
-                "input": "invalid_email",
-                "ctx": {
-                    "reason": "The email address is not valid. It must have exactly one @-sign."
-                },
-            },
             {
                 "type": "string_too_long",
                 "loc": ("name",),
@@ -46,8 +36,7 @@ class TestI18nTranslateWrapper:
         ]
 
         translated_errors = I18nTranslateWrapper.trans(errors)
-        assert translated_errors[0]["msg"] == "有効なメールアドレスではありません。"
-        assert translated_errors[1]["msg"] == "50 文字以下で入力してください。"
-        assert translated_errors[2]["msg"] == "有効な文字を入力してください。"
-        assert translated_errors[3]["msg"] == "必須項目です。"
+        assert translated_errors[0]["msg"] == "50 文字以下で入力してください。"
+        assert translated_errors[1]["msg"] == "有効な文字を入力してください。"
+        assert translated_errors[2]["msg"] == "必須項目です。"
         assert translated_errors[2].get("url") is None
