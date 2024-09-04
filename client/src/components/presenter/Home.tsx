@@ -5,8 +5,6 @@
 
 import type { FC } from 'react';
 import {
-  AppBar,
-  Toolbar,
   Typography,
   Button,
   Container,
@@ -42,23 +40,6 @@ const FeatureSection = ({ title, description }) => (
 const Home: FC = () => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'white' }}>
-      <AppBar position="static" color="transparent" elevation={0}>
-        <Toolbar>
-          <Typography variant="h4" sx={{ flexGrow: 1, ml: 3 }}>
-            LOGO
-          </Typography>
-          <Button
-            color="inherit"
-            startIcon={<img src="user-icon.png" alt="User icon" />}
-          >
-            ログイン
-          </Button>
-          <Button variant="contained" sx={{ ml: 2, bgcolor: '#d9d9d9' }}>
-            ユーザー登録
-          </Button>
-        </Toolbar>
-      </AppBar>
-
       <Box sx={{ bgcolor: '#aaaaaa', py: 7 }}>
         <Container>
           <Typography variant="h3" gutterBottom>

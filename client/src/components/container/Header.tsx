@@ -1,16 +1,12 @@
 import type { FC } from 'react';
+import { Box, Typography, Toolbar, AppBar, Button } from '@mui/material';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
-import { ROUTES_LISTS } from 'routes';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
+import PersonIcon from '@mui/icons-material/Person';
 
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Link from '@mui/material/Link';
-import Toolbar from '@mui/material/Toolbar';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
 
 const Header: FC = () => {
@@ -19,9 +15,7 @@ const Header: FC = () => {
   const callProtectedApi = useProtectedApi();
   const isLogined: boolean = useAuthTokenObserver() as boolean;
 
-  const handleLogout = async (event: React.MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault(); // リンクをクリックするとページの最上部にスクロールしないようにする
-
+  const handleLogout = async () => {
     const [response, error] = await callProtectedApi(LOGOUT_URL, 'POST');
 
     if (error) {
@@ -50,37 +44,37 @@ const Header: FC = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: 'flex-end' }}>
           {/* 右寄せにしている */}
-          <Link
-            component={RouterLink}
-            to={ROUTES_LISTS.SIGN_UP}
+          <Typography variant="h4" sx={{ flexGrow: 1, ml: 3 }}>
+            LOGO
+          </Typography>
+          {/* TODO: モーダルを開く処理の追加が必要 */}
+          <Button
             color="inherit"
-            sx={{ margin: '10px' }}
-            hidden={isLogined}
-          >
-            ユーザー登録
-          </Link>
-          <Link
-            component={RouterLink}
-            to={ROUTES_LISTS.LOGIN}
-            color="inherit"
-            sx={{ margin: '10px' }}
-            hidden={isLogined}
+            startIcon={<PersonIcon />}
+            sx={{ display: isLogined ? 'none' : 'inhelit' }}
           >
             ログイン
-          </Link>
-          <Link
-            component={RouterLink}
-            to="#" // ダミーのリンク
+          </Button>
+          <Button
+            variant="contained"
+            sx={{
+              ml: 2,
+              bgcolor: '#d9d9d9', // この色でいいのか？
+              display: isLogined ? 'none' : 'inhelit',
+            }}
+          >
+            ユーザー登録
+          </Button>
+          <Button
             color="inherit"
+            sx={{ display: !isLogined ? 'none' : 'inhelit' }}
             onClick={handleLogout}
-            sx={{ margin: '10px' }}
-            hidden={!isLogined}
           >
             ログアウト
-          </Link>
+          </Button>
         </Toolbar>
       </AppBar>
     </Box>
