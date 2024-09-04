@@ -14,7 +14,7 @@ const HeaderContainer: FC = () => {
   const isLogined: boolean = useAuthTokenObserver() as boolean;
 
   const handleLogout = async () => {
-    const [response, error] = await callProtectedApi(LOGOUT_URL, 'POST');
+    const [_, error] = await callProtectedApi(LOGOUT_URL, 'POST');
 
     if (error) {
       dispatch(
@@ -24,20 +24,18 @@ const HeaderContainer: FC = () => {
           severity: 'error',
         }),
       );
-      console.error('Error:', error);
 
       return;
     }
 
+    AuthToken.resetTokens();
     dispatch(
       setAlert({
         open: true,
-        message: 'ログアウトが成功したで',
+        message: 'ログアウトが成功しました',
         severity: 'success',
       }),
     );
-    AuthToken.resetTokens();
-    console.log('Response:', response?.data);
   };
 
   return <HeaderPresenter isLogined={isLogined} onLogout={handleLogout} />;
