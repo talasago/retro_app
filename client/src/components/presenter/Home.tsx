@@ -1,65 +1,60 @@
-// TODO:カラーの3色の定義はどこか外だしした方が良いかも
-// TODO:各コンポーネントに分ける
-// TODO: CSSファイルに分けるかどうか。
-// TODO: ヘッダーコンポーネントの修正
-
 import type { FC } from 'react';
-import {
-  Typography,
-  Button,
-  Container,
-  Box,
-  Grid,
-  Avatar,
-} from '@mui/material';
+import { Typography, Button, Container, Box, Grid } from '@mui/material';
 import { styled } from '@mui/system';
+import CircleIcon from '@mui/icons-material/Circle';
 
-// TODO: Footerは別コンポーネントにする
-const Footer = styled(Box)({
-  backgroundColor: '#aaaaaa',
-  height: '80px',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
-});
+interface FeatureSectionProps {
+  title: string;
+  description: string;
+}
 
-const FeatureSection = ({ title, description }) => (
-  <Grid container spacing={2} alignItems="center">
+const FeatureSection: FC<FeatureSectionProps> = ({ title, description }) => (
+  <Grid container spacing={3} alignItems="center">
     <Grid item>
-      <Avatar sx={{ width: 110, height: 110, bgcolor: '#d9d9d9' }} />
+      <CircleIcon color="disabled" sx={{ width: 110, height: 110 }} />
     </Grid>
-    <Grid item xs>
-      <Typography variant="h6" component="div" fontWeight="bold">
+    <Grid item>
+      <Typography variant="h5" fontWeight="bold">
         {title}
       </Typography>
-      <Typography variant="body1">{description}</Typography>
+      <Typography variant="body1" sx={{ pt: 2 }}>
+        {description}
+      </Typography>
     </Grid>
   </Grid>
 );
 
+const Footer = styled(Box)({
+  backgroundColor: '#aaaaaa',
+  height: '80px',
+  display: 'flex',
+  alignItems: 'center',
+});
+
 const Home: FC = () => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'white' }}>
-      <Box sx={{ bgcolor: '#aaaaaa', py: 7 }}>
+      <Box sx={{ bgcolor: '#aaaaaa', py: 11 }}>
         <Container>
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             アプリのキャッチコピー
           </Typography>
-          <Typography variant="h3" gutterBottom>
+          <Typography variant="h4" gutterBottom>
             すてきなテキストが入るエリア
           </Typography>
           <Button
             variant="contained"
-            sx={{ mt: 4, bgcolor: '#454545', borderRadius: '50px' }}
+            sx={{ mt: 4, bgcolor: '#454545', borderRadius: '100px', px: 10 }}
+            size="large"
           >
             試してみる
           </Button>
         </Container>
       </Box>
 
-      <Container sx={{ py: 5 }}>
+      <Container sx={{ pt: 8 }}>
         <Typography variant="h4" align="center" gutterBottom>
-          アプリ名が入ります{' '}
+          グリーンレンズ
           <Typography variant="h6" component="span">
             とは
           </Typography>
@@ -70,13 +65,11 @@ const Home: FC = () => {
           description="特徴1の説明が入ります。特徴1の説明が入ります。特徴1の説明が入ります。特徴1の説明が入ります。"
         />
         <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-
         <FeatureSection
           title="特徴2"
           description="特徴2の説明が入ります。特徴2の説明が入ります。特徴2の説明が入ります。特徴2の説明が入ります。"
         />
         <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-
         <FeatureSection
           title="特徴3"
           description="さらにユーザー登録をすることで、様々なメリットがうんたらかんたら～～ 特徴3でユーザー登録へ誘導するテキスト"
@@ -84,24 +77,31 @@ const Home: FC = () => {
       </Container>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Button
-          variant="contained"
-          sx={{ bgcolor: '#d9d9d9', borderRadius: '8px' }}
-        >
-          ユーザー登録してはじめる
-        </Button>
+        <Button variant="contained">ユーザー登録してはじめる</Button>
       </Box>
 
       <Footer>
-        <Typography variant="body2" sx={{ mx: 2 }}>
-          © Copyright 2024
-        </Typography>
-        <Typography variant="body2" sx={{ mx: 2 }}>
-          プライバシーポリシー
-        </Typography>
-        <Typography variant="body2" sx={{ mx: 2 }}>
-          利用規約
-        </Typography>
+        <Grid
+          container
+          justifyContent="space-between"
+          alignItems="center"
+          sx={{ px: { xs: 0.5, sm: 5, md: 20 } }}
+        >
+          <Grid item xs={4} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
+            <Typography variant="body2">© Copyright __sakopon 2024</Typography>
+          </Grid>
+          <Grid
+            item
+            xs={4}
+            container
+            sx={{ textAlign: { xs: 'center', sm: 'right' } }}
+          >
+            <Typography variant="body2" sx={{ mx: 1 }}>
+              プライバシーポリシー
+            </Typography>
+            <Typography variant="body2">利用規約</Typography>
+          </Grid>
+        </Grid>
       </Footer>
     </Box>
   );
