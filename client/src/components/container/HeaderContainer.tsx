@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+import { useState } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
+import LoginModal from 'features/Login/components/container/LoginModal';
 import HeaderPresenter from '../presenter/HeaderPresenter';
 
 const HeaderContainer: FC = () => {
@@ -12,6 +14,14 @@ const HeaderContainer: FC = () => {
   const { setAlert } = alertSlice.actions;
   const callProtectedApi = useProtectedApi();
   const isLogined: boolean = useAuthTokenObserver() as boolean;
+
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const handleOpenLoginModal = (): void => {
+    setIsLoginModalOpen(true);
+  };
+  const handleCloseLoginModal = (): void => {
+    setIsLoginModalOpen(false);
+  };
 
   const handleLogout = async () => {
     const [_, error] = await callProtectedApi(LOGOUT_URL, 'POST');
@@ -38,7 +48,16 @@ const HeaderContainer: FC = () => {
     );
   };
 
-  return <HeaderPresenter isLogined={isLogined} onLogout={handleLogout} />;
+  return (
+    <>
+      <HeaderPresenter
+        isLogined={isLogined}
+        onLogout={handleLogout}
+        onOpenLoginModal={handleOpenLoginModal}
+      />
+      <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
+    </>
+  );
 };
 
 export default HeaderContainer;

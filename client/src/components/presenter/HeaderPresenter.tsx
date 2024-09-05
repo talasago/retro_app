@@ -5,9 +5,14 @@ import PersonIcon from '@mui/icons-material/Person';
 interface HeaderPresenterProps {
   isLogined: boolean;
   onLogout: () => void;
+  onOpenLoginModal: () => void;
 }
 
-const HeaderPresenter: FC<HeaderPresenterProps> = ({ isLogined, onLogout }) => {
+const HeaderPresenter: FC<HeaderPresenterProps> = ({
+  isLogined,
+  onLogout,
+  onOpenLoginModal,
+}) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="transparent" elevation={0}>
@@ -21,6 +26,7 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({ isLogined, onLogout }) => {
             color="inherit"
             startIcon={<PersonIcon />}
             sx={{ display: isLogined ? 'none' : 'inhelit' }}
+            onClick={onOpenLoginModal}
           >
             ログイン
           </Button>
