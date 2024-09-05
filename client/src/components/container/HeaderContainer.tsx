@@ -23,7 +23,7 @@ const HeaderContainer: FC = () => {
     setIsLoginModalOpen(false);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async (): Promise<void> => {
     const [_, error] = await callProtectedApi(LOGOUT_URL, 'POST');
 
     if (error) {
