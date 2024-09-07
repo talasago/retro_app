@@ -66,7 +66,7 @@ const HeaderContainer: FC = () => {
       {memoizedHeaderPresenter}
       <LoginModalContainer
         isOpen={isLoginModalOpen}
-        onClose={handleCloseLoginModal}
+        onCloseModal={handleCloseLoginModal}
       />
     </>
   );

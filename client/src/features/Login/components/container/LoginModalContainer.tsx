@@ -19,7 +19,7 @@ import type { LoginFormSchema } from '../schemas/loginFormSchema';
 
 interface LoginModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onCloseModal: () => void;
 }
 
 const loginUser = async (requestBody: LoginFormSchema) => {
@@ -34,7 +34,7 @@ const loginUser = async (requestBody: LoginFormSchema) => {
   });
 };
 
-const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
 
@@ -67,6 +67,7 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
         }),
       );
       console.log('Response:', response.data);
+      onCloseModal();
     } catch (error) {
       // TODO:500エラーと400エラーでメッセージを変える
       dispatch(
@@ -84,7 +85,7 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
     () => (
       <LoginModalPresenter
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={onCloseModal}
         register={register}
         handleSubmit={handleSubmit}
         onSubmit={onSubmit}
