@@ -50,38 +50,35 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
   });
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
-  const onSubmit: SubmitHandler<LoginFormSchema> = useCallback(
-    async (loginFormData) => {
-      try {
-        const response = await loginUser(loginFormData);
+  const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
+    try {
+      const response = await loginUser(loginFormData);
 
-        AuthToken.setTokens(
-          response.data.access_token,
-          response.data.refresh_token,
-        );
+      AuthToken.setTokens(
+        response.data.access_token,
+        response.data.refresh_token,
+      );
 
-        dispatch(
-          setAlert({
-            open: true,
-            message: 'ログインしました',
-            severity: 'success',
-          }),
-        );
-        console.log('Response:', response.data);
-      } catch (error) {
-        // TODO:500エラーと400エラーでメッセージを変える
-        dispatch(
-          setAlert({
-            open: true,
-            message: 'ログインAPIがエラーになってるで',
-            severity: 'error',
-          }),
-        );
-        console.error('Error:', error);
-      }
-    },
-    [dispatch, setAlert],
-  );
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインしました',
+          severity: 'success',
+        }),
+      );
+      console.log('Response:', response.data);
+    } catch (error) {
+      // TODO:500エラーと400エラーでメッセージを変える
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインAPIがエラーになってるで',
+          severity: 'error',
+        }),
+      );
+      console.error('Error:', error);
+    }
+  };
 
   const memoizedLoginModalPresenter = useMemo(
     () => (
@@ -95,7 +92,8 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
         isSubmitting={isSubmitting}
       />
     ),
-    [isOpen, onClose, register, handleSubmit, onSubmit, errors, isSubmitting],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isOpen, isSubmitting],
   );
 
   return memoizedLoginModalPresenter;
