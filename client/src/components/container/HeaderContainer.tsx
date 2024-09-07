@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useState } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
@@ -48,13 +48,22 @@ const HeaderContainer: FC = () => {
     );
   };
 
-  return (
-    <>
+  const memoizedHeaderPresenter = useMemo(
+    () => (
       <HeaderPresenter
         isLogined={isLogined}
         onLogout={handleLogout}
         onOpenLoginModal={handleOpenLoginModal}
       />
+    ),
+    // ログイン状態が変化したときだけ、表示が変わるので再レンダリングする
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isLogined],
+  );
+
+  return (
+    <>
+      {memoizedHeaderPresenter}
       <LoginModalContainer
         isOpen={isLoginModalOpen}
         onClose={handleCloseLoginModal}
@@ -63,4 +72,4 @@ const HeaderContainer: FC = () => {
   );
 };
 
-export default HeaderContainer;
+export default React.memo(HeaderContainer);

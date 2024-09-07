@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import React from 'react';
 import { Box, Typography, Toolbar, AppBar, Button } from '@mui/material';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -25,7 +26,7 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
           <Button
             color="inherit"
             startIcon={<PersonIcon />}
-            sx={{ display: isLogined ? 'none' : 'inhelit' }}
+            sx={{ display: isLogined ? 'none' : 'inherit' }}
             onClick={onOpenLoginModal}
           >
             ログイン
@@ -35,14 +36,14 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
             sx={{
               ml: 2,
               bgcolor: '#d9d9d9', // この色でいいのか？
-              display: isLogined ? 'none' : 'inhelit',
+              display: isLogined ? 'none' : 'inherit',
             }}
           >
             ユーザー登録
           </Button>
           <Button
             color="inherit"
-            sx={{ display: !isLogined ? 'none' : 'inhelit' }}
+            sx={{ display: !isLogined ? 'none' : 'inherit' }}
             onClick={onLogout}
           >
             ログアウト
@@ -53,4 +54,4 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
   );
 };
 
-export default HeaderPresenter;
+export default React.memo(HeaderPresenter);

@@ -2,7 +2,7 @@
 // TODO:デザインとの差異確認
 // TODO:モーダル閉じない時があるもんだい
 
-import { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
@@ -34,7 +34,6 @@ const loginUser = async (requestBody: LoginFormSchema) => {
   });
 };
 
-// TODO: ヘッダーとこれはuseMemoを使ってもいいかも
 const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
@@ -102,4 +101,4 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
   return memoizedLoginModalPresenter;
 };
 
-export default LoginModalContainer;
+export default React.memo(LoginModalContainer);
