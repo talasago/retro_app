@@ -2,7 +2,6 @@
 // TODO:デザインとの差異確認
 // TODO:モーダル閉じない時があるもんだい
 // TODO:ログインフォームの削除
-// TODO:ログインフォームの内容からロジックを移植
 // presenterとcontainerの分離
 
 import type { FC } from 'react';
@@ -66,8 +65,33 @@ const LoginModal: FC<LoginModalProps> = ({ isOpen, onClose }): JSX.Element => {
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
-    console.log(loginFormData);
-    // TODO:ログインロジックを実装
+    try {
+      const response = await loginUser(loginFormData);
+
+      AuthToken.setTokens(
+        response.data.access_token,
+        response.data.refresh_token,
+      );
+
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインしました',
+          severity: 'success',
+        }),
+      );
+      console.log('Response:', response.data);
+    } catch (error) {
+      // TODO:500エラーと400エラーでメッセージを変える
+      dispatch(
+        setAlert({
+          open: true,
+          message: 'ログインAPIがエラーになってるで',
+          severity: 'error',
+        }),
+      );
+      console.error('Error:', error);
+    }
   };
 
   return (
@@ -144,6 +168,7 @@ const LoginModal: FC<LoginModalProps> = ({ isOpen, onClose }): JSX.Element => {
                 fullWidth
                 variant="outlined"
                 sx={{ height: 50, borderColor: 'grey.600', color: 'grey.600' }}
+                // TODO: ユーザー登録モーダルを開く
               >
                 ユーザー登録はこちら
               </Button>
