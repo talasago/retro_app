@@ -2,6 +2,7 @@
 // TODO:デザインとの差異確認
 // TODO:モーダル閉じない時があるもんだい
 
+import { useMemo, useCallback } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
@@ -50,47 +51,55 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onClose }) => {
   });
   // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
-  const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
-    try {
-      const response = await loginUser(loginFormData);
+  const onSubmit: SubmitHandler<LoginFormSchema> = useCallback(
+    async (loginFormData) => {
+      try {
+        const response = await loginUser(loginFormData);
 
-      AuthToken.setTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-      );
+        AuthToken.setTokens(
+          response.data.access_token,
+          response.data.refresh_token,
+        );
 
-      dispatch(
-        setAlert({
-          open: true,
-          message: 'ログインしました',
-          severity: 'success',
-        }),
-      );
-      console.log('Response:', response.data);
-    } catch (error) {
-      // TODO:500エラーと400エラーでメッセージを変える
-      dispatch(
-        setAlert({
-          open: true,
-          message: 'ログインAPIがエラーになってるで',
-          severity: 'error',
-        }),
-      );
-      console.error('Error:', error);
-    }
-  };
-
-  return (
-    <LoginModalPresenter
-      isOpen={isOpen}
-      onClose={onClose}
-      register={register}
-      handleSubmit={handleSubmit}
-      onSubmit={onSubmit}
-      errors={errors}
-      isSubmitting={isSubmitting}
-    />
+        dispatch(
+          setAlert({
+            open: true,
+            message: 'ログインしました',
+            severity: 'success',
+          }),
+        );
+        console.log('Response:', response.data);
+      } catch (error) {
+        // TODO:500エラーと400エラーでメッセージを変える
+        dispatch(
+          setAlert({
+            open: true,
+            message: 'ログインAPIがエラーになってるで',
+            severity: 'error',
+          }),
+        );
+        console.error('Error:', error);
+      }
+    },
+    [dispatch, setAlert],
   );
+
+  const memoizedLoginModalPresenter = useMemo(
+    () => (
+      <LoginModalPresenter
+        isOpen={isOpen}
+        onClose={onClose}
+        register={register}
+        handleSubmit={handleSubmit}
+        onSubmit={onSubmit}
+        errors={errors}
+        isSubmitting={isSubmitting}
+      />
+    ),
+    [isOpen, onClose, register, handleSubmit, onSubmit, errors, isSubmitting],
+  );
+
+  return memoizedLoginModalPresenter;
 };
 
 export default LoginModalContainer;
