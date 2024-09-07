@@ -1,7 +1,6 @@
 // TODO:各パラメータの調整確認
 // TODO:デザインとの差異確認
 // TODO:モーダル閉じない時があるもんだい
-// TODO:ログインフォームの削除
 
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
