@@ -1,11 +1,4 @@
-// TODO:各パラメータの調整確認
-// TODO:デザインとの差異確認
-// TODO:モーダル閉じない時があるもんだい
-// TODO:ログインフォームの削除
-// presenterとcontainerの分離
-
-import type { FC } from 'react';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { type FC } from 'react';
 import {
   Box,
   Button,
@@ -18,82 +11,34 @@ import {
   FormHelperText,
   CircularProgress,
 } from '@mui/material';
-import axios from 'axios';
-import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
-import { useForm } from 'react-hook-form';
-import type { SubmitHandler } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { alertSlice } from 'stores/alert';
-import type { AppDispatch } from 'stores/store';
+import {
+  type FieldErrors,
+  type UseFormRegister,
+  type UseFormHandleSubmit,
+  type SubmitHandler,
+} from 'react-hook-form';
 import LockIcon from '@mui/icons-material/Lock';
-import { AuthToken } from 'domains/AuthToken';
-import { loginFormSchema } from '../schemas/loginFormSchema';
-import type { LoginFormSchema } from '../schemas/loginFormSchema';
+import { type LoginFormSchema } from '../schemas/loginFormSchema';
 
-interface LoginModalProps {
+interface LoginModalPresenterProps {
   isOpen: boolean;
   onClose: () => void;
+  register: UseFormRegister<LoginFormSchema>;
+  handleSubmit: UseFormHandleSubmit<LoginFormSchema>;
+  onSubmit: SubmitHandler<LoginFormSchema>;
+  errors: FieldErrors<LoginFormSchema>;
+  isSubmitting: boolean;
 }
 
-const loginUser = async (requestBody: LoginFormSchema) => {
-  const params = new URLSearchParams();
-  params.append('username', requestBody.name);
-  params.append('password', requestBody.password);
-
-  return await axios.post(LOGIN_URL, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  });
-};
-
-// TODO: ヘッダーとこれはuseMemoを使ってもいいかも
-const LoginModal: FC<LoginModalProps> = ({ isOpen, onClose }): JSX.Element => {
-  const dispatch = useDispatch<AppDispatch>();
-  const { setAlert } = alertSlice.actions;
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormSchema>({
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
-    resolver: yupResolver(loginFormSchema),
-  });
-  // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
-
-  const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
-    try {
-      const response = await loginUser(loginFormData);
-
-      AuthToken.setTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-      );
-
-      dispatch(
-        setAlert({
-          open: true,
-          message: 'ログインしました',
-          severity: 'success',
-        }),
-      );
-      console.log('Response:', response.data);
-    } catch (error) {
-      // TODO:500エラーと400エラーでメッセージを変える
-      dispatch(
-        setAlert({
-          open: true,
-          message: 'ログインAPIがエラーになってるで',
-          severity: 'error',
-        }),
-      );
-      console.error('Error:', error);
-    }
-  };
-
+const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
+  isOpen,
+  onClose,
+  register,
+  handleSubmit,
+  onSubmit,
+  errors,
+  isSubmitting,
+}) => {
   return (
     <div>
       <Modal
@@ -167,7 +112,11 @@ const LoginModal: FC<LoginModalProps> = ({ isOpen, onClose }): JSX.Element => {
               <Button
                 fullWidth
                 variant="outlined"
-                sx={{ height: 50, borderColor: 'grey.600', color: 'grey.600' }}
+                sx={{
+                  height: 50,
+                  borderColor: 'grey.600',
+                  color: 'grey.600',
+                }}
                 // TODO: ユーザー登録モーダルを開く
               >
                 ユーザー登録はこちら
@@ -180,4 +129,4 @@ const LoginModal: FC<LoginModalProps> = ({ isOpen, onClose }): JSX.Element => {
   );
 };
 
-export default LoginModal;
+export default LoginModalPresenter;

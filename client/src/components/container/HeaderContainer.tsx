@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
-import LoginModal from 'features/Login/components/container/LoginModal';
+import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
 import HeaderPresenter from '../presenter/HeaderPresenter';
 
 const HeaderContainer: FC = () => {
@@ -55,7 +55,10 @@ const HeaderContainer: FC = () => {
         onLogout={handleLogout}
         onOpenLoginModal={handleOpenLoginModal}
       />
-      <LoginModal isOpen={isLoginModalOpen} onClose={handleCloseLoginModal} />
+      <LoginModalContainer
+        isOpen={isLoginModalOpen}
+        onClose={handleCloseLoginModal}
+      />
     </>
   );
 };
