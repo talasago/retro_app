@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';

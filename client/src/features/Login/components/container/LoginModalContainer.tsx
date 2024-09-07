@@ -2,7 +2,7 @@
 // TODO:デザインとの差異確認
 // TODO:モーダル閉じない時があるもんだい
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
