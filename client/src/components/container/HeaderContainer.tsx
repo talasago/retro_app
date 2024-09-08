@@ -15,6 +15,8 @@ const HeaderContainer: FC = () => {
   const callProtectedApi = useProtectedApi();
   const isLogined: boolean = useAuthTokenObserver() as boolean;
 
+  // TODO: ここら辺LoginModalContainerの責務かもしれないがどうだろう。
+  // ただ、ログインモーダル→サインインに飛ぶ可能性もあるので、このコンポーネントが良いのか？
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const handleOpenLoginModal = (): void => {
     setIsLoginModalOpen(true);

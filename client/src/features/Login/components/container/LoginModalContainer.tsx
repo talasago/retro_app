@@ -1,6 +1,4 @@
-// TODO:各パラメータの調整確認
-// TODO:デザインとの差異確認
-// TODO:モーダル閉じない時があるもんだい
+// todo:×ボタン
 
 import React, { useMemo } from 'react';
 import type { FC } from 'react';

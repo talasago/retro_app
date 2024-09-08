@@ -18,11 +18,9 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: 'flex-end' }}>
-          {/* 右寄せにしている */}
           <Typography variant="h4" sx={{ flexGrow: 1, ml: 3 }}>
             LOGO
           </Typography>
-          {/* TODO: モーダルを開く処理の追加が必要 */}
           <Button
             color="inherit"
             startIcon={<PersonIcon />}
