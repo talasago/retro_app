@@ -2,10 +2,10 @@ import type { FC } from 'react';
 import React, { useState, useMemo } from 'react';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import { signUpModalSlice } from 'stores/signUpModal';
-import type { RootState, AppDispatch } from 'stores/store';
+import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
 import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
 import SignUpModalContainer from 'features/SignUp/components/container/SignUpModalContainer';
@@ -27,16 +27,10 @@ const HeaderContainer: FC = () => {
     setIsLoginModalOpen(false);
   };
 
-  const isSignUpModalOpen = useSelector(
-    (state: RootState) => state.signUpModal.isOpen,
-  );
-  const { openSignUpModal, closeSignUpModal } = signUpModalSlice.actions;
+  const { openSignUpModal } = signUpModalSlice.actions;
 
   const handleOpenSignUpModal = (): void => {
     dispatch(openSignUpModal());
-  };
-  const handleCloseSignUpModal = (): void => {
-    dispatch(closeSignUpModal());
   };
 
   const handleLogout = async (): Promise<void> => {
@@ -85,10 +79,7 @@ const HeaderContainer: FC = () => {
         isOpen={isLoginModalOpen}
         onCloseModal={handleCloseLoginModal}
       />
-      <SignUpModalContainer
-        isOpen={isSignUpModalOpen}
-        onCloseModal={handleCloseSignUpModal}
-      />
+      <SignUpModalContainer />
     </>
   );
 };

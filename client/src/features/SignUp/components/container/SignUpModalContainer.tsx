@@ -5,17 +5,13 @@ import axios from 'axios';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { alertSlice } from 'stores/alert';
-import type { AppDispatch } from 'stores/store';
+import { signUpModalSlice } from 'stores/signUpModal';
+import type { AppDispatch, RootState } from 'stores/store';
 import SignUpModalPresenter from '../presenter/SignUpModalPresenter';
 import { registrationFormSchema } from '../schemas/registrationFormSchema';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
-
-interface SignUpModalProps {
-  isOpen: boolean;
-  onCloseModal: () => void;
-}
 
 const registUser = async (data: RegistrationFormSchema) => {
   return await axios.post(SIGN_UP_URL, data, {
@@ -25,12 +21,15 @@ const registUser = async (data: RegistrationFormSchema) => {
   });
 };
 
-const SignUpModalContainer: FC<SignUpModalProps> = ({
-  isOpen,
-  onCloseModal,
-}) => {
+const SignUpModalContainer: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
+
+  const isOpen = useSelector((state: RootState) => state.signUpModal.isOpen);
+  const { closeSignUpModal } = signUpModalSlice.actions;
+  const handleCloseSignUpModal = (): void => {
+    dispatch(closeSignUpModal());
+  };
 
   const {
     register,
@@ -56,7 +55,7 @@ const SignUpModalContainer: FC<SignUpModalProps> = ({
         }),
       );
       console.log('Response:', response.data);
-      onCloseModal();
+      handleCloseSignUpModal();
       reset();
     } catch (error) {
       // TODO:500エラーと400エラーでメッセージを変える
@@ -75,7 +74,7 @@ const SignUpModalContainer: FC<SignUpModalProps> = ({
     () => (
       <SignUpModalPresenter
         isOpen={isOpen}
-        onClose={onCloseModal}
+        onClose={handleCloseSignUpModal}
         register={register}
         handleSubmit={handleSubmit}
         onSubmit={onSubmit}
