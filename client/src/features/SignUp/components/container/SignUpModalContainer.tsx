@@ -1,5 +1,3 @@
-// todo:×ボタン
-
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,7 +25,10 @@ const registUser = async (data: RegistrationFormSchema) => {
   });
 };
 
-const SignUpModalContainer: FC<SignUpModalProps> = ({ isOpen, onCloseModal }) => {
+const SignUpModalContainer: FC<SignUpModalProps> = ({
+  isOpen,
+  onCloseModal,
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
 

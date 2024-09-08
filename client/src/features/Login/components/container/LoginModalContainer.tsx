@@ -1,5 +1,3 @@
-// todo:×ボタン
-
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
