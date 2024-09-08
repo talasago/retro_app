@@ -7,6 +7,7 @@ import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
 import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
+import SignUpModalContainer from 'features/SignUp/components/container/SignUpModalContainer';
 import HeaderPresenter from '../presenter/HeaderPresenter';
 
 const HeaderContainer: FC = () => {
@@ -23,6 +24,14 @@ const HeaderContainer: FC = () => {
   };
   const handleCloseLoginModal = (): void => {
     setIsLoginModalOpen(false);
+  };
+
+  const [isSignUpModalOpen, setisSignUpModalOpen] = useState(false);
+  const handleOpenSignUpModal = (): void => {
+    setisSignUpModalOpen(true);
+  };
+  const handleCloseSignUpModal = (): void => {
+    setisSignUpModalOpen(false);
   };
 
   const handleLogout = async (): Promise<void> => {
@@ -56,6 +65,7 @@ const HeaderContainer: FC = () => {
         isLogined={isLogined}
         onLogout={handleLogout}
         onOpenLoginModal={handleOpenLoginModal}
+        onOpenSignUpModal={handleOpenSignUpModal}
       />
     ),
     // ログイン状態が変化したときだけ、表示が変わるので再レンダリングする
@@ -69,6 +79,10 @@ const HeaderContainer: FC = () => {
       <LoginModalContainer
         isOpen={isLoginModalOpen}
         onCloseModal={handleCloseLoginModal}
+      />
+      <SignUpModalContainer
+        isOpen={isSignUpModalOpen}
+        onCloseModal={handleCloseSignUpModal}
       />
     </>
   );

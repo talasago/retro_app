@@ -7,12 +7,14 @@ interface HeaderPresenterProps {
   isLogined: boolean;
   onLogout: () => void;
   onOpenLoginModal: () => void;
+  onOpenSignUpModal: () => void;
 }
 
 const HeaderPresenter: FC<HeaderPresenterProps> = ({
   isLogined,
   onLogout,
   onOpenLoginModal,
+  onOpenSignUpModal,
 }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -36,6 +38,7 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
               bgcolor: '#d9d9d9', // この色でいいのか？
               display: isLogined ? 'none' : 'inherit',
             }}
+            onClick={onOpenSignUpModal}
           >
             ユーザー登録
           </Button>
