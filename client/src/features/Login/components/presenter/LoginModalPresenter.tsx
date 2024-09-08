@@ -10,6 +10,7 @@ import {
   Modal,
   FormHelperText,
   CircularProgress,
+  IconButton,
 } from '@mui/material';
 import {
   type FieldErrors,
@@ -17,6 +18,7 @@ import {
   type UseFormHandleSubmit,
   type SubmitHandler,
 } from 'react-hook-form';
+import CloseIcon from '@mui/icons-material/Close';
 import LockIcon from '@mui/icons-material/Lock';
 import { type LoginFormSchema } from '../schemas/loginFormSchema';
 
@@ -77,6 +79,17 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
               e.stopPropagation();
             }}
           >
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-end',
+              }}
+            >
+              <IconButton onClick={onClose}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
                 <Avatar sx={{ bgcolor: 'grey.800', width: 90, height: 90 }}>
