@@ -141,18 +141,6 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
               >
                 {isSubmitting ? <CircularProgress size={24} /> : 'ログインする'}
               </Button>
-              <Button
-                fullWidth
-                variant="outlined"
-                sx={{
-                  height: 50,
-                  borderColor: 'grey.600',
-                  color: 'grey.600',
-                }}
-                // TODO: ユーザー登録モーダルを開く
-              >
-                ユーザー登録はこちら
-              </Button>
             </form>
           </Paper>
         </Container>
