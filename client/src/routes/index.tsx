@@ -2,11 +2,7 @@ import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import Home from '../components/presenter/Home';
-import RegistrationForm from '../features/SignUp/components/container/RegistrationForm';
-
-export const ROUTES_LISTS = {
-  SIGN_UP: 'sign_up',
-} as const;
+export const ROUTES_LISTS = {} as const;
 
 const IndexRoutes: FC = () => {
   const { hash, pathname } = useLocation();
@@ -20,7 +16,6 @@ const IndexRoutes: FC = () => {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path={ROUTES_LISTS.SIGN_UP} element={<RegistrationForm />} />
       <Route path="*" element={<Home />} />
     </Routes>
   );
