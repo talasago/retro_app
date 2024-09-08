@@ -1,5 +1,5 @@
 import os
-import re
+from copy import deepcopy
 from typing import TYPE_CHECKING, Final, List
 
 from pydantic_i18n import JsonLoader, PydanticI18n
@@ -18,23 +18,10 @@ class I18nTranslateWrapper:
 
     @classmethod
     def trans(cls, errors: list["ErrorDict"]) -> List:
-        translated_errors = tr.translate(errors, locale=DEFAULT_LOCALE)
+        original_errors: list["ErrorDict"] = tr.translate(errors, locale=DEFAULT_LOCALE)
+        translated_errors: list[dict] = deepcopy(original_errors)  # 一応deepcopyしてる
 
         for error in translated_errors:
-            error["msg"] = cls.__update_error_message(error)
             error.pop("url", None)
+
         return translated_errors
-
-    @staticmethod
-    def __update_error_message(error: dict) -> str:
-        loc = error.get("loc", "") or ""  # Noneの場合があるため空文字を設定
-        msg = error.get("msg", "")
-
-        if "email" in loc:
-            return "有効なメールアドレスではありません。"
-        else:
-            return re.sub("[a-zA-Z]", "", msg)
-            # 正規表現を使用してアルファベットを削除
-            # 理由：「String should have at most {} characters」のようなエラーメッセージの場合
-            # 「50 charactars文字以下で入力してください。」と不要な英語が残ってしまうため
-            # 恐らくPydanticI18nのバグ。https://github.com/boardpack/pydantic-i18n/issues/160 で対応されそうな気がする。

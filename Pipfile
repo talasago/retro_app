@@ -9,12 +9,12 @@ mangum = "*"
 sqlalchemy = "*"
 alembic = "*" # これはlambdaにデプロイする必要ないからdevでもいいかもな
 passlib = {version = "*", extras = ["bcrypt"]}
-email-validator = "*"
 python-multipart = "*"
-python-jose = {version = "*", extras = ["cryptography"]}
 psycopg2-binary = "*"
 pydantic-i18n = "*"
 boto3 = "*"
+pyjwt = "*"
+cryptography = "*"
 
 [dev-packages]
 flake8 = "*"

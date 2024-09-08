@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String
@@ -14,8 +14,6 @@ if TYPE_CHECKING:
 
 class CommentModel(Base):
     """SQLAlchemyのモデルクラス"""
-
-    # INDEXED_COLUMNS: tuple = ("id", "uuid", "email", "name")
 
     __tablename__ = "comments"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
@@ -34,10 +32,13 @@ class CommentModel(Base):
 
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow()
+        DateTime, nullable=False, default=datetime.now(timezone.utc)
     )
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.utcnow(), onupdate=datetime.utcnow()
+        DateTime,
+        nullable=False,
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc),
     )
 
     # 外部キー

@@ -33,6 +33,8 @@ from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
+    from typing import Sequence
+
     from fastapi import Request
 
     from app.repository.user_repository import UserRepository
@@ -46,9 +48,22 @@ add_cors_middleware(app)
 async def validation_exception_handler(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
+    errors: Sequence[dict] = exc.errors()
+
+    for error in errors:
+        if "ctx" in error and isinstance(
+            error.get("ctx", "").get("error", ""), ValueError
+        ):
+            # pydenticのカスタムバリデーションを使ったとき、
+            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
+            error["ctx"]["error"] = str(error["ctx"]["error"])
+        if "loc" in error and (error.get("loc", "") == ("body", "password")):
+            # ユーザーが入力したpasswordをマスク化する
+            error["input"] = "[MASKED]"
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(exc.errors())},  # type: ignore
+        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
         #  type(exc.errors()) => listとなっていることを確認している
     )
 
@@ -63,9 +78,7 @@ def signup_user(
     user_params: UserCreate, user_repo: "UserRepository" = Depends(get_user_repo)
 ):
     """ユーザー登録のAPIエンドポイント"""
-    user: UserModel = UserModel(
-        name=user_params.name, email=user_params.email, password=user_params.password
-    )
+    user: UserModel = UserModel(name=user_params.name, password=user_params.password)
     try:
         user_repo.save(user=user)
     except RetroAppColmunUniqueError as e:
@@ -95,8 +108,7 @@ def sign_in(
     """
     Request bodyのParameters(form_data):
       - grant_type: 使用していない
-      - username: このアプリではユーザーのメールアドレスとする。紛らわしいがユーザー名ではない。
-        OAuthの仕様でメールアドレスがないため、仕方なくusernameに入れている。
+      - username: ユーザー名
       - password: ユーザーのパスワード
       - self.scopes: 使用していない
       - client_id: 使用していない
@@ -105,7 +117,7 @@ def sign_in(
 
     try:
         user: "UserModel" = auth_service.authenticate(
-            email=form_data.username, password=form_data.password
+            username=form_data.username, password=form_data.password
         )
     except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
         raise HTTPException(

@@ -11,8 +11,9 @@ client_comment = TestClient(app_comment)
 @pytest.fixture(scope="session")
 def add_comment_api():
     def _method(
-        comment_data: dict,
         access_token: str,
+        comment_data: dict = {},
+        is_assert_response_code_2xx: bool = True,
         retrospective_method_id=1,
         option: dict = {},
     ) -> Response:
@@ -25,7 +26,8 @@ def add_comment_api():
                 "Origin": "http://localhost",
             },
         )
-        assert response.status_code == 201
+        if is_assert_response_code_2xx:
+            assert response.status_code == 201
         return response
 
     return _method

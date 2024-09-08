@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
 import pytest
@@ -64,6 +64,17 @@ class TestAuthService:
                     auth_service.get_current_user(token=refresh_token)
                 assert str(e.value) == "TokenTypeが一致しません。"
 
+        class TestWhenInvalidTokenWithNotUuid:
+            def test_raise_error(self, auth_service: AuthService):
+                """デコードしたペイロードのuuidがuuidの形式でない場合、例外を返す"""
+                invalid_token = generate_test_token(
+                    token_type=TokenType.ACCESS_TOKEN, user_uuid="hoge"
+                )
+
+                with pytest.raises(RetroAppAuthenticationError) as e:
+                    auth_service.get_current_user(token=invalid_token)
+                assert str(e.value) == "uuidの形式が正しくありません。"
+
         class TestWhenNotExistUserUUID:
             def test_raise_error(self, auth_service: AuthService):
                 """デコードしたペイロードのuuidで検索した結果、レコードが無い場合は例外を返す"""
@@ -80,13 +91,13 @@ class TestAuthService:
 
                 expired_access_token = generate_test_token(
                     token_type=TokenType.ACCESS_TOKEN,
-                    exp=datetime.utcnow() - timedelta(minutes=100),
+                    exp=datetime.now(timezone.utc) - timedelta(minutes=100),
                 )
 
                 with pytest.raises(RetroAppTokenExpiredError) as e:
                     auth_service.get_current_user(token=expired_access_token)
                 # assert str(e.value) == 'ログイン有効期間を過ぎています。再度ログインしてください。'
-                assert str(e.value) == "Signature has expired."
+                assert str(e.value) == "Signature has expired"
 
     class TestGetCurrentUserFromRefreshToken:
         class TestWhenValidParam:
@@ -178,22 +189,24 @@ class TestAuthService:
             def test_return_authenticated_user(
                 self, auth_service: AuthService, user_repo
             ):
-                """メールアドレスとパスワードが一致している場合、そのユーザーを返すこと"""
+                """usernameとパスワードが一致している場合、そのユーザーを返すこと"""
                 user_params = {
-                    "email": "authenticate_user@example.com",
+                    "name": "authenticate_user",
                     "password": "qwsedfrtgyhujikolp;@:!234",
                 }
                 test_user: "UserModel" = create_test_user(user_repo, **user_params)
-                authenticated_user = auth_service.authenticate(**user_params)
+                authenticated_user = auth_service.authenticate(
+                    username=user_params["name"], password=user_params["password"]
+                )
 
                 assert authenticated_user == test_user
-                assert authenticated_user.email == user_params["email"]
+                assert authenticated_user.name == user_params["name"]
 
-        class TestWhenNotExistEmail:
+        class TestWhenNotExistName:
             def test_raise_exception(self, auth_service: AuthService):
-                """メールアドレスが存在しない場合、エラーを返す"""
+                """usernameが存在しない場合、エラーを返す"""
                 user_params = {
-                    "email": "not_exsist_mail@example.com",
+                    "username": "not_exsist_mail",
                     "password": "qwsedfrtgyhujikolp;@:!234",
                 }
 
@@ -208,31 +221,31 @@ class TestAuthService:
                 test_user: "UserModel" = create_test_user(user_repo)
 
                 with pytest.raises(RetroAppAuthenticationError) as e:
-                    auth_service.authenticate(email=test_user.email, password="hoge")
+                    auth_service.authenticate(username=test_user.name, password="hoge")
 
                 assert str(e.value) == "パスワードが一致しません。"
 
         class TestWhenParamIsNone:
             def test_raise_exeption(self, auth_service: AuthService):
-                """email、passwordどちらがNondでもエラーとする"""
+                """username、passwordどちらがNondでもエラーとする"""
                 # あまり重要度が高い処理ではないので、1test1assertとはしない
 
                 with pytest.raises(TypeError) as e:
-                    auth_service.authenticate(email=None, password=None)  # type: ignore
+                    auth_service.authenticate(username=None, password=None)  # type: ignore
 
                 # fmt: off
-                assert str(e.value) == "email and password must be other than None"
+                assert str(e.value) == "username and password must be other than None"
                 # fmt: on
 
                 with pytest.raises(TypeError) as e:
-                    auth_service.authenticate(email="hoge", password=None)  # type: ignore
+                    auth_service.authenticate(username="hoge", password=None)  # type: ignore
 
                 # fmt: off
-                assert str(e.value) == "email and password must be other than None"
+                assert str(e.value) == "username and password must be other than None"
                 # fmt: on
                 with pytest.raises(TypeError) as e:
-                    auth_service.authenticate(email=None, password="hoge")  # type: ignore
+                    auth_service.authenticate(username=None, password="hoge")  # type: ignore
 
                 # fmt: off
-                assert str(e.value) == "email and password must be other than None"
+                assert str(e.value) == "username and password must be other than None"
                 # fmt: off

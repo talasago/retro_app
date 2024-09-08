@@ -1,8 +1,9 @@
 service: retro-app
-frameworkVersion: '>=3.0.0 <4.0.0'
+frameworkVersion: '>=4.0.0 <5.0.0'
 
 plugins:
   - serverless-python-requirements
+  - serverless-api-gateway-throttling
 
 custom:
   pythonRequirements:
@@ -23,6 +24,9 @@ custom:
     #cacheLocation: ./.serverless/.requirements_cache
     # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
     dockerBuildCmdExtraArgs: ['--platforms', 'linux/arm64']
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 10
+    maxConcurrentRequests: 10
 
 package:
   patterns:
@@ -75,7 +79,7 @@ provider:
       # Log level to use for execution logging
       level: INFO
       # Log full requests/responses for execution logging
-      fullExecutionData: true
+      fullExecutionData: false
 
       # NOTE:ロールは自動で作成されるので、それを使うように設定する
       # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)

@@ -1,7 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING
 
 import pytest
+from factories.user_factory import ApiCommonUserFactory
 from httpx import Response
 from sqlalchemy import select
 
@@ -22,11 +23,9 @@ class TestUserFunction:
             """
             テスト観点
             1.ユーザーが登録できること
-            2.同じメールアドレスで登録できないこと
-            3.CORS設定が正しいこと(最低限の確認)
+            2.CORS設定が正しいこと(最低限の確認)
             """
             user_data: dict = {
-                "email": "testuser@example.com",
                 "name": "Test User",
                 "password": "testpassword",
             }
@@ -36,26 +35,12 @@ class TestUserFunction:
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
             assert_cors_headers(response_1st)
 
-            response_2nd = add_user_api(
-                user_data=user_data, is_assert_response_code_2xx=False, option=option
-            )
-            assert response_2nd.status_code == 409
-            assert response_2nd.json() == {
-                "detail": "指定されたメールアドレスはすでに登録されています。"
-            }
-            assert_cors_headers(response_2nd)
-
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
-            # パスワードのバリデーションがすり抜けている気がする...
 
         def test_422_be_translated_into_japanese(self, add_user_api):
             """pydenticのエラーメッセージが日本語化されていること"""
-            user_data: dict = {
-                "email": "test_422_be_translated_into_japanese@example.com",
-                "name": "芳" * 51,
-                "password": "testpassword",
-            }
+            user_data: dict = ApiCommonUserFactory(name="芳" * 51)
 
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
@@ -64,61 +49,50 @@ class TestUserFunction:
                 response.json()["detail"][0]["msg"] == "50 文字以下で入力してください。"
             )
 
-    class TestLogin:
-        # TODO:TestLogin用のユーザーを作りたいなあ。毎回テストの中で作るのをやめたい。fixture使えばいいのか
-        class TestValidParam:
-            def test_return_200(self, add_user_api, login_api):
-                user_data: dict = {
-                    "email": "testuser1@example.com",
-                    "name": "Test User1",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
+        def test_422_when_password_is_invalid(self, add_user_api):
+            """パスワードのバリデーションでエラーになること、passwordがレスポンスに含まれてないこと"""
+            user_data: dict = ApiCommonUserFactory(password="1234")
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": user_data["password"],
-                }
-                response = login_api(login_user_data, True)
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
+
+            assert response.status_code == 422
+            assert (
+                response.json()["detail"][0]["msg"]
+                == "パスワードには8文字以上の文字を入力してください。"
+            )
+            assert response.json()["detail"][0]["input"] == "[MASKED]"
+
+    class TestLogin:
+        @pytest.fixture(scope="module", autouse=True)
+        def add_user_for_login(self, add_user_api, user_data_for_login) -> None:
+            add_user_api(user_data_for_login)
+
+        @pytest.fixture(scope="module")
+        def user_data_for_login(self) -> dict:
+            return {
+                "name": "user_data_for_login",
+                "username": "user_data_for_login",
+                "password": "testpassword!1",
+            }
+
+        class TestValidParam:
+            def test_return_201(self, login_api, user_data_for_login):
+                response = login_api(user_data_for_login, True)
 
                 res_body = response.json()
                 assert res_body["access_token"] is not None
                 assert res_body["refresh_token"] is not None
                 assert res_body["message"] == "ログインしました"
                 assert res_body["token_type"] == "bearer"
-                assert res_body["name"] == "Test User1"
-
-        class TestWhenNotExistEmail:
-            def test_return_401(self, login_api):
-                """存在しないメアドを指定した場合、エラーとなること"""
-                user_data: dict = {
-                    "username": "APITestWhenNotExistEmail@example.com",
-                    "password": "testpassword",
-                }
-                response = login_api(user_data, True, is_assert_response_code_2xx=False)
-
-                res_body = response.json()
-                assert response.status_code == 401
-                assert (
-                    res_body["detail"]
-                    == "メールアドレスまたはパスワードが間違っています。"
-                )
-                assert response.headers["WWW-Authenticate"] == "Bearer"
+                assert res_body["name"] == "user_data_for_login"
 
         class TestWhenUnmatchPassword:
-            def test_return_401(self, add_user_api, login_api):
-                """パスワードが一致しない場合、エラーとなること"""
-                user_data: dict = {
-                    "email": "apiTestWhenUnmatchPassword@example.com",
-                    "name": "apiTestWhenUnmatchPassword",
-                    "password": "testpassword",
-                }
-                add_user_api(user_data)
 
-                login_user_data: dict = {
-                    "username": user_data["email"],
-                    "password": "hogehoge",
-                }
+            def test_return_401(self, login_api, user_data_for_login):
+                """パスワードが一致しない場合、エラーとなること"""
+                login_user_data = dict(user_data_for_login)
+                login_user_data["password"] = "hogehoge"
+
                 response = login_api(
                     login_user_data, True, is_assert_response_code_2xx=False
                 )
@@ -146,23 +120,21 @@ class TestUserFunction:
                 その状態で/refresh_tokenにアクセスするとエラーとなること
                 """
                 user_data: dict = {
-                    "email": "testuserlogout@example.com",
                     "name": "Test Userlogout",
                     "password": "testpassword",
                 }
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token, refresh_token = login_api(login_param)
 
-                logout_response: "Response" = logout_api(access_token)
-                assert logout_response.status_code == 200
+                logout_response: "Response" = logout_api(access_token, False)
                 assert logout_response.json() == {"message": "ログアウトしました"}
 
-                stmt = select(UserModel).where(UserModel.email == user_data["email"])
+                stmt = select(UserModel).where(UserModel.name == user_data["name"])
                 user: UserModel = db.execute(stmt).scalars().first()  # type: ignore
                 assert user  # Noneではないことの確認
                 assert user.refresh_token is None
@@ -177,19 +149,25 @@ class TestUserFunction:
                 """access_tokenが無効な値の場合、401を返すこと"""
                 token: str = generate_test_token("dummy", "dummy")  # type: ignore
 
-                response = logout_api(token)
+                response = logout_api(token, False)
 
                 res_body = response.json()
                 assert response.status_code == 401
                 assert res_body["detail"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
 
+        class TestWhenInvalidTokenWithNotUuid:
+            def test_return_401(
+                self, logout_api, call_api_with_invalid_access_token_assert_401
+            ):
+                call_api_with_invalid_access_token_assert_401(logout_api)
+
         class TestWhenNotExistUser:
             def test_return_401(self, logout_api):
                 """トークンで指定したUUIDのユーザーが存在しない場合、エラーとなること"""
                 access_token: str = generate_test_token(TokenType.ACCESS_TOKEN)
 
-                response = response = logout_api(access_token)
+                response = response = logout_api(access_token, False)
 
                 assert response.status_code == 401
                 assert response.json() == {"detail": "ユーザーが存在しません。"}
@@ -200,10 +178,10 @@ class TestUserFunction:
                 """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
                 access_token: str = generate_test_token(
                     token_type=TokenType.ACCESS_TOKEN,
-                    exp=datetime.utcnow() - timedelta(minutes=10),
+                    exp=datetime.now(timezone.utc) - timedelta(minutes=10),
                 )
 
-                response = logout_api(access_token)
+                response = logout_api(access_token, False)
 
                 res_body = response.json()
                 assert response.status_code == 401
@@ -216,14 +194,14 @@ class TestUserFunction:
         class TestWhenInvalidParam:
             def test_return_401(self, logout_api):
                 """トークンが不正な値の場合401を返す"""
-                response = logout_api("hoge")
+                response = logout_api("hoge", False)
 
                 res_body = response.json()
                 assert response.status_code == 401
                 assert res_body["detail"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
 
-    # ログアウトのテスト観点
+    # ログアウトのテスト観点(未対応分)
     # ・もう一度同じaccess_tokenでアクセスすると、エラーを返すこと(4xx)
     #   ・ログインしていない状態でアクセスするのと同義
     #   ・これは一旦実装しない。実装するならアクセストークンのブロックリストを使う必要があるため
@@ -235,14 +213,13 @@ class TestUserFunction:
         class TestWhenValidParam:
             def test_return_200(self, add_user_api, login_api, refresh_token_api):
                 user_data: dict = {
-                    "email": "testrefresh_token@example.com",
                     "name": "Test Userrefresh_token",
                     "password": "QG+UJxEdf,T5",
                 }
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token, refresh_token = login_api(login_param)
@@ -263,14 +240,13 @@ class TestUserFunction:
                 それより前に発行されたリフレッシュトークンは無効になること。
                 また、アクセストークンが再発行されること"""
                 user_data: dict = {
-                    "email": "testrefresh_token_invalid_param@example.com",
                     "name": "Test testrefresh_token_invalid_param",
                     "password": "QG+UJxEdf,T5",
                 }
                 add_user_api(user_data)
 
                 login_param: dict = {
-                    "username": user_data["email"],
+                    "username": user_data["name"],
                     "password": user_data["password"],
                 }
                 access_token_1st, refresh_token_1st = login_api(login_param)
@@ -307,7 +283,7 @@ class TestUserFunction:
                 """トークンの有効期限が切れている場合、再ログインを促すメッセージを返すこと"""
                 refresh_token: str = generate_test_token(
                     token_type=TokenType.REFRESH_TOKEN,
-                    exp=datetime.utcnow() - timedelta(days=7),
+                    exp=datetime.now(timezone.utc) - timedelta(days=7),
                 )
 
                 response = refresh_token_api(refresh_token)

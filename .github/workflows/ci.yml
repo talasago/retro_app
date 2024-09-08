@@ -132,7 +132,7 @@ jobs:
 
       - name: Setup postgres
         run: |
-          docker-compose up -d
+          docker compose up -d
 
       - name: Read python version from .python-version
         id: python_version

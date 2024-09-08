@@ -3,7 +3,7 @@ from __future__ import annotations
 import re
 from typing import ClassVar
 
-from pydantic import EmailStr, Field, SecretStr, field_validator
+from pydantic import Field, SecretStr, field_validator
 
 from .base_model import BaseModel
 
@@ -11,20 +11,9 @@ from .base_model import BaseModel
 class UserSchema(BaseModel):
     """pydanticのモデルクラス"""
 
-    email: EmailStr = Field(
-        max_length=50,
-        description="ユーザーのメールアドレス",
-        examples=["testuser@example.com"],
-    )
     name: str = Field(
         max_length=50, description="ユーザーの名前", examples=["Test User"]
     )
-
-    # emailについて
-    # NOTE:emailのバリデーションはコチラ
-    # https://github.com/JoshData/python-email-validator/blob/5abaa7b4ce6677e5a2217db2e52202a760de3c24/email_validator/validate_email.py#
-    # 最大文字列長とかもやってくれてそう。
-    # TODO:ただ、メッセージの日本語化はこちら側で実装しないといけないかも
 
     # nameについて
     # WARNING: サロゲートペアとか絵文字とかのカウントは考慮してない。
@@ -40,7 +29,7 @@ class UserSchema(BaseModel):
 
 class UserCreate(UserSchema):
     PASSWARD_REGEX: ClassVar[str] = (
-        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,./=~|[\](){}<>]{8,50}$'
+        r'^[0-9a-zA-Z!?_+*\'"`#$%&\-^\\@;:,.\/=~|[\](){}<>]{8,50}$'
     )
     password: SecretStr = Field(
         description=f"ユーザーのパスワード。regex_prttern: {PASSWARD_REGEX}",
@@ -56,8 +45,6 @@ class UserCreate(UserSchema):
     @classmethod
     def check_password_format(cls, password: SecretStr) -> str:
         reveal_password: str = password.get_secret_value()
-        if not re.match(UserCreate.PASSWARD_REGEX, reveal_password):
-            raise ValueError(
-                "パスワードには半角の数字、記号、大文字英字、小文字英字を含んだ8文字以上の文字を入力してください。"
-            )
+        if not re.match(cls.PASSWARD_REGEX, reveal_password):
+            raise ValueError("パスワードには8文字以上の文字を入力してください。")
         return reveal_password

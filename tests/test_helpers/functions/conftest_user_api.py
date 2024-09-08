@@ -1,4 +1,5 @@
 import pytest
+from factories.user_factory import ApiCommonUserFactory
 from fastapi.testclient import TestClient
 from httpx import Response
 
@@ -14,7 +15,6 @@ def add_user_api():
     def _method(
         user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
     ) -> Response:
-        # TODO:user_dataが無ければこのメソッドで適当に作るようにしたい→呼び出し元で毎回dictを作りたくない。
         response = client_user.post("/api/v1/sign_up", json=user_data, **option)
 
         if is_assert_response_code_2xx:
@@ -22,9 +22,6 @@ def add_user_api():
         return response
 
     return _method
-
-
-# responseが200系であることの検証を追加する
 
 
 @pytest.fixture(scope="session")
@@ -84,7 +81,11 @@ def refresh_token_api():
 
 @pytest.fixture(scope="session")
 def logout_api():
-    def _method(access_token: str) -> Response:
+
+    def _method(
+        access_token: str,
+        is_assert_response_code_2xx: bool = True,
+    ) -> Response:
         response = client_user.post(
             "/api/v1/logout",
             headers={
@@ -92,6 +93,19 @@ def logout_api():
                 "Authorization": f"Bearer {access_token}",
             },
         )
+        if is_assert_response_code_2xx:
+            assert response.status_code == 200
         return response
 
     return _method
+
+
+@pytest.fixture(scope="session")
+def tokens_of_logged_in_api_common_user(add_user_api, login_api) -> tuple[str, str]:
+    """
+    ログイン済みのAPI共通ユーザーのアクセストークンとリフレッシュトークンを返します。
+    """
+    api_common_user: dict = ApiCommonUserFactory()
+    add_user_api(user_data=api_common_user)
+    access_token, refresh_token = login_api(login_param=api_common_user)
+    return (access_token, refresh_token)
