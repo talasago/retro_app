@@ -11,7 +11,6 @@ class TestCommentModel:
         def test_whether_user_id_exist(self, db):
             user_data: dict = {
                 "name": "John Doe-comment",
-                "email": "invalid_email-comment",
                 "password": "Passw0rd#123",
             }
             user = UserModel(**user_data)
