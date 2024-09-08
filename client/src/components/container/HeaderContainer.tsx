@@ -4,6 +4,7 @@ import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
+import { signUpModalSlice } from 'stores/signUpModal';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
 import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
@@ -26,12 +27,10 @@ const HeaderContainer: FC = () => {
     setIsLoginModalOpen(false);
   };
 
-  const [isSignUpModalOpen, setisSignUpModalOpen] = useState(false);
+  const { openSignUpModal } = signUpModalSlice.actions;
+
   const handleOpenSignUpModal = (): void => {
-    setisSignUpModalOpen(true);
-  };
-  const handleCloseSignUpModal = (): void => {
-    setisSignUpModalOpen(false);
+    dispatch(openSignUpModal());
   };
 
   const handleLogout = async (): Promise<void> => {
@@ -80,10 +79,7 @@ const HeaderContainer: FC = () => {
         isOpen={isLoginModalOpen}
         onCloseModal={handleCloseLoginModal}
       />
-      <SignUpModalContainer
-        isOpen={isSignUpModalOpen}
-        onCloseModal={handleCloseSignUpModal}
-      />
+      <SignUpModalContainer />
     </>
   );
 };
