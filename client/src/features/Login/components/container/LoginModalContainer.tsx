@@ -38,13 +38,13 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
+    reset,
   } = useForm<LoginFormSchema>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     shouldFocusError: true,
     resolver: yupResolver(loginFormSchema),
   });
-  // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
     try {
@@ -64,6 +64,7 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       );
       console.log('Response:', response.data);
       onCloseModal();
+      reset();
     } catch (error) {
       // TODO:500エラーと400エラーでメッセージを変える
       dispatch(

@@ -35,6 +35,7 @@ const SignUpModalContainer: FC<SignUpModalProps> = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<RegistrationFormSchema>({
     mode: 'onSubmit',
@@ -42,7 +43,6 @@ const SignUpModalContainer: FC<SignUpModalProps> = ({
     shouldFocusError: true,
     resolver: yupResolver(registrationFormSchema),
   });
-  // MEMO: ほんとは戻り値を使ってresetとかclearErrorsの実装した方が良さげ
 
   const onSubmit: SubmitHandler<RegistrationFormSchema> = async (data) => {
     try {
@@ -57,6 +57,7 @@ const SignUpModalContainer: FC<SignUpModalProps> = ({
       );
       console.log('Response:', response.data);
       onCloseModal();
+      reset();
     } catch (error) {
       // TODO:500エラーと400エラーでメッセージを変える
       dispatch(
