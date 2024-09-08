@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { Helmet } from 'react-helmet-async';
 import IndexRoutes from 'routes';
 import Alert from 'components/container/Alert';
-import Header from 'components/container/Header';
+import HeaderContainer from 'components/container/HeaderContainer';
 import Providers from './Providers';
 
 const appTitle = import.meta.env.VITE_APP_TITLE;
@@ -12,7 +12,7 @@ const App: FC = () => (
     <Helmet>
       <title>{appTitle}</title>
     </Helmet>
-    <Header />
+    <HeaderContainer />
     <IndexRoutes />
     <Alert />
   </Providers>
