@@ -46,12 +46,15 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
         aria-describedby="transition-modal-description"
         open={isOpen}
         onClose={onClose}
-        // closeAfterTransition
-        // slots={{ backdrop: Backdrop }}
         slotProps={{
           backdrop: {
             timeout: 500,
           },
+        }}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       >
         <Container
@@ -60,38 +63,54 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            // height: '100vh', これあるとモーダルが閉じなくなる
           }}
+          onClick={onClose}
         >
-          <Paper elevation={3} sx={{ width: 400, padding: 4, borderRadius: 2 }}>
+          <Paper
+            elevation={3}
+            sx={{ width: 400, padding: 4, borderRadius: 2 }}
+            onClick={(e) => {
+              // ContainerでonClick={onClose}を入れている。
+              // モーダルの横をクリックしたらクローズするようにしているため
+              // そのクリックイベントが伝播すると、モーダル内でもクローズしてしまうため
+              // この処理を追加した
+              e.stopPropagation();
+            }}
+          >
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
                 <Avatar sx={{ bgcolor: 'grey.800', width: 90, height: 90 }}>
                   <LockIcon sx={{ fontSize: 50 }} />
                 </Avatar>
               </Box>
-              <FormControl fullWidth error={errors.name !== undefined}>
+              <FormControl
+                fullWidth
+                error={errors.name !== undefined}
+                sx={{ mb: 2 }}
+              >
                 <TextField
                   {...register('name')}
                   fullWidth
                   variant="filled"
                   label="ユーザー名"
                   sx={{
-                    mb: 2,
                     bgcolor: 'grey.200',
                     borderRadius: 1,
                   }}
                 />
                 <FormHelperText>{errors.name?.message}</FormHelperText>
               </FormControl>
-              <FormControl fullWidth error={errors.password !== undefined}>
+              <FormControl
+                fullWidth
+                error={errors.password !== undefined}
+                sx={{ mb: 2 }}
+              >
                 <TextField
                   {...register('password')}
                   variant="filled"
                   label="パスワード"
                   type="password"
                   sx={{
-                    mb: 2,
                     bgcolor: 'grey.200',
                     borderRadius: 1,
                     width: '100%',
