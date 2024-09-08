@@ -69,6 +69,9 @@ jobs:
         aws-region: ap-northeast-1
 
     - name: sls deploy
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
       # TODO: 別ジョブにしたい。set-upの次に行いたい。ただ、やるとするとcacheを復元する手順とかが必要で、処理時間的に分けるメリットがなさそうと判断して一旦対応しない、
       run: |
         cd ./infra/
