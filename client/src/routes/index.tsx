@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import Home from '../components/presenter/Home';
+import HomeContainer from '../components/container/HomeContainer';
 export const ROUTES_LISTS = {} as const;
 
 const IndexRoutes: FC = () => {
@@ -15,8 +15,8 @@ const IndexRoutes: FC = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="*" element={<Home />} />
+      <Route path="/" element={<HomeContainer />} />
+      <Route path="*" element={<HomeContainer />} />
     </Routes>
   );
 };

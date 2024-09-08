@@ -31,7 +31,11 @@ const Footer = styled(Box)({
   alignItems: 'center',
 });
 
-const Home: FC = () => {
+interface HomePresenterProps {
+  onOpenSignUpModal: () => void;
+}
+
+const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'white' }}>
       <Box sx={{ bgcolor: '#aaaaaa', py: 11 }}>
@@ -77,7 +81,9 @@ const Home: FC = () => {
       </Container>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Button variant="contained">ユーザー登録してはじめる</Button>
+        <Button variant="contained" onClick={onOpenSignUpModal}>
+          ユーザー登録してはじめる
+        </Button>
       </Box>
 
       <Footer>
@@ -107,4 +113,4 @@ const Home: FC = () => {
   );
 };
 
-export default Home;
+export default HomePresenter;
