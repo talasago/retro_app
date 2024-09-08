@@ -79,7 +79,7 @@ provider:
       # Log level to use for execution logging
       level: INFO
       # Log full requests/responses for execution logging
-      fullExecutionData: true
+      fullExecutionData: false
 
       # NOTE:ロールは自動で作成されるので、それを使うように設定する
       # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)
