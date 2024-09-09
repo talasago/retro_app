@@ -18,7 +18,9 @@ from app.database import Base, SessionLocal  # noqa: E402
 from app.models.retrospective_method.comment_model import (  # noqa: F401,E402
     CommentModel,
 )
+from app.models.user_model import UserModel  # noqa: E402
 from app.repository.user_repository import UserRepository  # noqa: E402
+from tests.test_helpers.create_test_user import create_test_user  # noqa: E402
 
 pytest_plugins = [
     "test_helpers.functions.conftest_user_api",
@@ -69,3 +71,8 @@ def migrate() -> None:
 @pytest.fixture(scope="session")
 def user_repo(db: Session) -> UserRepository:
     return UserRepository(db)
+
+
+@pytest.fixture(scope="session")
+def common_test_user_model(user_repo) -> UserModel:
+    return create_test_user(user_repo=user_repo, name="common user model")
