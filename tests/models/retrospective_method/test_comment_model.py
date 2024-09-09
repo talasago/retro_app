@@ -37,4 +37,23 @@ class TestCommentModel:
             db.rollback()
             assert isinstance(e.value.orig, psycopg2_errors.ForeignKeyViolation)
 
-        # TODO 「ユーザ削除時にコメントも削除されているか」のケース
+        def test_delete_comment_when_delete_user(self, db):
+            # TODO:user_dataのfixtureとか使ってもいいかも
+            # あとbeforeみたいなので共通化したい
+            user_data: dict = {
+                "name": "John Doe-comment2",
+                "password": "Passw0rd#123",
+            }
+            user = UserModel(**user_data)
+            db.add(user)
+            db.commit()
+
+            comment: CommentModel = CommentModel(
+                retrospective_method_id=1, user_id=user.id, comment="test"
+            )
+            db.add(comment)
+            db.commit()
+            db.delete(user)
+            db.commit()
+
+            assert db.query(CommentModel).filter_by(user_id=user.id).count() == 0

@@ -40,8 +40,8 @@ class UserModel(Base):
     )
 
     # 外部キーの設定
-    # TODO: N+1が発生するかは未確認
-    comments: Mapped[List["CommentModel"]] = relationship(back_populates="user")
+    # MEMO: N+1が発生するかは未確認
+    comments: Mapped[List["CommentModel"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
     @property
     def password(self) -> None:

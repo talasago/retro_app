@@ -6,8 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 
-# from app.models.user_model import UserModel
-
 if TYPE_CHECKING:
     from app.models.user_model import UserModel
 
@@ -16,17 +14,13 @@ class CommentModel(Base):
     """SQLAlchemyのモデルクラス"""
 
     __tablename__ = "comments"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    # uuid: Mapped[_uuid.UUID] = mapped_column(
-    #     UUID(as_uuid=True), default=_uuid.uuid4, nullable=False, unique=True
-    # )
 
-    # TODO : foreign_keyは後で指定する (retrospective_method_id & user_id)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     retrospective_method_id: Mapped[int] = mapped_column(
         Integer, primary_key=False, nullable=False
     )
     user_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     comment: Mapped[str] = mapped_column(String, nullable=False)
 
