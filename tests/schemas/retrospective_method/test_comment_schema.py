@@ -48,7 +48,8 @@ class TestCommentSchema:
                 CommentSchema(**comment_data)
 
             assert (
-                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"] == "必須項目です。"
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "必須項目です。"
             )
 
     class TestRetrospectiveMethodId:
@@ -77,7 +78,8 @@ class TestCommentSchema:
                 CommentSchema(**comment_data)
 
             assert (
-                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"] == "必須項目です。"
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "必須項目です。"
             )
 
         def test_invalid_retrospective_method_id_too_low(self):
@@ -158,5 +160,6 @@ class TestCommentSchema:
                 CommentSchema(**comment_data)
 
             assert (
-                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"] == "必須項目です。"
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "必須項目です。"
             )
