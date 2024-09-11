@@ -80,6 +80,58 @@ class TestCommentSchema:
                 I18nTranslateWrapper.trans(e.value.errors())[0]["msg"] == "必須項目です。"
             )
 
+        def test_invalid_retrospective_method_id_too_low(self):
+            comment_data: dict[str, Any] = {
+                "comment": "This is a valid comment.",
+                "retrospective_method_id": 0,
+                "user_id": 1,
+            }
+
+            with pytest.raises(ValidationError) as e:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "1 以上の値を入力してください。"
+            )
+
+        def test_invalid_retrospective_method_id_too_high(self):
+            comment_data: dict[str, Any] = {
+                "comment": "This is a valid comment.",
+                "retrospective_method_id": 73,
+                "user_id": 1,
+            }
+
+            with pytest.raises(ValidationError) as e:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "72 以下の値を入力してください。"
+            )
+
+        def test_valid_retrospective_method_id_id_min_number(self):
+            comment_data: dict[str, Any] = {
+                "comment": "This is a valid comment.",
+                "retrospective_method_id": 1,
+                "user_id": 1,
+            }
+
+            comment = CommentSchema(**comment_data)
+
+            assert comment.retrospective_method_id == 1
+
+        def test_valid_retrospective_method_id_max_number(self):
+            comment_data: dict[str, Any] = {
+                "comment": "This is a valid comment.",
+                "retrospective_method_id": 72,
+                "user_id": 1,
+            }
+
+            comment = CommentSchema(**comment_data)
+
+            assert comment.retrospective_method_id == 72
+
     class TestUserId:
         def test_invalid_user_id(self):
             comment_data: dict[str, Any] = {

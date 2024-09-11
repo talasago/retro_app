@@ -14,9 +14,10 @@ class CommentSchema(BaseModel):
     )
     retrospective_method_id: int = Field(
         ...,
+        ge=1,
+        le=72,
         description="レトロスペクティブメソッドのID",
         examples=[1],
-        #TODO: 最大値と最小値の設定
     )
     user_id: int = Field(..., description="ユーザーのID", examples=[1])
 
