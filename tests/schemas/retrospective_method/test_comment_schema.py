@@ -5,16 +5,13 @@ from pydantic import ValidationError
 
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
+from tests.factories.retrospective_method.comment_factory import CommentFactory
 
 
 class TestCommentSchema:
     @pytest.fixture(scope="function")
     def comment_data(self) -> dict[str, Any]:
-        return {
-            "comment": "This is a valid comment.",
-            "retrospective_method_id": 1,
-            "user_id": 1,
-        }
+        return CommentFactory().__dict__
 
     def test_valid_comment_data(self, comment_data):
         comment = CommentSchema(**comment_data)
