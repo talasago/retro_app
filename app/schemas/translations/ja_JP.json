@@ -2,5 +2,6 @@
   "String should have at most {} characters": "{} 文字以下で入力してください。",
   "Input should be a valid string": "有効な文字を入力してください。",
   "Field required": "必須項目です。",
-  "Value error, {}": "{}"
+  "Value error, {}": "{}",
+  "Input should be a valid integer, unable to parse string as an integer": "有効な整数を入力してください。"
 }
