@@ -1,12 +1,16 @@
 import uuid as _uuid
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING, List
 
 from passlib.context import CryptContext
 from sqlalchemy import DateTime, Integer, String, event
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.retrospective_method.comment_model import CommentModel
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -33,6 +37,12 @@ class UserModel(Base):
         nullable=False,
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc),
+    )
+
+    # 外部キーの設定
+    # MEMO: N+1が発生するかは未確認
+    comments: Mapped[List["CommentModel"]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
     )
 
     @property

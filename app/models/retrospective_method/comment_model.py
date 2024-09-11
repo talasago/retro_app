@@ -1,25 +1,27 @@
 from datetime import datetime, timezone
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+
+if TYPE_CHECKING:
+    from app.models.user_model import UserModel
 
 
 class CommentModel(Base):
     """SQLAlchemyのモデルクラス"""
 
     __tablename__ = "comments"
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    # uuid: Mapped[_uuid.UUID] = mapped_column(
-    #     UUID(as_uuid=True), default=_uuid.uuid4, nullable=False, unique=True
-    # )
 
-    # TODO : foreign_keyは後で指定する (retrospective_method_id & user_id)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     retrospective_method_id: Mapped[int] = mapped_column(
         Integer, primary_key=False, nullable=False
     )
-    user_id: Mapped[int] = mapped_column(Integer, primary_key=False, nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+    )
     comment: Mapped[str] = mapped_column(String, nullable=False)
 
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
@@ -32,6 +34,9 @@ class CommentModel(Base):
         default=datetime.now(timezone.utc),
         onupdate=datetime.now(timezone.utc),
     )
+
+    # 外部キー
+    user: Mapped["UserModel"] = relationship(back_populates="comments")
 
 
 # @event.listens_for(CommentModel.uuid, "set")
