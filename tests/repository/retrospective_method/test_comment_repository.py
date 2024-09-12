@@ -35,7 +35,7 @@ class TestCommentRepository:
             assert created_comment.comment == "This is a valid comment."
 
         class TestWhenCommitError:
-            def test_expect_rollback(self, db: Session, mocker):
+            def test_expect_rollback(self, db: Session, mocker, create_comment):
                 """commit時にエラーが発生した場合、rollbackされることを確認する"""
 
                 # commit時に強制的にエラーを発生させる
@@ -50,10 +50,7 @@ class TestCommentRepository:
                     db, "rollback"
                 )  # rollbackメソッドを呼び出されたか確認したいためモック
 
-                comment = CommentFactory()
-                comment_repo = CommentRepository(db)
-
                 with pytest.raises(OperationalError):
-                    comment_repo.save(comment)
+                    create_comment(CommentFactory())
 
                 assert db.rollback.call_count == 1  # type: ignore
