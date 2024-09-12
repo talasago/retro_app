@@ -43,6 +43,25 @@ class TestCommentSchema:
                 == "必須項目です。"
             )
 
+        def test_space_only(self, comment_data):
+            comment_data["comment"] = " "
+            with pytest.raises(ValidationError) as e1:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+                == "必須項目です。"
+            )
+
+            comment_data["comment"] = "　"
+            with pytest.raises(ValidationError) as e2:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
+                == "必須項目です。"
+            )
+
     class TestRetrospectiveMethodId:
         def test_invalid_retrospective_method_id(self, comment_data):
             comment_data["retrospective_method_id"] = "invalid_id"
