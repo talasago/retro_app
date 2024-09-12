@@ -12,14 +12,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @pytest.fixture
-def create_comment(db: Session, user_repo):
-    def _method(**comment_params) -> CommentModel:
+def create_comment(db: Session):
+    def _method(comment_model: CommentModel) -> CommentModel:
         comment_repo = CommentRepository(db)
-        comment = CommentFactory(
-            user_id=create_test_user(user_repo).id, **comment_params
-        )
-        comment_repo.save(comment)
-        return comment
+        comment_repo.save(comment_model)
+        return comment_model
 
     return _method
 
@@ -28,12 +25,13 @@ def create_comment(db: Session, user_repo):
 class TestCommentRepository:
     class TestSave:
 
-        def test_create_comment(self, db: Session, create_comment):
-            comment: CommentModel = create_comment()
+        def test_create_comment(self, db: Session, create_comment, user_repo):
+            user_id = create_test_user(user_repo).id
+            comment: CommentModel = create_comment(CommentFactory(user_id=user_id))
 
             created_comment: CommentModel = db.query(CommentModel).filter_by(id=comment.id).one()  # type: ignore
             assert created_comment.retrospective_method_id == 1
-            assert created_comment.user_id == 1
+            assert created_comment.user_id == user_id
             assert created_comment.comment == "This is a valid comment."
 
         class TestWhenCommitError:
