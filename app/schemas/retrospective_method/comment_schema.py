@@ -28,5 +28,6 @@ class CommentSchema(BaseModel):
             raise ValueError("必須項目です。")
         return v
 
+
 class CommentCreate(BaseModel):
     comment: str = Field(CommentSchema.model_fields["comment"])
