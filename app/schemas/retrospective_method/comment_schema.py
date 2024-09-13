@@ -24,7 +24,7 @@ class CommentSchema(BaseModel):
     @field_validator("comment", mode="before")
     @classmethod
     def no_len_0_char(cls, v):
-        if v is not None and v.strip() == "":
+        if isinstance(v, str) and v.strip() == "":
             raise ValueError("必須項目です。")
         return v
 
