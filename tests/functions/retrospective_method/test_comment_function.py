@@ -7,7 +7,6 @@ from tests.test_helpers.functions.cors import assert_cors_headers
 # - カスタムバリデーションの場合とそうじゃない時
 # キーが無い時（コメントが無い時）
 # createSchemaでエラーの時
-# Noneの時
 # それぞれでWhenで分ける
 
 

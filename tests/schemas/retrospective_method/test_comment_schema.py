@@ -33,6 +33,16 @@ class TestCommentSchema:
             )
 
         def test_missing_comment(self, comment_data):
+            comment_data["comment"] = None
+
+            with pytest.raises(ValidationError) as e:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "有効な文字を入力してください。"
+            )
+
             comment_data.pop("comment")
 
             with pytest.raises(ValidationError) as e:
@@ -75,6 +85,16 @@ class TestCommentSchema:
             )
 
         def test_missing_retrospective_method_id(self, comment_data):
+            comment_data["retrospective_method_id"] = None
+
+            with pytest.raises(ValidationError) as e:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "有効な整数を入力してください。"
+            )
+
             comment_data.pop("retrospective_method_id")
 
             with pytest.raises(ValidationError) as e:
@@ -134,6 +154,16 @@ class TestCommentSchema:
             )
 
         def test_missing_user_id(self, comment_data):
+            comment_data["user_id"] = None
+
+            with pytest.raises(ValidationError) as e:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "有効な整数を入力してください。"
+            )
+
             comment_data.pop("user_id")
 
             with pytest.raises(ValidationError) as e:
