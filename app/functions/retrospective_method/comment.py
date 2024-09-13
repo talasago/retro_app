@@ -3,6 +3,7 @@
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, FastAPI, status
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 from pydantic import ValidationError
@@ -22,6 +23,8 @@ from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
+    from typing import Sequence
+
     from fastapi import Request
     from pydantic_core import ErrorDetails
 
@@ -46,6 +49,30 @@ async def validation_exception_handler(
             # pydenticのカスタムバリデーションを使ったとき、
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
+
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
+        #  type(exc.errors()) => listとなっていることを確認している
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler2(
+    request: "Request", exc: RequestValidationError
+) -> JSONResponse:
+    errors: Sequence[dict] = exc.errors()
+
+    for error in errors:
+        if "ctx" in error and isinstance(
+            error.get("ctx", "").get("error", ""), ValueError
+        ):
+            # pydenticのカスタムバリデーションを使ったとき、
+            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
+            error["ctx"]["error"] = str(error["ctx"]["error"])
+        if "loc" in error and (error.get("loc", "") == ("body", "password")):
+            # ユーザーが入力したpasswordをマスク化する
+            error["input"] = "[MASKED]"
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
