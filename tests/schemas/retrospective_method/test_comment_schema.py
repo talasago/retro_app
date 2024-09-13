@@ -76,9 +76,7 @@ class TestCommentSchema:
         def test_not_str_class(self, comment_data):
             # {}をAPIで渡すとなぜかFieldがcommentデータに入っているのでその対応
             # pydanticの問題だと思うが...
-            f_info: FieldInfo = Field(
-                CommentSchema.model_fields["comment"]
-            ).default
+            f_info: FieldInfo = Field(CommentSchema.model_fields["comment"]).default
             comment_data["comment"] = f_info
 
             with pytest.raises(ValidationError) as e2:
