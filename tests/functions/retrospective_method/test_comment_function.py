@@ -2,9 +2,6 @@ import pytest
 
 from tests.test_helpers.functions.cors import assert_cors_headers
 
-# ふりかえり手法がnoneの時
-# そもそもそのAPIにたどりつかないか？？？
-
 
 @pytest.mark.usefixtures("db")
 class TestCommentFunction:
