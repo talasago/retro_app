@@ -34,7 +34,7 @@ class TestExeptionHandler:
                         "ctx": {"error": ValueError("必須項目です。")},
                         "url": "https://errors.pydantic.dev/2.9/v/value_error",
                     },  # type: ignore
-                    # とくにerrorsを変更してない時
+                    # とくにerrorsを変更してない時(日本語変換を除く)
                     {
                         "type": "greater_than_equal",
                         "loc": ("retrospective_method_id",),
@@ -56,7 +56,7 @@ class TestExeptionHandler:
             assert res_body["detail"][0]["input"] == ""
             assert res_body["detail"][1]["msg"] == "1 以上の値を入力してください。"
             assert res_body["detail"][1]["ctx"]["ge"] == 1
-            assert res_body["detail"][1]["input"] == "0"
+            assert res_body["detail"][1]["input"] == 0
 
     class TestWhenRequestValidationError:
         @pytest.mark.asyncio
@@ -65,10 +65,11 @@ class TestExeptionHandler:
         ):
             # MEMO:引数requestは使用してないのでテストしない。
             request = None
-            # {}をAPIで渡すとき、passwordのとき
+
             exc = RequestValidationError(
                 # bodyはテストに関係ないので指定しない。
                 errors=[
+                    # {}をAPIで渡すとき
                     {
                         "type": "string_type",
                         "loc": ("comment",),
@@ -76,6 +77,7 @@ class TestExeptionHandler:
                         "input": Field(CommentSchema.model_fields["comment"]).default,
                         "url": "https://errors.pydantic.dev/2.9/v/string_type",
                     },
+                    # passwordのとき
                     {
                         "type": "value_error",
                         "loc": ("body", "password"),
@@ -95,11 +97,7 @@ class TestExeptionHandler:
             res_body: dict = json.loads(response.body)
 
             assert res_body["detail"][0]["msg"] == "有効な文字を入力してください。"
-            # これ辞めたい
-            assert (
-                res_body["detail"][0]["input"]
-                == "annotation=str required=True description='コメントの内容' examples=['テストコメント'] metadata=[MaxLen(max_length=100)]"
-            )
+            assert res_body["detail"][0]["input"] is None
             assert (
                 res_body["detail"][1]["msg"]
                 == "パスワードには8文字以上の文字を入力してください。"
@@ -109,3 +107,37 @@ class TestExeptionHandler:
                 == "パスワードには8文字以上の文字を入力してください。"
             )
             assert res_body["detail"][1]["input"] == "[MASKED]"
+
+        class TestWhenIncludeInputType:
+
+            @pytest.mark.parametrize(
+                ["input"],
+                [
+                    pytest.param(0, id="int"),
+                    pytest.param(14.5, id="flaot"),
+                    pytest.param([0, 3, "list"], id="list"),
+                    pytest.param({"hoge": "ggg"}, id="dict"),
+                    pytest.param(True, id="bool"),
+                    pytest.param("str", id="str"),
+                ],
+            )
+            @pytest.mark.asyncio
+            async def test_input_type(self, input):
+                # MEMO:引数requestは使用してないのでテストしない。
+                request = None
+
+                exc = RequestValidationError(
+                    # テストに関係ないので必要最低限度のみ指定。
+                    errors=[
+                        {
+                            "msg": "Input should be a valid string",
+                            "input": input,
+                        }
+                    ]
+                )
+
+                response = await exception_handler_validation_error(request, exc)  # type: ignore
+                assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+                res_body: dict = json.loads(response.body)
+
+                assert res_body["detail"][0]["input"] == input
