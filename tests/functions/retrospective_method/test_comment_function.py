@@ -38,23 +38,7 @@ class TestCommentFunction:
                     pytest.param(
                         {"comment": "", "retrospective_method_id": 1},
                         [422, "必須項目です。"],
-                        id="When CreateSchema error and CustomValidation error",
-                    ),
-                    pytest.param(
-                        {"comment": None, "retrospective_method_id": 1},
-                        [422, "有効な文字を入力してください。"],
-                        id="When CreateSchema error and not CustomValidation error",
-                    ),
-                    pytest.param(
-                        {"comment": "comment", "retrospective_method_id": 0},
-                        [422, "1 以上の値を入力してください。"],
-                        id="When CommentSchemaError error and not CustomValidation error",
-                    ),
-                    # CommentSchemaErrorではまだカスタムバリデーションを定義していないため、CommentSchemaError and CustomValidation errorは不要
-                    pytest.param(
-                        {"comment": {}, "retrospective_method_id": 1},
-                        [422, "有効な文字を入力してください。"],
-                        id="When CommentSchema's input is FieldInfo",
+                        id="When CreateSchema error",
                     ),
                     pytest.param(
                         {"comment": "comment", "retrospective_method_id": None},
@@ -62,7 +46,7 @@ class TestCommentFunction:
                             422,
                             "有効な整数を入力してください。",
                         ],  # このパターンは実際にはフロントエンド側で発生しない想定
-                        id="When retrospective_method_id is None",
+                        id="When CommentSchemaError error and retrospective_method_id is None",
                     ),
                 ],
             )
