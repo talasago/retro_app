@@ -49,6 +49,7 @@ async def validation_exception_handler(
 ) -> JSONResponse:
     return await exception_handler.exception_handler_validation_error(request, exc)
 
+
 @app.post(
     "/api/v1/sign_up",
     summary="ユーザーを登録します。",
