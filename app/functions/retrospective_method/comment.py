@@ -43,14 +43,16 @@ async def validation_exception_handler(
     errors: list[ErrorDetails] = exc.errors()
 
     for error in errors:
-        if "ctx" in error and isinstance(
-            error.get("ctx", {}).get("error", ""), ValueError # str以外が良いかも
+        if "ctx" in error and not isinstance(
+            error.get("ctx", {}).get("error", ""), str
         ):
             # pydenticのカスタムバリデーションを使ったとき、
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
 
         if "input" in error and not isinstance(error.get("input", ""), str):
+            # {}をAPIで渡すとなぜかFieldInfoがinputに入っているのでその対応
+            # pydanticかfastapiの問題だと思うが...
             error["input"] = str(error["input"])
 
     return JSONResponse(
