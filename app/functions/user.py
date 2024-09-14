@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from mangum import Mangum
 
+import app.functions.handlers as exception_handler
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppColmunUniqueError,
@@ -28,12 +29,10 @@ from app.schemas.http_response_body_user_schema import (
     SignInApiResponseBody,
     TokenApiResponseBody,
 )
-from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from typing import Sequence
 
     from fastapi import Request
 
@@ -48,25 +47,7 @@ add_cors_middleware(app)
 async def validation_exception_handler(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
-    errors: Sequence[dict] = exc.errors()
-
-    for error in errors:
-        if "ctx" in error and isinstance(
-            error.get("ctx", "").get("error", ""), ValueError
-        ):
-            # pydenticのカスタムバリデーションを使ったとき、
-            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
-            error["ctx"]["error"] = str(error["ctx"]["error"])
-        if "loc" in error and (error.get("loc", "") == ("body", "password")):
-            # ユーザーが入力したpasswordをマスク化する
-            error["input"] = "[MASKED]"
-
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
-        #  type(exc.errors()) => listとなっていることを確認している
-    )
-
+    return await exception_handler.exception_handler_validation_error(request, exc)
 
 @app.post(
     "/api/v1/sign_up",

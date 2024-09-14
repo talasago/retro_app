@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 from pydantic_core import ValidationError
 
-import app.functions.handlers as handlers
+import app.functions.handlers as exception_handler
 from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
@@ -34,14 +34,14 @@ add_cors_middleware(app)
 
 @app.exception_handler(ValidationError)
 async def exception_handler_validation_error(request: "Request", exc: ValidationError):
-    return await handlers.exception_handler_validation_error(request, exc)
+    return await exception_handler.exception_handler_validation_error(request, exc)
 
 
 @app.exception_handler(RequestValidationError)
 async def exception_handler_request_calidation_error(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
-    return await handlers.exception_handler_validation_error(request, exc)
+    return await exception_handler.exception_handler_validation_error(request, exc)
 
 
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
