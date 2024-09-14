@@ -6,7 +6,7 @@ from fastapi import Depends, FastAPI, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from mangum import Mangum
-from pydantic import ValidationError
+from pydantic_core import ValidationError
 
 from app.functions.dependencies import (
     get_comment_repo,
