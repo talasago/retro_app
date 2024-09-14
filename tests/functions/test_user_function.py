@@ -38,8 +38,8 @@ class TestUserFunction:
             # TODO:異常系のテストを追加する
             # DBに保存されているかの観点が必要。
 
-        def test_422_be_translated_into_japanese(self, add_user_api):
-            """pydenticのエラーメッセージが日本語化されていること"""
+        # 422のテストは他で網羅されているので最低限のみ確認
+        def test_422_when_name_is_invalid(self, add_user_api):
             user_data: dict = ApiCommonUserFactory(name="芳" * 51)
 
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
@@ -50,9 +50,7 @@ class TestUserFunction:
             )
 
         def test_422_when_password_is_invalid(self, add_user_api):
-            """パスワードのバリデーションでエラーになること、passwordがレスポンスに含まれてないこと"""
             user_data: dict = ApiCommonUserFactory(password="1234")
-
             response = add_user_api(user_data, is_assert_response_code_2xx=False)
 
             assert response.status_code == 422
