@@ -44,14 +44,14 @@ async def exception_handler_request_calidation_error(
     errors: Sequence[dict] = exc.errors()
 
     for error in errors:
-        if "ctx" in error and isinstance(
-            error.get("ctx", "").get("error", ""), ValueError
+        if "ctx" in error and not isinstance(
+            error.get("ctx", "").get("error", ""), str
         ):
             # pydenticのカスタムバリデーションを使ったとき、
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
         if "loc" in error and (error.get("loc", "") == ("body", "password")):
-            # ユーザーが入力したpasswordをマスク化する
+            # パスワードをそのままレスポンスボディに含めないようにする
             error["input"] = "[MASKED]"
 
     return JSONResponse(
