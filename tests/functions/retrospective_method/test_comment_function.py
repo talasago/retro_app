@@ -2,9 +2,8 @@ import pytest
 
 from tests.test_helpers.functions.cors import assert_cors_headers
 
-# キーが無い時（コメントが無い時
-# jsonが空のとき
-
+# ふりかえり手法がnoneの時
+# そもそもそのAPIにたどりつかないか？？？
 
 @pytest.mark.usefixtures("db")
 class TestCommentFunction:
@@ -53,7 +52,12 @@ class TestCommentFunction:
                         [422, "1 以上の値を入力してください。"],
                         id="When CommentSchemaError error and not CustomValidation error",
                     ),
-                    # CommentSchemaErrorではまだカスタムバリデーションを定義していないため
+                    # CommentSchemaErrorではまだカスタムバリデーションを定義していないため、CommentSchemaError and CustomValidation errorは不要
+                    pytest.param(
+                        {"comment": {}, "retrospective_method_id": 1},
+                        [422, "有効な文字を入力してください。"],
+                        id="When CommentSchema's input is FieldInfo",
+                    ),
                 ],
             )
             def test_return_422_by_validation_error(
@@ -73,7 +77,8 @@ class TestCommentFunction:
                 assert response.status_code == expected_data[0]
                 assert response.json()["detail"][0]["msg"] == expected_data[1]
 
-            class TestWhenRequiredParamIsEmpty:
+
+            class TestWhenRequiredParamIsNone:
                 def test_return_422(
                     self,
                     tokens_of_logged_in_api_common_user,
@@ -81,12 +86,10 @@ class TestCommentFunction:
                 ):
 
                     response = add_comment_api(
+                        comment_data=None,
                         access_token=tokens_of_logged_in_api_common_user[0],
                         is_assert_response_code_2xx=False,
                     )
 
                     assert response.status_code == 422
-                    assert (
-                        response.json()["detail"][0]["msg"]
-                        == "有効な文字を入力してください。"
-                    )
+                    assert response.json()["detail"][0]["msg"] == "必須項目です。"
