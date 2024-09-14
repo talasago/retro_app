@@ -58,6 +58,11 @@ class TestCommentFunction:
                         [422, "有効な文字を入力してください。"],
                         id="When CommentSchema's input is FieldInfo",
                     ),
+                    pytest.param(
+                        {"comment": "comment", "retrospective_method_id": None},
+                        [422, "有効な整数を入力してください。"], # このパターンは実際にはフロントエンド側で発生しない想定
+                        id="When retrospective_method_id is None",
+                    ),
                 ],
             )
             def test_return_422_by_validation_error(
@@ -76,7 +81,6 @@ class TestCommentFunction:
                 )
                 assert response.status_code == expected_data[0]
                 assert response.json()["detail"][0]["msg"] == expected_data[1]
-
 
             class TestWhenRequiredParamIsNone:
                 def test_return_422(
