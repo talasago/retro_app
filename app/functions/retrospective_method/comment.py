@@ -44,11 +44,14 @@ async def validation_exception_handler(
 
     for error in errors:
         if "ctx" in error and isinstance(
-            error.get("ctx", {}).get("error", ""), ValueError
+            error.get("ctx", {}).get("error", ""), ValueError # str以外が良いかも
         ):
             # pydenticのカスタムバリデーションを使ったとき、
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
+
+        if "input" in error and not isinstance(error.get("input", ""), str):
+            error["input"] = str(error["input"])
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,

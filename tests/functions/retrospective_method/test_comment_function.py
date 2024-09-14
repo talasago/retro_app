@@ -74,7 +74,6 @@ class TestCommentFunction:
                 assert response.json()["detail"][0]["msg"] == expected_data[1]
 
             class TestWhenRequiredParamIsEmpty:
-                @pytest.mark.skip()
                 def test_return_422(
                     self,
                     tokens_of_logged_in_api_common_user,
@@ -87,4 +86,7 @@ class TestCommentFunction:
                     )
 
                     assert response.status_code == 422
-                    assert response.json()["detail"][0]["msg"] == "hogehoge"
+                    assert (
+                        response.json()["detail"][0]["msg"]
+                        == "有効な文字を入力してください。"
+                    )
