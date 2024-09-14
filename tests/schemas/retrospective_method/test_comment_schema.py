@@ -9,11 +9,12 @@ from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from tests.factories.retrospective_method.comment_factory import CommentFactory
 
 
-class TestCommentSchema:
-    @pytest.fixture(scope="function")
-    def comment_data(self) -> dict[str, Any]:
-        return CommentFactory().__dict__
+@pytest.fixture(scope="function")
+def comment_data() -> dict[str, Any]:
+    return CommentFactory().__dict__
 
+
+class TestCommentSchema:
     def test_valid_comment_data(self, comment_data):
         comment = CommentSchema(**comment_data)
 
@@ -186,5 +187,28 @@ class TestCommentSchema:
 
             assert (
                 I18nTranslateWrapper.trans(e.value.errors())[0]["msg"]
+                == "必須項目です。"
+            )
+
+
+class TestCommentCreate:
+    class TestComment:
+        # 基本はCommentSchemaのテストでカバーされているため、最低限カスタムバリデーションが通るかどうかだけ
+        def test_space_only(self, comment_data):
+            comment_data["comment"] = " "
+            with pytest.raises(ValidationError) as e1:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
+                == "必須項目です。"
+            )
+
+            comment_data["comment"] = "　"
+            with pytest.raises(ValidationError) as e2:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
                 == "必須項目です。"
             )
