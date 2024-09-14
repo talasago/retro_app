@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from mangum import Mangum
 from pydantic_core import ValidationError
 
+import app.functions.handlers as handlers
 from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
@@ -19,14 +20,10 @@ from app.schemas.http_response_body_user_schema import (
     ApiResponseBodyBase,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
-from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from typing import Sequence
-
     from fastapi import Request
-    from pydantic_core import ErrorDetails
 
     from app.repository.retrospective_method.comment_repository import CommentRepository
 
@@ -35,55 +32,16 @@ app = FastAPI()
 add_cors_middleware(app)
 
 
-# TODO: 共通化
 @app.exception_handler(ValidationError)
-async def validation_exception_handler(
-    _: "Request", exc: ValidationError
-) -> JSONResponse:
-    errors: list[ErrorDetails] = exc.errors()
-
-    for error in errors:
-        if "ctx" in error and not isinstance(
-            error.get("ctx", {}).get("error", ""), str
-        ):
-            # pydenticのカスタムバリデーションを使ったとき、
-            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
-            error["ctx"]["error"] = str(error["ctx"]["error"])
-
-        if "input" in error and not isinstance(error.get("input", ""), str):
-            # {}をAPIで渡すとなぜかFieldInfoがinputに入っているのでその対応
-            # pydanticかfastapiの問題だと思うが...
-            error["input"] = str(error["input"])
-
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
-        #  type(exc.errors()) => listとなっていることを確認している
-    )
+async def exception_handler_validation_error(request: "Request", exc: ValidationError):
+    return await handlers.exception_handler_validation_error(request, exc)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler2(
+async def exception_handler_request_calidation_error(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
-    errors: Sequence[dict] = exc.errors()
-
-    for error in errors:
-        if "ctx" in error and isinstance(
-            error.get("ctx", "").get("error", ""), ValueError
-        ):
-            # pydenticのカスタムバリデーションを使ったとき、
-            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
-            error["ctx"]["error"] = str(error["ctx"]["error"])
-        if "loc" in error and (error.get("loc", "") == ("body", "password")):
-            # ユーザーが入力したpasswordをマスク化する
-            error["input"] = "[MASKED]"
-
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
-        #  type(exc.errors()) => listとなっていることを確認している
-    )
+    return await handlers.exception_handler_request_calidation_error(request, exc)
 
 
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
