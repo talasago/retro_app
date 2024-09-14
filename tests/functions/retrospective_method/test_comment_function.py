@@ -5,6 +5,7 @@ from tests.test_helpers.functions.cors import assert_cors_headers
 # ふりかえり手法がnoneの時
 # そもそもそのAPIにたどりつかないか？？？
 
+
 @pytest.mark.usefixtures("db")
 class TestCommentFunction:
     class TestAddComment:
@@ -60,7 +61,10 @@ class TestCommentFunction:
                     ),
                     pytest.param(
                         {"comment": "comment", "retrospective_method_id": None},
-                        [422, "有効な整数を入力してください。"], # このパターンは実際にはフロントエンド側で発生しない想定
+                        [
+                            422,
+                            "有効な整数を入力してください。",
+                        ],  # このパターンは実際にはフロントエンド側で発生しない想定
                         id="When retrospective_method_id is None",
                     ),
                 ],
