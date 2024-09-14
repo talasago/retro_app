@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+import copy
 
 from fastapi import Request, status
 from fastapi.exceptions import RequestValidationError
@@ -7,18 +7,23 @@ from pydantic_core import ValidationError
 
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 
-if TYPE_CHECKING:
-    from typing import Sequence
-
-    from pydantic_core import ErrorDetails
-
 
 async def exception_handler_validation_error(
-    _: "Request", exc: ValidationError
+    _: "Request", exc: ValidationError | RequestValidationError
 ) -> JSONResponse:
-    errors: list[ErrorDetails] = exc.errors()
+    errors: list = __sanitize_errors(exc.errors())  # type: ignore
 
-    for error in errors:
+    return JSONResponse(
+        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        content={"detail": I18nTranslateWrapper.trans(errors)},
+    )
+
+
+def __sanitize_errors(errors: list) -> list:
+    # 影響はないと思うが、配列が呼び出し元に影響与えたくないためコピーする
+    return_errors = copy.deepcopy(errors)
+
+    for error in return_errors:
         if "ctx" in error and not isinstance(
             error.get("ctx", {}).get("error", ""), str
         ):
@@ -31,31 +36,7 @@ async def exception_handler_validation_error(
             # pydanticかfastapiの問題だと思うが...
             error["input"] = str(error["input"])
 
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
-        #  type(exc.errors()) => listとなっていることを確認している
-    )
-
-
-async def exception_handler_request_calidation_error(
-    _: "Request", exc: RequestValidationError
-) -> JSONResponse:
-    errors: Sequence[dict] = exc.errors()
-
-    for error in errors:
-        if "ctx" in error and not isinstance(
-            error.get("ctx", "").get("error", ""), str
-        ):
-            # pydenticのカスタムバリデーションを使ったとき、
-            # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
-            error["ctx"]["error"] = str(error["ctx"]["error"])
         if "loc" in error and (error.get("loc", "") == ("body", "password")):
             # パスワードをそのままレスポンスボディに含めないようにする
             error["input"] = "[MASKED]"
-
-    return JSONResponse(
-        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-        content={"detail": I18nTranslateWrapper.trans(errors)},  # type: ignore
-        #  type(exc.errors()) => listとなっていることを確認している
-    )
+    return return_errors

@@ -41,7 +41,7 @@ async def exception_handler_validation_error(request: "Request", exc: Validation
 async def exception_handler_request_calidation_error(
     request: "Request", exc: RequestValidationError
 ) -> JSONResponse:
-    return await handlers.exception_handler_request_calidation_error(request, exc)
+    return await handlers.exception_handler_validation_error(request, exc)
 
 
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
