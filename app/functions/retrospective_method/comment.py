@@ -13,6 +13,7 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
+    GetCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
 
@@ -54,6 +55,8 @@ def add_comment(
 @router.get(
     "/api/v1/retrospective_method/{retrospective_method_id}/comment",
     summary="レビューコメントを取得します。",
+    status_code=status.HTTP_200_OK,
+    response_model=GetCommentApiResponseBody,
 )
 def get_comment(
     retrospective_method_id: int,
@@ -70,5 +73,4 @@ def get_comment(
         comment_dict = comment.to_dict()
         result_comments.append(comment_dict)
 
-    return JSONResponse(content=result_comments)
-    # content=AddCommentApiResponseBody().model_dump(),
+    return JSONResponse(content={"comments": result_comments})

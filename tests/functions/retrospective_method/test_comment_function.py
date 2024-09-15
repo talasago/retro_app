@@ -113,10 +113,11 @@ class TestCommentFunction:
                 )
 
                 assert_cors_headers(response)
+                comments = response.json()["comments"]
                 assert response.status_code == 200
-                assert response.json()[0]["comment"] == "test comment"
-                assert response.json()[1]["comment"] == "test comment2"
-                assert response.json()[2]["comment"] == "test comment3"
+                assert comments["comment"] == "test comment"
+                assert comments["comment"] == "test comment2"
+                assert comments["comment"] == "test comment3"
                 for comment in response.json():
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
@@ -130,10 +131,11 @@ class TestCommentFunction:
                 )
 
                 assert_cors_headers(response)
+                comments = response.json()["comments"]
                 assert response.status_code == 200
-                assert response.json()[0]["comment"] == "test comment"
-                assert response.json()[1]["comment"] == "test comment2"
-                assert response.json()[2]["comment"] == "test comment3"
+                assert comments["comment"] == "test comment"
+                assert comments["comment"] == "test comment2"
+                assert comments["comment"] == "test comment3"
                 for comment in response.json():
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
@@ -145,5 +147,8 @@ class TestCommentFunction:
                 )
 
                 assert_cors_headers(response)
+                comments = response.json()["comments"]
                 assert response.status_code == 200
-                assert response.json() == []
+                assert comments == []
+
+        # パラメータが数値以外の時。
