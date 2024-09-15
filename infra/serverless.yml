@@ -103,3 +103,12 @@ functions:
       - http:
           path: /api/v1/logout
           method: ANY
+  comment_function:
+    handler: app.functions.main.handler
+    events:
+      - http:
+          path: /api/v1/retrospectives/{retrospective_id}/comments
+          method: ANY
+      - http:
+          path: /api/v1/retrospectives/{retrospective_id}/comments
+          method: ANY      
