@@ -30,7 +30,4 @@ class CommentSchema(BaseModel):
 
 
 class CommentCreate(BaseModel):
-    ## CommentSchemaのcommentと同じにしたいだけなのだが、いい方法がない。
-    comment: str = Field(
-        ..., max_length=100, description="コメントの内容", examples=["テストコメント"]
-    )
+    comment: str = Field(CommentSchema.model_fields["comment"])

@@ -1,16 +1,21 @@
 import pytest
 from factories.user_factory import ApiCommonUserFactory
+from fastapi.testclient import TestClient
 from httpx import Response
 
+from app.functions.user import app as app_user
 from app.schemas.token_schema import TokenType
+
+# MEMO:clientもどこかで共通化した方が良いかもしれない
+client_user = TestClient(app_user)
 
 
 @pytest.fixture(scope="session")
-def add_user_api(test_client):
+def add_user_api():
     def _method(
         user_data: dict, is_assert_response_code_2xx: bool = True, option: dict = {}
     ) -> Response:
-        response = test_client.post("/api/v1/sign_up", json=user_data, **option)
+        response = client_user.post("/api/v1/sign_up", json=user_data, **option)
 
         if is_assert_response_code_2xx:
             assert response.status_code == 201
@@ -20,7 +25,7 @@ def add_user_api(test_client):
 
 
 @pytest.fixture(scope="session")
-def login_api(test_client):
+def login_api():
     """
     ログインパラメータを使用して '/token' エンドポイントに対して POST リクエストを実行します。
 
@@ -36,7 +41,7 @@ def login_api(test_client):
     def _method(
         login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
     ) -> Response | tuple[str, str]:
-        response: Response = test_client.post(
+        response: Response = client_user.post(
             "/token",
             headers={
                 "accept": "application/json",
@@ -60,9 +65,9 @@ def login_api(test_client):
 
 
 @pytest.fixture(scope="session")
-def refresh_token_api(test_client):
+def refresh_token_api():
     def _method(refresh_token: str) -> Response:
-        response: Response = test_client.post(
+        response: Response = client_user.post(
             "/refresh_token",
             headers={
                 "accept": "application/json",
@@ -75,12 +80,13 @@ def refresh_token_api(test_client):
 
 
 @pytest.fixture(scope="session")
-def logout_api(test_client):
+def logout_api():
+
     def _method(
         access_token: str,
         is_assert_response_code_2xx: bool = True,
     ) -> Response:
-        response = test_client.post(
+        response = client_user.post(
             "/api/v1/logout",
             headers={
                 "accept": "application/json",

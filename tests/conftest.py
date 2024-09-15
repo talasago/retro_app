@@ -5,7 +5,6 @@ from collections.abc import Generator
 import pytest
 from alembic import command
 from alembic.config import Config
-from fastapi.testclient import TestClient  # noqa: E402
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm.session import Session
 
@@ -13,7 +12,6 @@ pj_root_path = os.path.join(os.path.dirname(__file__), "../")
 sys.path.append(pj_root_path)
 
 from app.database import Base, SessionLocal  # noqa: E402
-from app.functions.main import app  # noqa: E402
 
 # Base.metadataにテーブルを含めるために一時的にmodelをインポート。
 # TODO:repositoryを作成したら、repositoryをインポートするように変更する
@@ -78,8 +76,3 @@ def user_repo(db: Session) -> UserRepository:
 @pytest.fixture(scope="session")
 def common_test_user_model(user_repo) -> UserModel:
     return create_test_user(user_repo=user_repo, name="common user model")
-
-
-@pytest.fixture(scope="session")
-def test_client() -> TestClient:
-    return TestClient(app)

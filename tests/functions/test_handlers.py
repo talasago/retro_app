@@ -3,9 +3,11 @@ import json
 import pytest
 from fastapi import status
 from fastapi.exceptions import RequestValidationError
+from pydantic.fields import Field
 from pydantic_core import ValidationError
 
 from app.functions.handlers import exception_handler_validation_error
+from app.schemas.retrospective_method.comment_schema import CommentSchema
 
 
 class TestExeptionHandler:
@@ -67,6 +69,14 @@ class TestExeptionHandler:
             exc = RequestValidationError(
                 # bodyはテストに関係ないので指定しない。
                 errors=[
+                    # {}をAPIで渡すとき
+                    {
+                        "type": "string_type",
+                        "loc": ("comment",),
+                        "msg": "Input should be a valid string",
+                        "input": Field(CommentSchema.model_fields["comment"]).default,
+                        "url": "https://errors.pydantic.dev/2.9/v/string_type",
+                    },
                     # passwordのとき
                     {
                         "type": "value_error",
@@ -86,15 +96,17 @@ class TestExeptionHandler:
             assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
             res_body: dict = json.loads(response.body)
 
+            assert res_body["detail"][0]["msg"] == "有効な文字を入力してください。"
+            assert res_body["detail"][0]["input"] is None
             assert (
-                res_body["detail"][0]["msg"]
+                res_body["detail"][1]["msg"]
                 == "パスワードには8文字以上の文字を入力してください。"
             )
             assert (
-                res_body["detail"][0]["ctx"]["error"]
+                res_body["detail"][1]["ctx"]["error"]
                 == "パスワードには8文字以上の文字を入力してください。"
             )
-            assert res_body["detail"][0]["input"] == "[MASKED]"
+            assert res_body["detail"][1]["input"] == "[MASKED]"
 
         class TestWhenIncludeInputType:
 
