@@ -1,3 +1,5 @@
+from typing import Callable
+
 import pytest
 from passlib.context import CryptContext
 from sqlalchemy.exc import OperationalError
@@ -11,7 +13,7 @@ from tests.factories.retrospective_method.comment_factory import CommentFactory
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def create_comment(db: Session):
     def _method(comment_model: CommentModel) -> CommentModel:
         comment_repo = CommentRepository(db)
@@ -24,7 +26,7 @@ def create_comment(db: Session):
 @pytest.mark.usefixtures("db")
 class TestCommentRepository:
     class TestSave:
-
+        # 現状Saveで更新するユースケースはないので、UPDATEのテストは省略
         def test_create_comment(self, db: Session, create_comment, user_repo):
             user_id = create_test_user(user_repo).id
             comment: CommentModel = create_comment(CommentFactory(user_id=user_id))
@@ -56,38 +58,35 @@ class TestCommentRepository:
                 assert db.rollback.call_count == 1  # type: ignore
 
     class TestFind:
+        @pytest.fixture(scope="session")
+        def sut(self, db: Session) -> Callable:
+            return CommentRepository(db).find
+
         # テスト観点
-        # - conditionsがNoneの場合、全てのコメントを取得する
-        # - 検索条件、複数、単数
-        # - 検索条件をdictで渡した場合と、個別で渡した場合の結果が同じであること
-        # - 検索条件が見つからない場合，空リストを返す
+        # - retrospective_method_id が指定されていて存在するとき、そのIDに対応するコメントを取得する
+        # - conditionsがNoneや{}の場合、全てのコメントを取得する
+        # - 指定した検索条件で何も見つからない場合，空リストを返す
 
-        def test_find_comments_by_retrospective_method_id(
-            self, db: Session, create_comment
-        ):
-            """retrospective_method_id に基づいてコメントを検索する。"""
-            # Setup
-            retrospective_method_id = 3
-            comment1 = create_comment(
-                CommentFactory(retrospective_method_id=retrospective_method_id)
-            )
-            comment2 = create_comment(
-                CommentFactory(retrospective_method_id=retrospective_method_id)
-            )
-            create_comment(
-                CommentFactory(retrospective_method_id=4)
-            )  # This comment should not be found
+        @pytest.fixture(scope="class", autouse=True)
+        def setup_create_comments(self, create_comment):
+            create_comment(CommentFactory(
+                retrospective_method_id=10,
+                comment="retrospective_method_id=10"
+            ))
+            create_comment(CommentFactory(retrospective_method_id=2))
+            create_comment(CommentFactory(retrospective_method_id=3))
+            create_comment(CommentFactory(retrospective_method_id=3))
 
-            # Execute
-            repo = CommentRepository(db)
-            results = repo.find(
-                conditions={"retrospective_method_id": retrospective_method_id}
-            )
+        class TestWhenThereIsRetrospectiveMethodId:
+            class TestWhenThereAreMatchingComments:
+                def test_return_comments_by_retrospective_method_id(self, sut):
+                    """retrospective_method_id に基づいてコメントを返すこと"""
+                    # Setup
+                    conditions = {"retrospective_method_id": 3}
+                    results = sut(conditions=conditions)
 
-            # Verify
-            assert len(results) == 2
-            assert comment1 in results
-            assert comment2 in results
+                    for result in results:
+                        assert result.retrospective_method_id == 3
 
         @pytest.mark.skip()
         def test_find_comments_by_user_id(self, db: Session, create_comment):
