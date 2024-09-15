@@ -35,8 +35,20 @@ class CommentModel(Base):
         onupdate=datetime.now(timezone.utc),
     )
 
-    # 外部キー
+    # 外部キーのデータ
+    # 遅延読み込みになってるっぽい、CommentModelのuserにアクセスしない限り
+    # user情報を取得するクエリは実行されないはず
     user: Mapped["UserModel"] = relationship(back_populates="comments")
+
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "retrospective_method_id": self.retrospective_method_id,
+            "user_id": self.user_id,
+            "comment": self.comment,
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
+        }
 
 
 # @event.listens_for(CommentModel.uuid, "set")

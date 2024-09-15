@@ -56,3 +56,19 @@ class AddCommentApiResponseBody(BaseModel):
         description="処理メッセージ",
         examples=["コメントを登録しました。"],
     )
+
+
+class GetCommentApiResponseBody(BaseModel):
+    comments: list = Field(
+        description="コメントデータ",
+        examples=[
+            {
+                "comment_id": 1,
+                "retrospective_method_id": 1,
+                "user_id": 1,
+                "comment": "comment",
+                "created_at": "2021-01-01T00:00:00",
+                "updated_at": "2021-01-01T00:00:00",
+            }
+        ],
+    )
