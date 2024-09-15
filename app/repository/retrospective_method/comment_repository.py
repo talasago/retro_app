@@ -31,7 +31,7 @@ class CommentRepository:
 
         self.__db.refresh(comment)
 
-    def find(self, **conditions: CommentConditions) -> list[CommentModel]:
+    def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
         if conditions is None:
             conditions = {}
             #  self.__db.query(CommentModel).all()でもいいかもしれない

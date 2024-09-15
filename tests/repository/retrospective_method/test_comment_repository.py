@@ -80,7 +80,9 @@ class TestCommentRepository:
 
             # Execute
             repo = CommentRepository(db)
-            results = repo.find(retrospective_method_id=retrospective_method_id)
+            results = repo.find(
+                conditions={"retrospective_method_id": retrospective_method_id}
+            )
 
             # Verify
             assert len(results) == 2

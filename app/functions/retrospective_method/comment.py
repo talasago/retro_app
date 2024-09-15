@@ -61,7 +61,9 @@ def get_comment(
 ):
     """コメント取得のエンドポイント。"""
 
-    comments = comment_repo.find(retrospective_method_id=retrospective_method_id)
+    comments = comment_repo.find(
+        conditions={"retrospective_method_id": retrospective_method_id}
+    )
 
     result_comments: list[dict] = []
     for comment in comments:
