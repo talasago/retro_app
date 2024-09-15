@@ -48,7 +48,7 @@ class TestCommentFunction:
                             422,
                             "有効な整数を入力してください。",
                         ],  # このパターンは実際にはフロントエンド側で発生しない想定
-                        id="When CommentSchemaError error and retrospective_method_id is None",
+                        id="When retrospective_method_id is None",
                     ),
                 ],
             )
@@ -103,52 +103,50 @@ class TestCommentFunction:
                     comment_data=comment_data,
                     retrospective_method_id=5,
                     access_token=tokens_of_logged_in_api_common_user[0],
-                    is_assert_response_code_2xx=True,
                 )
 
-        class WhenDuringLogin:
+        class TestWhenDuringLogin:
             def test_return_200(self, sut):
-                response = sut(
-                    retrospective_method_id=5, is_assert_response_code_2xx=False
-                )
+                response = sut(retrospective_method_id=5)
 
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
-                assert response.status_code == 200
-                assert comments["comment"] == "test comment"
-                assert comments["comment"] == "test comment2"
-                assert comments["comment"] == "test comment3"
-                for comment in response.json():
+                assert comments[0]["comment"] == "test comment"
+                assert comments[1]["comment"] == "test comment2"
+                assert comments[2]["comment"] == "test comment3"
+                for comment in comments:
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
 
-        class WhenNotLogin:
+        class TestWhenNotLogin:
             def test_return_200(self, sut, tokens_of_logged_in_api_common_user):
                 response = sut(
                     access_token=tokens_of_logged_in_api_common_user[0],
                     retrospective_method_id=5,
-                    is_assert_response_code_2xx=False,
                 )
 
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
-                assert response.status_code == 200
-                assert comments["comment"] == "test comment"
-                assert comments["comment"] == "test comment2"
-                assert comments["comment"] == "test comment3"
-                for comment in response.json():
+                assert comments[0]["comment"] == "test comment"
+                assert comments[1]["comment"] == "test comment2"
+                assert comments[2]["comment"] == "test comment3"
+                for comment in comments:
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
 
-        class WhenNotMatchRetrospectiveMethodId:
+        class TestWhenNotMatchRetrospectiveMethodId:
             def test_return_200(self, sut):
-                response = sut(
-                    retrospective_method_id=999, is_assert_response_code_2xx=False
-                )
+                response = sut(retrospective_method_id=999)
 
-                assert_cors_headers(response)
                 comments = response.json()["comments"]
-                assert response.status_code == 200
                 assert comments == []
 
-        # パラメータが数値以外の時。
+
+        class TestWhenInvalidRetrospectiveMethodId:
+            def test_return_422(self, sut):
+                response = sut(
+                    retrospective_method_id="invalid", is_assert_response_code_2xx=False
+                )
+
+                assert response.status_code == 422
+                assert response.json()["detail"][0]["msg"] == "有効な整数を入力してください。"
