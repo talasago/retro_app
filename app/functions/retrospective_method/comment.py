@@ -50,13 +50,14 @@ def add_comment(
         content=AddCommentApiResponseBody().model_dump(),
     )
 
+
 @router.get(
     "/api/v1/retrospective_method/{retrospective_method_id}/comment",
-    summary="レビューコメントを取得します。"
+    summary="レビューコメントを取得します。",
 )
 def get_comment(
     retrospective_method_id: int,
-    comment_repo: "CommentRepository" = Depends(get_comment_repo)
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント取得のエンドポイント。"""
 

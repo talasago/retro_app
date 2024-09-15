@@ -55,6 +55,7 @@ class CommentModel(Base):
             "updated_at": str(self.updated_at),
         }
 
+
 # @event.listens_for(CommentModel.uuid, "set")
 # def disable_uuid_column_update(target, value, oldvalue, initiator):
 #     """

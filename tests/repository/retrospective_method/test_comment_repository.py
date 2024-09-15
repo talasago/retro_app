@@ -62,7 +62,6 @@ class TestCommentRepository:
         # - 検索条件をdictで渡した場合と、個別で渡した場合の結果が同じであること
         # - 検索条件が見つからない場合，空リストを返す
 
-
         def test_find_comments_by_retrospective_method_id(
             self, db: Session, create_comment
         ):
