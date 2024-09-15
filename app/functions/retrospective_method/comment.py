@@ -12,7 +12,7 @@ from app.functions.dependencies import (
 from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
-    ApiResponseBodyBase,
+    AddCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
 
@@ -23,10 +23,11 @@ if TYPE_CHECKING:
 router = APIRouter(tags=["comment"])
 
 
-# TODO : 後でやる openAPI response_model=ApiResponseBodyBase
 @router.post(
     "/api/v1/retrospective_method/{retrospective_method_id}/comment",
-    summary="レビューコメント登録します。",
+    summary="レビューコメントを登録します。",
+    status_code=status.HTTP_201_CREATED,
+    response_model=AddCommentApiResponseBody,
 )
 def add_comment(
     retrospective_method_id: int,
@@ -46,7 +47,5 @@ def add_comment(
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
-        content=ApiResponseBodyBase(
-            message="コメント登録が完了しました。"
-        ).model_dump(),
+        content=AddCommentApiResponseBody().model_dump(),
     )
