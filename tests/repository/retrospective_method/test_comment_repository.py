@@ -58,14 +58,9 @@ class TestCommentRepository:
                 assert db.rollback.call_count == 1  # type: ignore
 
     class TestFind:
-        @pytest.fixture(scope="session")
+        @pytest.fixture(scope="class")
         def sut(self, db: Session) -> Callable:
             return CommentRepository(db).find
-
-        # テスト観点
-        # - retrospective_method_id が指定されていて存在するとき、そのIDに対応するコメントを取得する
-        # - conditionsがNoneや{}の場合、全てのコメントを取得する
-        # - 指定した検索条件で何も見つからない場合，空リストを返す
 
         @pytest.fixture(scope="class", autouse=True)
         def setup_create_comments(self, create_comment):
@@ -81,99 +76,37 @@ class TestCommentRepository:
             class TestWhenThereAreMatchingComments:
                 def test_return_comments_by_retrospective_method_id(self, sut):
                     """retrospective_method_id に基づいてコメントを返すこと"""
-                    # Setup
                     conditions = {"retrospective_method_id": 3}
                     results = sut(conditions=conditions)
 
                     for result in results:
                         assert result.retrospective_method_id == 3
+            class TestWhenThereIsNoMatchingComments:
+                def test_return_empty_list(self, sut):
+                    """条件に一致するコメントがない場合、空リストを返すこと"""
+                    conditions = {"retrospective_method_id": 99999}
+                    results = sut(conditions=conditions)
 
-        @pytest.mark.skip()
-        def test_find_comments_by_user_id(self, db: Session, create_comment):
-            """user_id に基づいてコメントを検索する。"""
-            # Setup
-            user_id = 1
-            comment1 = create_comment(CommentFactory(user_id=user_id))
-            comment2 = create_comment(CommentFactory(user_id=user_id))
-            create_comment(
-                CommentFactory(user_id=2)
-            )  # This comment should not be found
+                    assert results == []
 
-            # Execute
-            repo = CommentRepository(db)
-            results = repo.find(user_id=user_id)
+        class TestWhenNotConditions:
+            @pytest.mark.parametrize("conditions", [None, {}])
+            def test_return_all_comments_none_and_empty_dict(self, sut, conditions, db: Session):
+                """conditionsにNoneや{}が指定されていない場合、全てのコメントを返すこと"""
 
-            # Verify
-            assert len(results) == 2
-            assert comment1 in results
-            assert comment2 in results
+                results = sut(conditions=conditions)
+                actual_comments = db.query(CommentModel).all()
+                result_ids = {comment.id for comment in results}
+                actual_comments_ids = {comment.id for comment in actual_comments}
 
-        @pytest.mark.skip()
-        def test_find_comments_by_keyword(self, db: Session, create_comment):
-            """keyword に基づいてコメントを検索する。"""
-            # Setup
-            keyword = "test"
-            comment1 = create_comment(CommentFactory(comment="This is a test comment."))
-            comment2 = create_comment(CommentFactory(comment="Another test comment."))
-            create_comment(
-                CommentFactory(comment="This should not be found.")
-            )  # This comment should not be found
+                assert result_ids == actual_comments_ids
 
-            # Execute
-            repo = CommentRepository(db)
-            results = repo.find(keyword=keyword)
+            def test_return_all_comments(self, sut, db: Session):
+                """conditionsが指定されていない場合、全てのコメントを返すこと"""
 
-            # Verify
-            assert len(results) == 2
-            assert comment1 in results
-            assert comment2 in results
+                results = sut()
+                actual_comments = db.query(CommentModel).all()
+                result_ids = {comment.id for comment in results}
+                actual_comments_ids = {comment.id for comment in actual_comments}
 
-        @pytest.mark.skip()
-        def test_find_comments_by_multiple_conditions(
-            self, db: Session, create_comment
-        ):
-            """複数の条件（retrospective_method_id、user_id、keyword）に基づいてコメントを検索する。"""
-            # Setup
-            retrospective_method_id = 1
-            user_id = 1
-            keyword = "test"
-            comment1 = create_comment(
-                CommentFactory(
-                    retrospective_method_id=retrospective_method_id,
-                    user_id=user_id,
-                    comment="This is a test comment.",
-                )
-            )
-            create_comment(
-                CommentFactory(
-                    retrospective_method_id=retrospective_method_id,
-                    user_id=user_id,
-                    comment="This should not be found.",
-                )
-            )  # This comment should not be found
-            create_comment(
-                CommentFactory(
-                    retrospective_method_id=2,
-                    user_id=user_id,
-                    comment="This should not be found.",
-                )
-            )  # This comment should not be found
-            create_comment(
-                CommentFactory(
-                    retrospective_method_id=retrospective_method_id,
-                    user_id=2,
-                    comment="This should not be found.",
-                )
-            )  # This comment should not be found
-
-            # Execute
-            repo = CommentRepository(db)
-            results = repo.find(
-                retrospective_method_id=retrospective_method_id,
-                user_id=user_id,
-                keyword=keyword,
-            )
-
-            # Verify
-            assert len(results) == 1
-            assert comment1 in results
+                assert result_ids == actual_comments_ids
