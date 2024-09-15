@@ -141,7 +141,6 @@ class TestCommentFunction:
                 comments = response.json()["comments"]
                 assert comments == []
 
-
         class TestWhenInvalidRetrospectiveMethodId:
             def test_return_422(self, sut):
                 response = sut(
@@ -149,4 +148,7 @@ class TestCommentFunction:
                 )
 
                 assert response.status_code == 422
-                assert response.json()["detail"][0]["msg"] == "有効な整数を入力してください。"
+                assert (
+                    response.json()["detail"][0]["msg"]
+                    == "有効な整数を入力してください。"
+                )
