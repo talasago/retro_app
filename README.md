@@ -146,9 +146,8 @@ $ pipenv run format_and_lint
 ```
 
 ### ローカルでwebサーバーを立ち上げる方法
-例）ユーザーに関するFunctionを起動できるようにする場合
 ```bash
-$ pipenv run uvicorn app.functions.user:app --reload
+$ pipenv run uvicorn app.functions.main:app --reload
 ```
 
 ## 開発用のエディタ

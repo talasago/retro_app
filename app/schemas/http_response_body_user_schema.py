@@ -40,3 +40,19 @@ class RefreshTokenApiResponseBody(BaseModel):
     token_type: str = Field(description="トークンタイプ", examples=["test_user"])
     access_token: str = Field(description="アクセストークン")
     refresh_token: str = Field(description="リフレッシュトークン")
+
+
+class LogoutApiResponseBody(BaseModel):
+    message: str = Field(
+        default="ログアウトしました",
+        description="処理メッセージ",
+        examples=["ログアウトしました"],
+    )
+
+
+class AddCommentApiResponseBody(BaseModel):
+    message: str = Field(
+        default="コメントを登録しました。",
+        description="処理メッセージ",
+        examples=["コメントを登録しました。"],
+    )
