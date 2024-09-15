@@ -18,6 +18,7 @@ if TYPE_CHECKING:
 app = FastAPI()
 add_cors_middleware(app)
 
+
 # MEMO: CommentCreateではなく、CommentSchemaでバリデーションエラーになった時はこちら
 # CommentCreateがCommentSchemaを継承してないため。
 # add_commentの引数指定のCommentCreateを入れていても、
@@ -25,6 +26,7 @@ add_cors_middleware(app)
 @app.exception_handler(ValidationError)
 async def exception_handler_validation_error(request: "Request", exc: ValidationError):
     return await exception_handler.exception_handler_validation_error(request, exc)
+
 
 @app.exception_handler(RequestValidationError)
 async def exception_handler_request_calidation_error(

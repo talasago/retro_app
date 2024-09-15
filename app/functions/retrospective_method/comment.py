@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
 router = APIRouter()
 
+
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
 @router.post(
     "/api/v1/retrospective_method/{retrospective_method_id}/comment",

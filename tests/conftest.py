@@ -79,6 +79,7 @@ def user_repo(db: Session) -> UserRepository:
 def common_test_user_model(user_repo) -> UserModel:
     return create_test_user(user_repo=user_repo, name="common user model")
 
+
 @pytest.fixture(scope="session")
 def test_client() -> TestClient:
     return TestClient(app)
