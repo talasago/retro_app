@@ -34,6 +34,7 @@ if TYPE_CHECKING:
 
 router = APIRouter(tags=["user"])
 
+
 @router.post(
     "/api/v1/sign_up",
     summary="ユーザーを登録します。",
