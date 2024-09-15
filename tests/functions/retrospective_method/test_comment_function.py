@@ -17,9 +17,9 @@ class TestCommentFunction:
                 response = add_comment_api(
                     comment_data=comment_data,
                     access_token=tokens_of_logged_in_api_common_user[0],
+                    is_assert_response_code_2xx=True,
                 )
                 assert_cors_headers(response)
-                assert response.status_code == 201
                 assert response.json() == {"message": "コメントを登録しました。"}
 
                 # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
@@ -84,3 +84,16 @@ class TestCommentFunction:
 
                     assert response.status_code == 422
                     assert response.json()["detail"][0]["msg"] == "必須項目です。"
+
+    class TestGetComment:
+        @pytest.fixture(scope="session")
+        def sut(self, get_comment_api):
+            return get_comment_api
+
+        # 必要な他のテスト観点
+        # - ログインしなくても叩けること
+
+        def test_return_200(self, sut):
+            response = sut(retrospective_method_id=1 ,is_assert_response_code_2xx=False)
+            assert_cors_headers(response)
+            assert response.status_code == 200

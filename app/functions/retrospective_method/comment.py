@@ -49,3 +49,18 @@ def add_comment(
         status_code=status.HTTP_201_CREATED,
         content=AddCommentApiResponseBody().model_dump(),
     )
+
+@router.get(
+    "/api/v1/retrospective_method/{retrospective_method_id}/comment",
+    summary="レビューコメントを取得します。"
+)
+def get_comment(
+    retrospective_method_id: int,
+    comment_repo: "CommentRepository" = Depends(get_comment_repo)
+):
+    """コメント取得のエンドポイント。"""
+
+    # comment_repo.get_comment(retrospective_method_id)
+
+    return JSONResponse(content={"message": "get_comment"})
+        # content=AddCommentApiResponseBody().model_dump(),
