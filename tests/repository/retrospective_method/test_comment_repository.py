@@ -64,10 +64,11 @@ class TestCommentRepository:
 
         @pytest.fixture(scope="class", autouse=True)
         def setup_create_comments(self, create_comment):
-            create_comment(CommentFactory(
-                retrospective_method_id=10,
-                comment="retrospective_method_id=10"
-            ))
+            create_comment(
+                CommentFactory(
+                    retrospective_method_id=10, comment="retrospective_method_id=10"
+                )
+            )
             create_comment(CommentFactory(retrospective_method_id=2))
             create_comment(CommentFactory(retrospective_method_id=3))
             create_comment(CommentFactory(retrospective_method_id=3))
@@ -81,6 +82,7 @@ class TestCommentRepository:
 
                     for result in results:
                         assert result.retrospective_method_id == 3
+
             class TestWhenThereIsNoMatchingComments:
                 def test_return_empty_list(self, sut):
                     """条件に一致するコメントがない場合、空リストを返すこと"""
@@ -91,7 +93,9 @@ class TestCommentRepository:
 
         class TestWhenNotConditions:
             @pytest.mark.parametrize("conditions", [None, {}])
-            def test_return_all_comments_none_and_empty_dict(self, sut, conditions, db: Session):
+            def test_return_all_comments_none_and_empty_dict(
+                self, sut, conditions, db: Session
+            ):
                 """conditionsにNoneや{}が指定されていない場合、全てのコメントを返すこと"""
 
                 results = sut(conditions=conditions)
