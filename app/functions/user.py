@@ -32,8 +32,7 @@ if TYPE_CHECKING:
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
-router = APIRouter()
-
+router = APIRouter(tags=["user"])
 
 @router.post(
     "/api/v1/sign_up",

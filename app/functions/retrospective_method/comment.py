@@ -20,8 +20,7 @@ from app.schemas.retrospective_method.comment_schema import CommentCreate, Comme
 if TYPE_CHECKING:
     from app.repository.retrospective_method.comment_repository import CommentRepository
 
-router = APIRouter()
-
+router = APIRouter(tags=["comment"])
 
 # TODO : 後でやる openAPI response_model=ApiResponseBodyBase
 @router.post(
