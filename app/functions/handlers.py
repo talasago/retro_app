@@ -30,6 +30,13 @@ def __sanitize_errors(errors: list) -> list:
             # ctx.errorに"ValueError(hogehoge)"となるとJSONに変換できないため、strに変換する
             error["ctx"]["error"] = str(error["ctx"]["error"])
 
+        if "input" in error and not isinstance(
+            error.get("input", ""), (int, float, list, dict, bool, str)
+        ):  # APIで渡されそうな値でプリミティブ型を指定
+            # {}をAPIで渡すとなぜかFieldInfoがinputに入っているのでその対応
+            # pydanticかfastapiの問題だと思うが...
+            error["input"] = None
+
         if "loc" in error and (error.get("loc", "") == ("body", "password")):
             # パスワードをそのままレスポンスボディに含めないようにする
             error["input"] = "[MASKED]"
