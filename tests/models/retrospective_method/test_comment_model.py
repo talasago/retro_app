@@ -4,6 +4,7 @@ from sqlalchemy.exc import IntegrityError
 
 from app.models.retrospective_method.comment_model import CommentModel
 from tests.factories.retrospective_method.comment_factory import CommentFactory
+from tests.test_helpers.create_test_user import create_test_user
 
 
 class TestCommentModel:
@@ -26,16 +27,12 @@ class TestCommentModel:
             db.rollback()
             assert isinstance(e.value.orig, psycopg2_errors.ForeignKeyViolation)
 
-        def test_delete_comment_when_delete_user(self, db, common_test_user_model):
-            comment: CommentModel = CommentFactory(user_id=common_test_user_model.id)
+        def test_delete_comment_when_delete_user(self, db, user_repo):
+            test_user = create_test_user(user_repo)
+            comment: CommentModel = CommentFactory(user_id=test_user.id)
             db.add(comment)
             db.commit()
-            db.delete(common_test_user_model)
+            db.delete(test_user)
             db.commit()
 
-            assert (
-                db.query(CommentModel)
-                .filter_by(user_id=common_test_user_model.id)
-                .count()
-                == 0
-            )
+            assert db.query(CommentModel).filter_by(user_id=test_user.id).count() == 0
