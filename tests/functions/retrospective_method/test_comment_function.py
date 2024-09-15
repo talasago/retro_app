@@ -111,7 +111,9 @@ class TestCommentFunction:
 
         class WhenDuringLogin:
             def test_return_200(self, sut):
-                response = sut(retrospective_method_id=5, is_assert_response_code_2xx=False)
+                response = sut(
+                    retrospective_method_id=5, is_assert_response_code_2xx=False
+                )
 
                 assert_cors_headers(response)
                 assert response.status_code == 200
