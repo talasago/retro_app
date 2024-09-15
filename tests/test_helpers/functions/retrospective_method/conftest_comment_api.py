@@ -1,15 +1,9 @@
 import pytest
-from fastapi.testclient import TestClient
 from httpx import Response
-
-from app.functions.retrospective_method.comment import app as app_comment
-
-# MEMO:clientもどこかで共通化した方が良いかもしれない
-client_comment = TestClient(app_comment)
 
 
 @pytest.fixture(scope="session")
-def add_comment_api():
+def add_comment_api(test_client):
     def _method(
         access_token: str,
         comment_data: dict = {},
@@ -17,7 +11,7 @@ def add_comment_api():
         retrospective_method_id=1,
         option: dict = {},
     ) -> Response:
-        response = client_comment.post(
+        response = test_client.post(
             f"/api/v1/retrospective_method/{retrospective_method_id}/comment",
             json=comment_data,
             headers={

@@ -2,13 +2,10 @@
 
 from typing import TYPE_CHECKING
 
-from fastapi import Depends, FastAPI, Header, HTTPException, status
-from fastapi.exceptions import RequestValidationError
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from mangum import Mangum
 
-import app.functions.handlers as exception_handler
 from app.errors.retro_app_error import (
     RetroAppAuthenticationError,
     RetroAppColmunUniqueError,
@@ -21,10 +18,9 @@ from app.functions.dependencies import (
     get_user_repo,
     oauth2_scheme,
 )
-from app.functions.middleware import add_cors_middleware
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
-    ApiResponseBodyBase,
+    LogoutApiResponseBody,
     RefreshTokenApiResponseBody,
     SignInApiResponseBody,
     TokenApiResponseBody,
@@ -33,24 +29,13 @@ from app.schemas.user_schema import UserCreate
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-
-    from fastapi import Request
-
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
-app = FastAPI()
-add_cors_middleware(app)
+router = APIRouter(tags=["user"])
 
 
-@app.exception_handler(RequestValidationError)
-async def validation_exception_handler(
-    request: "Request", exc: RequestValidationError
-) -> JSONResponse:
-    return await exception_handler.exception_handler_validation_error(request, exc)
-
-
-@app.post(
+@router.post(
     "/api/v1/sign_up",
     summary="ユーザーを登録します。",
     response_model=SignInApiResponseBody,
@@ -78,10 +63,11 @@ def signup_user(
 
 # NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
 # oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
-@app.post(
+@router.post(
     "/token",
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -114,10 +100,11 @@ def sign_in(
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
-@app.post(
+@router.post(
     "/refresh_token",
     summary="リフレッシュトークンでトークンを再発行します。",
     response_model=RefreshTokenApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def refresh_token(
     auth_service: "AuthService" = Depends(get_auth_service),
@@ -158,8 +145,11 @@ def refresh_token(
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
-@app.post(
-    "/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase
+@router.post(
+    "/api/v1/logout",
+    summary="ログアウトします。",
+    response_model=LogoutApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def logout(
     current_user: "UserModel" = Depends(get_current_user),
@@ -174,8 +164,5 @@ def logout(
     auth_service.delete_refresh_token(current_user)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=ApiResponseBodyBase(message="ログアウトしました").model_dump(),
+        content=LogoutApiResponseBody().model_dump(),
     )
-
-
-handler = Mangum(app)
