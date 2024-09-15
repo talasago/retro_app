@@ -1,7 +1,8 @@
 from typing import Any
 
 import pytest
-from pydantic import ValidationError
+from pydantic import Field, ValidationError
+from pydantic.fields import FieldInfo
 
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
@@ -71,6 +72,20 @@ class TestCommentSchema:
             assert (
                 I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
                 == "必須項目です。"
+            )
+
+        def test_not_str_class(self, comment_data):
+            # {}をAPIで渡すとなぜかFieldがcommentデータに入っているのでその対応
+            # pydanticの問題だと思うが...
+            f_info: FieldInfo = Field(CommentSchema.model_fields["comment"]).default
+            comment_data["comment"] = f_info
+
+            with pytest.raises(ValidationError) as e2:
+                CommentSchema(**comment_data)
+
+            assert (
+                I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
+                == "有効な文字を入力してください。"
             )
 
     class TestRetrospectiveMethodId:
