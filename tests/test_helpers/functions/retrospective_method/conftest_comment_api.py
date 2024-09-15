@@ -2,10 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from httpx import Response
 
-from app.functions.retrospective_method.comment import app as app_comment
+from app.functions.main import app
 
 # MEMO:clientもどこかで共通化した方が良いかもしれない
-client_comment = TestClient(app_comment)
+client_comment = TestClient(app)
 
 
 @pytest.fixture(scope="session")

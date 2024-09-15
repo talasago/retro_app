@@ -3,11 +3,11 @@ from factories.user_factory import ApiCommonUserFactory
 from fastapi.testclient import TestClient
 from httpx import Response
 
-from app.functions.user import app as app_user
+from app.functions.main import app
 from app.schemas.token_schema import TokenType
 
 # MEMO:clientもどこかで共通化した方が良いかもしれない
-client_user = TestClient(app_user)
+client_user = TestClient(app)
 
 
 @pytest.fixture(scope="session")
