@@ -86,20 +86,37 @@ class TestCommentFunction:
                     assert response.json()["detail"][0]["msg"] == "必須項目です。"
 
     class TestGetComment:
-        @pytest.fixture(scope="session")
+        @pytest.fixture(scope="class")
         def sut(self, get_comment_api):
             return get_comment_api
 
         # 必要な他のテスト観点
         # - ログインしなくても叩けること
-        # - userを返さないこと
+
+        @pytest.fixture(scope="class", autouse=True)
+        def create_comment(self, add_comment_api, tokens_of_logged_in_api_common_user):
+            comments = [
+                {"comment": "test comment"},
+                {"comment": "test comment2"},
+                {"comment": "test comment3"},
+            ]
+
+            for comment_data in comments:
+                add_comment_api(
+                    comment_data=comment_data,
+                    retrospective_method_id=5,
+                    access_token=tokens_of_logged_in_api_common_user[0],
+                    is_assert_response_code_2xx=True,
+                )
 
         def test_return_200(self, sut):
-            # dataをcreateしておく必要がある、今はテスト間に依存関係ができてしまっている。
+            response = sut(retrospective_method_id=5, is_assert_response_code_2xx=False)
 
-            response = sut(retrospective_method_id=1, is_assert_response_code_2xx=False)
             assert_cors_headers(response)
             assert response.status_code == 200
-            assert response.json()[0]["retrospective_method_id"] == 1
-            assert response.json()[0]["user_id"] == 1
             assert response.json()[0]["comment"] == "test comment"
+            assert response.json()[1]["comment"] == "test comment2"
+            assert response.json()[2]["comment"] == "test comment3"
+            for comment in response.json():
+                assert "user" not in comment
+                assert comment["retrospective_method_id"] == 5
