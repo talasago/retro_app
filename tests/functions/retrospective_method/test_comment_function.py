@@ -90,9 +90,6 @@ class TestCommentFunction:
         def sut(self, get_comment_api):
             return get_comment_api
 
-        # 必要な他のテスト観点
-        # - ログインしなくても叩けること
-
         @pytest.fixture(scope="class", autouse=True)
         def create_comment(self, add_comment_api, tokens_of_logged_in_api_common_user):
             comments = [
@@ -140,3 +137,13 @@ class TestCommentFunction:
                 for comment in response.json():
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
+
+        class WhenNotMatchRetrospectiveMethodId:
+            def test_return_200(self, sut):
+                response = sut(
+                    retrospective_method_id=999, is_assert_response_code_2xx=False
+                )
+
+                assert_cors_headers(response)
+                assert response.status_code == 200
+                assert response.json() == []
