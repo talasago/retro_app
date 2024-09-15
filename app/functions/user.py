@@ -20,7 +20,7 @@ from app.functions.dependencies import (
 )
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
-    ApiResponseBodyBase,
+    LogoutApiResponseBody,
     RefreshTokenApiResponseBody,
     SignInApiResponseBody,
     TokenApiResponseBody,
@@ -67,6 +67,7 @@ def signup_user(
     "/token",
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -103,6 +104,7 @@ def sign_in(
     "/refresh_token",
     summary="リフレッシュトークンでトークンを再発行します。",
     response_model=RefreshTokenApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def refresh_token(
     auth_service: "AuthService" = Depends(get_auth_service),
@@ -144,7 +146,10 @@ def refresh_token(
 
 
 @router.post(
-    "/api/v1/logout", summary="ログアウトします。", response_model=ApiResponseBodyBase
+    "/api/v1/logout",
+    summary="ログアウトします。",
+    response_model=LogoutApiResponseBody,
+    status_code=status.HTTP_200_OK,
 )
 def logout(
     current_user: "UserModel" = Depends(get_current_user),
@@ -159,5 +164,5 @@ def logout(
     auth_service.delete_refresh_token(current_user)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=ApiResponseBodyBase(message="ログアウトしました").model_dump(),
+        content=LogoutApiResponseBody().model_dump(),
     )
