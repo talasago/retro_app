@@ -35,15 +35,10 @@ class CommentModel(Base):
         onupdate=datetime.now(timezone.utc),
     )
 
-    # 外部キー
-    user: Mapped["UserModel"] = relationship(back_populates="comments")
     # 外部キーのデータ
-    # 遅延読み込みにしたいが...
-    # 遅延読み込みしているので、CommentModelのuserをアクセスしない限り
-    # user情報を取得するクエリは実行されない
-    # user: Mapped["UserModel"] = relationship(
-    #    "UserModel", backref=backref("comments", lazy="dynamic"), lazy="noload"
-    # )
+    # 遅延読み込みになってるっぽい、CommentModelのuserにアクセスしない限り
+    # user情報を取得するクエリは実行されないはず
+    user: Mapped["UserModel"] = relationship(back_populates="comments")
 
     def to_dict(self) -> dict:
         return {

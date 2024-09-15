@@ -50,7 +50,3 @@ class CommentRepository:
 
         # ここでクエリ発行
         return query.all()
-
-        # 現段階でuser情報は不要なので削除したい。
-        # ただ、それはrepositoryの責務ではない気がしてきた。呼び出し元の責務だ。
-        # そっちでdictに変換して削除した方が早そう。
