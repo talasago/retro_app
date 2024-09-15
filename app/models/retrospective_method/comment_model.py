@@ -37,7 +37,23 @@ class CommentModel(Base):
 
     # 外部キー
     user: Mapped["UserModel"] = relationship(back_populates="comments")
+    # 外部キーのデータ
+    # 遅延読み込みにしたいが...
+    # 遅延読み込みしているので、CommentModelのuserをアクセスしない限り
+    # user情報を取得するクエリは実行されない
+    # user: Mapped["UserModel"] = relationship(
+    #    "UserModel", backref=backref("comments", lazy="dynamic"), lazy="noload"
+    # )
 
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "retrospective_method_id": self.retrospective_method_id,
+            "user_id": self.user_id,
+            "comment": self.comment,
+            "created_at": str(self.created_at),
+            "updated_at": str(self.updated_at),
+        }
 
 # @event.listens_for(CommentModel.uuid, "set")
 # def disable_uuid_column_update(target, value, oldvalue, initiator):

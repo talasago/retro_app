@@ -92,8 +92,14 @@ class TestCommentFunction:
 
         # 必要な他のテスト観点
         # - ログインしなくても叩けること
+        # - userを返さないこと
 
         def test_return_200(self, sut):
-            response = sut(retrospective_method_id=1 ,is_assert_response_code_2xx=False)
+            # dataをcreateしておく必要がある、今はテスト間に依存関係ができてしまっている。
+
+            response = sut(retrospective_method_id=1, is_assert_response_code_2xx=False)
             assert_cors_headers(response)
             assert response.status_code == 200
+            assert response.json()[0]["retrospective_method_id"] == 1
+            assert response.json()[0]["user_id"] == 1
+            assert response.json()[0]["comment"] == "test comment"

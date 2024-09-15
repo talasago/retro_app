@@ -60,7 +60,12 @@ def get_comment(
 ):
     """コメント取得のエンドポイント。"""
 
-    # comment_repo.get_comment(retrospective_method_id)
+    comments = comment_repo.find(retrospective_method_id=retrospective_method_id)
 
-    return JSONResponse(content={"message": "get_comment"})
-        # content=AddCommentApiResponseBody().model_dump(),
+    result_comments: list[dict] = []
+    for comment in comments:
+        comment_dict = comment.to_dict()
+        result_comments.append(comment_dict)
+
+    return JSONResponse(content=result_comments)
+    # content=AddCommentApiResponseBody().model_dump(),
