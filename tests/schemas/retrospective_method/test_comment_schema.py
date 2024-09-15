@@ -3,7 +3,7 @@ from typing import Any
 import pytest
 from pydantic import ValidationError
 
-from app.schemas.retrospective_method.comment_schema import CommentSchema
+from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
 from app.schemas.translations.i18n_translate_wrapper import I18nTranslateWrapper
 from tests.factories.retrospective_method.comment_factory import CommentFactory
 
@@ -182,7 +182,7 @@ class TestCommentCreate:
         def test_space_only(self, comment_data):
             comment_data["comment"] = " "
             with pytest.raises(ValidationError) as e1:
-                CommentSchema(**comment_data)
+                CommentCreate(**comment_data)
 
             assert (
                 I18nTranslateWrapper.trans(e1.value.errors())[0]["msg"]
@@ -191,7 +191,7 @@ class TestCommentCreate:
 
             comment_data["comment"] = "　"
             with pytest.raises(ValidationError) as e2:
-                CommentSchema(**comment_data)
+                CommentCreate(**comment_data)
 
             assert (
                 I18nTranslateWrapper.trans(e2.value.errors())[0]["msg"]
