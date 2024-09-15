@@ -109,14 +109,32 @@ class TestCommentFunction:
                     is_assert_response_code_2xx=True,
                 )
 
-        def test_return_200(self, sut):
-            response = sut(retrospective_method_id=5, is_assert_response_code_2xx=False)
+        class WhenDuringLogin:
+            def test_return_200(self, sut):
+                response = sut(retrospective_method_id=5, is_assert_response_code_2xx=False)
 
-            assert_cors_headers(response)
-            assert response.status_code == 200
-            assert response.json()[0]["comment"] == "test comment"
-            assert response.json()[1]["comment"] == "test comment2"
-            assert response.json()[2]["comment"] == "test comment3"
-            for comment in response.json():
-                assert "user" not in comment
-                assert comment["retrospective_method_id"] == 5
+                assert_cors_headers(response)
+                assert response.status_code == 200
+                assert response.json()[0]["comment"] == "test comment"
+                assert response.json()[1]["comment"] == "test comment2"
+                assert response.json()[2]["comment"] == "test comment3"
+                for comment in response.json():
+                    assert "user" not in comment
+                    assert comment["retrospective_method_id"] == 5
+
+        class WhenNotLogin:
+            def test_return_200(self, sut, tokens_of_logged_in_api_common_user):
+                response = sut(
+                    access_token=tokens_of_logged_in_api_common_user[0],
+                    retrospective_method_id=5,
+                    is_assert_response_code_2xx=False,
+                )
+
+                assert_cors_headers(response)
+                assert response.status_code == 200
+                assert response.json()[0]["comment"] == "test comment"
+                assert response.json()[1]["comment"] == "test comment2"
+                assert response.json()[2]["comment"] == "test comment3"
+                for comment in response.json():
+                    assert "user" not in comment
+                    assert comment["retrospective_method_id"] == 5
