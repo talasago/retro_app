@@ -36,10 +36,8 @@ class CommentRepository:
         self.__db.refresh(comment)
 
     def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
-        # これいらないかも
-        if conditions is None:
-            conditions = {}
-            #  self.__db.query(CommentModel).all()でもいいかもしれない
+        if not isinstance(conditions, dict):
+            raise TypeError("conditions must be of type dict")
 
         # MEMO: ここではまだクエリの発行ではない
         query: "Query" = self.__db.query(CommentModel)
