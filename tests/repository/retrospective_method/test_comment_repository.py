@@ -1,7 +1,6 @@
 from typing import Callable
 
 import pytest
-from passlib.context import CryptContext
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
@@ -9,8 +8,6 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.repository.retrospective_method.comment_repository import CommentRepository
 from tests.conftest import create_test_user
 from tests.factories.retrospective_method.comment_factory import CommentFactory
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @pytest.fixture(scope="session")

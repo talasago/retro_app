@@ -1,9 +1,13 @@
-from typing import TypedDict
+from typing import TYPE_CHECKING, TypedDict
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from app.models.retrospective_method.comment_model import CommentModel
+
+if TYPE_CHECKING:
+    from sqlalchemy.orm.query import Query
+    from sqlalchemy.sql.expression import BinaryExpression
 
 
 class CommentConditions(TypedDict, total=False):
@@ -32,15 +36,16 @@ class CommentRepository:
         self.__db.refresh(comment)
 
     def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
+        # これいらないかも
         if conditions is None:
             conditions = {}
             #  self.__db.query(CommentModel).all()でもいいかもしれない
 
         # MEMO: ここではまだクエリの発行ではない
-        query = self.__db.query(CommentModel)
+        query: "Query" = self.__db.query(CommentModel)
 
         # 動的にフィルタを追加
-        filters = [
+        filters: list["BinaryExpression"] = [
             getattr(CommentModel, key) == value for key, value in conditions.items()
         ]
 
