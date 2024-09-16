@@ -39,17 +39,16 @@ class CommentRepository:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 
-        # MEMO: ここではまだクエリの発行ではない
-        query: "Query" = self.__db.query(CommentModel)
+        if conditions == {}:
+            return self.__db.query(CommentModel).all()
 
         # 動的にフィルタを追加
         filters: list["BinaryExpression"] = [
             getattr(CommentModel, key) == value for key, value in conditions.items()
         ]
 
-        # ifいるのか？
-        if filters:
-            query = query.filter(and_(*filters))
+        # MEMO: ここではまだクエリの発行ではない
+        query: "Query" = self.__db.query(CommentModel).filter(and_(*filters))
 
         # ここでクエリ発行
         return query.all()
