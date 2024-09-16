@@ -1,7 +1,6 @@
 from typing import Callable
 
 import pytest
-from passlib.context import CryptContext
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 
@@ -9,8 +8,6 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.repository.retrospective_method.comment_repository import CommentRepository
 from tests.conftest import create_test_user
 from tests.factories.retrospective_method.comment_factory import CommentFactory
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 @pytest.fixture(scope="session")
@@ -92,20 +89,17 @@ class TestCommentRepository:
                     assert results == []
 
         class TestWhenNotConditions:
-            @pytest.mark.parametrize("conditions", [None, {}])
-            def test_return_all_comments_none_and_empty_dict(
-                self, sut, conditions, db: Session
-            ):
-                """conditionsにNoneや{}が指定されていない場合、全てのコメントを返すこと"""
+            def test_return_all_comments_empty_dict(self, sut, db: Session):
+                """conditionsが{}の場合、全てのコメントを返すこと"""
 
-                results = sut(conditions=conditions)
+                results = sut(conditions={})
                 actual_comments = db.query(CommentModel).all()
                 result_ids = {comment.id for comment in results}
                 actual_comments_ids = {comment.id for comment in actual_comments}
 
                 assert result_ids == actual_comments_ids
 
-            def test_return_all_comments(self, sut, db: Session):
+            def test_return_all_comments_empty_paramater(self, sut, db: Session):
                 """conditionsが指定されていない場合、全てのコメントを返すこと"""
 
                 results = sut()
@@ -114,3 +108,13 @@ class TestCommentRepository:
                 actual_comments_ids = {comment.id for comment in actual_comments}
 
                 assert result_ids == actual_comments_ids
+
+            class TestWhenInvalidConditions:
+                @pytest.mark.parametrize(
+                    "conditions", [1, "invalid_conditions", None, []]
+                )
+                def test_raise_type_error(self, sut, conditions):
+                    """conditionsがdict以外の場合、TypeErrorをraiseすること"""
+
+                    with pytest.raises(TypeError):
+                        sut(conditions=conditions)
