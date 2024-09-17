@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import { Typography, Button, Container, Box, Grid } from '@mui/material';
 import { styled } from '@mui/system';
+import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
-
 interface FeatureSectionProps {
   title: string;
   description: string;
@@ -103,9 +103,21 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
             sx={{ textAlign: { xs: 'center', sm: 'right' } }}
           >
             <Typography variant="body2" sx={{ mx: 1 }}>
-              プライバシーポリシー
+              <Link
+                to="/privacy_policy"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                プライバシーポリシー
+              </Link>
             </Typography>
-            <Typography variant="body2">利用規約</Typography>
+            <Typography variant="body2">
+              <Link
+                to="/service_term"
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                利用規約
+              </Link>
+            </Typography>
           </Grid>
         </Grid>
       </Footer>
