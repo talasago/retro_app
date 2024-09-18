@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import ServiceTerm from 'components/container/ServiceTerm';
-import PrivacyPolicy from 'components/container/PrivacyPolicy';
 import HomeContainer from '../components/container/HomeContainer';
 export const ROUTES_LISTS = {} as const;
 
@@ -20,7 +19,6 @@ const IndexRoutes: FC = () => {
       <Route path="/" element={<HomeContainer />} />
       <Route path="*" element={<HomeContainer />} />
       <Route path="service_term" element={<ServiceTerm />} />
-      <Route path="privacy_policy" element={<PrivacyPolicy />} />
     </Routes>
   );
 };
