@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import ServiceTerm from 'components/container/ServiceTerm';
 import HomeContainer from '../components/container/HomeContainer';
 export const ROUTES_LISTS = {} as const;
 
@@ -17,6 +18,7 @@ const IndexRoutes: FC = () => {
     <Routes>
       <Route path="/" element={<HomeContainer />} />
       <Route path="*" element={<HomeContainer />} />
+      <Route path="service_term" element={<ServiceTerm />} />
     </Routes>
   );
 };
