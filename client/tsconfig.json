@@ -18,6 +18,7 @@
     "jsx": "react-jsx",
     "baseUrl": "./src",
     "types": ["node", "jest"],
+    "noUncheckedIndexedAccess": true,
   },
   "include": ["src/**/*",],
 }
