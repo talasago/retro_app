@@ -35,7 +35,6 @@ if TYPE_CHECKING:
 
 router = APIRouter(tags=["user"])
 
-
 @router.post(
     "/api/v1/sign_up",
     summary="ユーザーを登録します。",
@@ -67,10 +66,8 @@ def signup_user(
     )
 
 
-# NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
 @router.post(
-    "/token",
+    "/api/v1/token",
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
     status_code=status.HTTP_200_OK,

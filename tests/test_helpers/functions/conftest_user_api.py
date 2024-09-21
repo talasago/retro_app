@@ -37,7 +37,7 @@ def login_api(test_client):
         login_param: dict, is_return_response=False, is_assert_response_code_2xx=True
     ) -> Response | tuple[str, str]:
         response: Response = test_client.post(
-            "/token",
+            "/api/v1/token",
             headers={
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded",

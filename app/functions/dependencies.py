@@ -20,7 +20,7 @@ from app.services.auth_service import AuthService
 if TYPE_CHECKING:
     from app.models.user_model import UserModel
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/token")
 
 
 def get_db():
