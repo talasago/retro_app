@@ -21,11 +21,11 @@ from app.schemas.retrospective_method.comment_schema import CommentCreate, Comme
 if TYPE_CHECKING:
     from app.repository.retrospective_method.comment_repository import CommentRepository
 
-router = APIRouter(tags=["comment"])
+router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
 
 
 @router.post(
-    "/api/v1/retrospective_method/{retrospective_method_id}/comment",
+    "/{retrospective_method_id}/comment",
     summary="レビューコメントを登録します。",
     status_code=status.HTTP_201_CREATED,
     response_model=AddCommentApiResponseBody,
@@ -53,7 +53,7 @@ def add_comment(
 
 
 @router.get(
-    "/api/v1/retrospective_method/{retrospective_method_id}/comment",
+    "/{retrospective_method_id}/comment",
     summary="レビューコメントを取得します。",
     status_code=status.HTTP_200_OK,
     response_model=GetCommentApiResponseBody,

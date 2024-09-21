@@ -33,10 +33,10 @@ if TYPE_CHECKING:
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
-router = APIRouter(tags=["user"])
+router = APIRouter(tags=["user"], prefix="/api/v1")
 
 @router.post(
-    "/api/v1/sign_up",
+    "/sign_up",
     summary="ユーザーを登録します。",
     response_model=SignInApiResponseBody,
     status_code=status.HTTP_201_CREATED,
@@ -67,7 +67,7 @@ def signup_user(
 
 
 @router.post(
-    "/api/v1/token",
+    "/token",
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
     status_code=status.HTTP_200_OK,
@@ -111,7 +111,7 @@ def sign_in(
 
 
 @router.post(
-    "/api/v1/refresh_token",
+    "/refresh_token",
     summary="リフレッシュトークンでトークンを再発行します。",
     response_model=RefreshTokenApiResponseBody,
     status_code=status.HTTP_200_OK,
@@ -167,7 +167,7 @@ def refresh_token(
 
 
 @router.post(
-    "/api/v1/logout",
+    "/logout",
     summary="ログアウトします。",
     response_model=LogoutApiResponseBody,
     status_code=status.HTTP_200_OK,
