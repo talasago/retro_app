@@ -41,7 +41,8 @@
     "format": "prettier --write --loglevel=warn 'src/**/*.{js,jsx,ts,tsx,html,json,gql,graphql}'",
     "preinstall": "npx typesync || :",
     "test": "NODE_OPTIONS='--experimental-vm-modules' npx jest",
-    "test:debug": "NODE_OPTIONS='--experimental-vm-modules' node --inspect-brk ./node_modules/jest/bin/jest.js"
+    "test:debug": "NODE_OPTIONS='--experimental-vm-modules' node --inspect-brk ./node_modules/jest/bin/jest.js",
+    "create_schema": "openapi-typescript --input ./openapi.json --output ./src/domains/internal/apiSchema.d.ts"
   },
   "eslintConfig": {
     "extends": [
