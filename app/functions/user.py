@@ -20,11 +20,11 @@ from app.functions.dependencies import (
 )
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
+    ClientErrorResponseBody,
     LogoutApiResponseBody,
     RefreshTokenApiResponseBody,
     SignInApiResponseBody,
     TokenApiResponseBody,
-    UnauthorizedResponseBody,
 )
 from app.schemas.user_schema import UserCreate
 
@@ -71,7 +71,7 @@ def signup_user(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_401_UNAUTHORIZED: {
-            "model": UnauthorizedResponseBody,
+            "model": ClientErrorResponseBody,
         }
     },
 )
@@ -96,7 +96,7 @@ def sign_in(
     except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content=UnauthorizedResponseBody(
+            content=ClientErrorResponseBody(
                 message="メールアドレスまたはパスワードが間違っています。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
@@ -115,7 +115,7 @@ def sign_in(
     status_code=status.HTTP_200_OK,
     responses={
         status.HTTP_401_UNAUTHORIZED: {
-            "model": UnauthorizedResponseBody,
+            "model": ClientErrorResponseBody,
         }
     },
 )
@@ -136,7 +136,7 @@ def refresh_token(
     except RetroAppRecordNotFoundError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content=UnauthorizedResponseBody(
+            content=ClientErrorResponseBody(
                 message="ユーザーが存在しません。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
@@ -144,7 +144,7 @@ def refresh_token(
     except RetroAppAuthenticationError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content=UnauthorizedResponseBody(
+            content=ClientErrorResponseBody(
                 message="Tokenが間違っています。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
@@ -152,7 +152,7 @@ def refresh_token(
     except RetroAppTokenExpiredError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            content=UnauthorizedResponseBody(
+            content=ClientErrorResponseBody(
                 message="ログイン有効期間を過ぎています。再度ログインしてください。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},

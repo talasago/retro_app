@@ -74,7 +74,7 @@ class GetCommentApiResponseBody(BaseModel):
     )
 
 
-class UnauthorizedResponseBody(BaseModel):
+class ClientErrorResponseBody(BaseModel):
     message: str = Field(
         description="処理メッセージ",
     )
