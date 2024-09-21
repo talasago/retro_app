@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -41,6 +41,11 @@ router = APIRouter(tags=["user"])
     summary="ユーザーを登録します。",
     response_model=SignInApiResponseBody,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "model": ClientErrorResponseBody,
+        }
+    },
 )
 def signup_user(
     user_params: UserCreate, user_repo: "UserRepository" = Depends(get_user_repo)
@@ -50,9 +55,9 @@ def signup_user(
     try:
         user_repo.save(user=user)
     except RetroAppColmunUniqueError as e:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
-            detail=e.message,
+            content=ClientErrorResponseBody(message=str(e)).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 

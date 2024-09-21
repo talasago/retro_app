@@ -35,8 +35,19 @@ class TestUserFunction:
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
             assert_cors_headers(response_1st)
 
-            # TODO:異常系のテストを追加する
-            # DBに保存されているかの観点が必要。
+        def test_409_when_user_already_exists(self, add_user_api):
+            user_data: dict = {
+                "name": "test_409_when_user_already_exists",
+                "password": "testpassword",
+            }
+            add_user_api(user_data)
+
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
+
+            assert response.status_code == 409
+            assert response.json() == {
+                "message": "指定された名前はすでに登録されています。"
+            }
 
         # 422のテストは他で網羅されているので最低限のみ確認
         def test_422_when_name_is_invalid(self, add_user_api):
