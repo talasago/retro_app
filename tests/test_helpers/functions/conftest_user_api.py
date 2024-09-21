@@ -63,7 +63,7 @@ def login_api(test_client):
 def refresh_token_api(test_client):
     def _method(refresh_token: str) -> Response:
         response: Response = test_client.post(
-            "/refresh_token",
+            "/api/v1/refresh_token",
             headers={
                 "accept": "application/json",
                 "Authorization": f"Bearer {refresh_token}",

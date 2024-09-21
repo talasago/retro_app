@@ -111,7 +111,7 @@ def sign_in(
 
 
 @router.post(
-    "/refresh_token",
+    "/api/v1/refresh_token",
     summary="リフレッシュトークンでトークンを再発行します。",
     response_model=RefreshTokenApiResponseBody,
     status_code=status.HTTP_200_OK,
