@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
+import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
@@ -18,7 +19,9 @@ interface LoginModalProps {
   onCloseModal: () => void;
 }
 
-const loginUser = async (requestBody: LoginFormSchema) => {
+const loginUser = async (
+  requestBody: LoginFormSchema,
+): Promise<AxiosResponse<apiSchemas['schemas']['TokenApiResponseBody']>> => {
   const params = new URLSearchParams();
   params.append('username', requestBody.name);
   params.append('password', requestBody.password);
@@ -58,11 +61,10 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       dispatch(
         setAlert({
           open: true,
-          message: 'ログインしました',
+          message: response.data.message,
           severity: 'success',
         }),
       );
-      console.log('Response:', response.data);
       onCloseModal();
       reset();
     } catch (error) {
