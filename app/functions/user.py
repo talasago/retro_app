@@ -33,11 +33,11 @@ if TYPE_CHECKING:
     from app.repository.user_repository import UserRepository
     from app.services.auth_service import AuthService
 
-router = APIRouter(tags=["user"])
+router = APIRouter(tags=["user"], prefix="/api/v1")
 
 
 @router.post(
-    "/api/v1/sign_up",
+    "/sign_up",
     summary="ユーザーを登録します。",
     response_model=SignInApiResponseBody,
     status_code=status.HTTP_201_CREATED,
@@ -67,8 +67,6 @@ def signup_user(
     )
 
 
-# NOTE:OpenAPIのAuthorizeボタンが、/tokenにアクセスするため、/api/v1を付けていない。変える方法は調べていない
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/prefix/token")かなあ
 @router.post(
     "/token",
     summary="ログインしてトークンを発行します。",
@@ -170,7 +168,7 @@ def refresh_token(
 
 
 @router.post(
-    "/api/v1/logout",
+    "/logout",
     summary="ログアウトします。",
     response_model=LogoutApiResponseBody,
     status_code=status.HTTP_200_OK,
