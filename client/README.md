@@ -14,8 +14,8 @@ $ yarn dev
 │   ├── components 
 │   │   ├── container → Presentational Componentを包含してロジックを持たせるコンポーネント(Container Component)
 │   │   └── presenter → 見た目だけに責務を持たせるコンポーネント(Presentational Component)
-│   ├── domains → [予定]ビジネスロジックや型定義用
-│   ├── features → [予定]各機能ごとのディレクトリ
+│   ├── domains → 型定義
+│   ├── features → 各機能ごとのディレクトリ
 |   |   └── [awesome]
 │   │       ├── container
 │   │       └── presenter
