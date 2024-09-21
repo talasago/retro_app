@@ -98,7 +98,7 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert (
-                    res_body["detail"]
+                    res_body["message"]
                     == "メールアドレスまたはパスワードが間違っています。"
                 )
                 assert response.headers["WWW-Authenticate"] == "Bearer"

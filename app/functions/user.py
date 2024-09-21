@@ -24,6 +24,7 @@ from app.schemas.http_response_body_user_schema import (
     RefreshTokenApiResponseBody,
     SignInApiResponseBody,
     TokenApiResponseBody,
+    UnauthorizedResponseBody,
 )
 from app.schemas.user_schema import UserCreate
 
@@ -68,6 +69,11 @@ def signup_user(
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
     status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": UnauthorizedResponseBody,
+        }
+    },
 )
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -88,9 +94,11 @@ def sign_in(
             username=form_data.username, password=form_data.password
         )
     except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="メールアドレスまたはパスワードが間違っています。",
+            content=UnauthorizedResponseBody(
+                message="メールアドレスまたはパスワードが間違っています。"
+            ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
