@@ -73,4 +73,6 @@ def get_comment(
         comment_dict = comment.to_dict()
         result_comments.append(comment_dict)
 
-    return JSONResponse(content={"comments": result_comments})
+    return JSONResponse(
+        content=GetCommentApiResponseBody(comments=result_comments).model_dump()
+    )

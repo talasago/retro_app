@@ -2,7 +2,7 @@
 
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, status
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -20,6 +20,7 @@ from app.functions.dependencies import (
 )
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
+    ClientErrorResponseBody,
     LogoutApiResponseBody,
     RefreshTokenApiResponseBody,
     SignInApiResponseBody,
@@ -40,6 +41,11 @@ router = APIRouter(tags=["user"])
     summary="ユーザーを登録します。",
     response_model=SignInApiResponseBody,
     status_code=status.HTTP_201_CREATED,
+    responses={
+        status.HTTP_409_CONFLICT: {
+            "model": ClientErrorResponseBody,
+        }
+    },
 )
 def signup_user(
     user_params: UserCreate, user_repo: "UserRepository" = Depends(get_user_repo)
@@ -49,9 +55,9 @@ def signup_user(
     try:
         user_repo.save(user=user)
     except RetroAppColmunUniqueError as e:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_409_CONFLICT,
-            detail=e.message,
+            content=ClientErrorResponseBody(message=str(e)).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -68,6 +74,11 @@ def signup_user(
     summary="ログインしてトークンを発行します。",
     response_model=TokenApiResponseBody,
     status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ClientErrorResponseBody,
+        }
+    },
 )
 def sign_in(
     form_data: OAuth2PasswordRequestForm = Depends(),
@@ -88,9 +99,11 @@ def sign_in(
             username=form_data.username, password=form_data.password
         )
     except (RetroAppAuthenticationError, RetroAppRecordNotFoundError):
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="メールアドレスまたはパスワードが間違っています。",
+            content=ClientErrorResponseBody(
+                message="メールアドレスまたはパスワードが間違っています。"
+            ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -105,6 +118,11 @@ def sign_in(
     summary="リフレッシュトークンでトークンを再発行します。",
     response_model=RefreshTokenApiResponseBody,
     status_code=status.HTTP_200_OK,
+    responses={
+        status.HTTP_401_UNAUTHORIZED: {
+            "model": ClientErrorResponseBody,
+        }
+    },
 )
 def refresh_token(
     auth_service: "AuthService" = Depends(get_auth_service),
@@ -121,21 +139,27 @@ def refresh_token(
             refresh_token=token
         )
     except RetroAppRecordNotFoundError:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="ユーザーが存在しません。",
+            content=ClientErrorResponseBody(
+                message="ユーザーが存在しません。"
+            ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
     except RetroAppAuthenticationError:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str("Tokenが間違っています。"),
+            content=ClientErrorResponseBody(
+                message="Tokenが間違っています。"
+            ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
     except RetroAppTokenExpiredError:
-        raise HTTPException(
+        return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str("ログイン有効期間を過ぎています。再度ログインしてください。"),
+            content=ClientErrorResponseBody(
+                message="ログイン有効期間を過ぎています。再度ログインしてください。"
+            ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 

@@ -35,8 +35,19 @@ class TestUserFunction:
             assert response_1st.json() == {"message": "ユーザー登録が成功しました。"}
             assert_cors_headers(response_1st)
 
-            # TODO:異常系のテストを追加する
-            # DBに保存されているかの観点が必要。
+        def test_409_when_user_already_exists(self, add_user_api):
+            user_data: dict = {
+                "name": "test_409_when_user_already_exists",
+                "password": "testpassword",
+            }
+            add_user_api(user_data)
+
+            response = add_user_api(user_data, is_assert_response_code_2xx=False)
+
+            assert response.status_code == 409
+            assert response.json() == {
+                "message": "指定された名前はすでに登録されています。"
+            }
 
         # 422のテストは他で網羅されているので最低限のみ確認
         def test_422_when_name_is_invalid(self, add_user_api):
@@ -98,7 +109,7 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert (
-                    res_body["detail"]
+                    res_body["message"]
                     == "メールアドレスまたはパスワードが間違っています。"
                 )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
@@ -139,7 +150,7 @@ class TestUserFunction:
 
                 ref_token_res: "Response" = refresh_token_api(refresh_token)
                 assert ref_token_res.status_code == 401
-                assert ref_token_res.json() == {"detail": "Tokenが間違っています。"}
+                assert ref_token_res.json() == {"message": "Tokenが間違っています。"}
                 assert ref_token_res.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidToken:
@@ -273,7 +284,7 @@ class TestUserFunction:
                 response = response = refresh_token_api(refresh_token)
 
                 assert response.status_code == 401
-                assert response.json() == {"detail": "ユーザーが存在しません。"}
+                assert response.json() == {"message": "ユーザーが存在しません。"}
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenExpiredToken:
@@ -289,7 +300,7 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert (
-                    res_body["detail"]
+                    res_body["message"]
                     == "ログイン有効期間を過ぎています。再度ログインしてください。"
                 )
                 assert response.headers["www-authenticate"] == "Bearer"
@@ -301,5 +312,5 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "Tokenが間違っています。"
+                assert res_body["message"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
