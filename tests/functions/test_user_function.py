@@ -139,7 +139,7 @@ class TestUserFunction:
 
                 ref_token_res: "Response" = refresh_token_api(refresh_token)
                 assert ref_token_res.status_code == 401
-                assert ref_token_res.json() == {"detail": "Tokenが間違っています。"}
+                assert ref_token_res.json() == {"message": "Tokenが間違っています。"}
                 assert ref_token_res.headers["www-authenticate"] == "Bearer"
 
         class TestWhenInvalidToken:
@@ -273,7 +273,7 @@ class TestUserFunction:
                 response = response = refresh_token_api(refresh_token)
 
                 assert response.status_code == 401
-                assert response.json() == {"detail": "ユーザーが存在しません。"}
+                assert response.json() == {"message": "ユーザーが存在しません。"}
                 assert response.headers["www-authenticate"] == "Bearer"
 
         class TestWhenExpiredToken:
@@ -289,7 +289,7 @@ class TestUserFunction:
                 res_body = response.json()
                 assert response.status_code == 401
                 assert (
-                    res_body["detail"]
+                    res_body["message"]
                     == "ログイン有効期間を過ぎています。再度ログインしてください。"
                 )
                 assert response.headers["www-authenticate"] == "Bearer"
@@ -301,5 +301,5 @@ class TestUserFunction:
 
                 res_body = response.json()
                 assert response.status_code == 401
-                assert res_body["detail"] == "Tokenが間違っています。"
+                assert res_body["message"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
