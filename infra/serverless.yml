@@ -27,6 +27,7 @@ custom:
   apiGatewayThrottling:
     maxRequestsPerSecond: 10
     maxConcurrentRequests: 10
+  apiPrefix: /api/v1
 
 package:
   patterns:
@@ -92,23 +93,23 @@ functions:
     handler: app.functions.main.handler
     events:
       - http:
-          path: /api/v1/sign_up
+          path: ${self:custom.apiPrefix}/sign_up
           method: ANY
       - http:
-          path: /token
+          path: ${self:custom.apiPrefix}/token
           method: ANY
       - http:
-          path: /refresh_token
+          path: ${self:custom.apiPrefix}/refresh_token
           method: ANY
       - http:
-          path: /api/v1/logout
+          path: ${self:custom.apiPrefix}/logout
           method: ANY
   comment_function:
     handler: app.functions.main.handler
     events:
       - http:
-          path: /api/v1/retrospectives/{retrospective_id}/comments
+          path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
           method: ANY
       - http:
-          path: /api/v1/retrospectives/{retrospective_id}/comments
+          path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
           method: ANY      
