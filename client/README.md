@@ -1,3 +1,8 @@
+# package.jsonに基づいた依存関係インストール
+```bash
+$ yarn
+```
+
 # ブラウザ上でローカルのコードを動かす
 ```bash
 $ yarn dev
