@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios, { type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse, type AxiosError } from 'axios';
 import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -31,6 +32,17 @@ const loginUser = async (
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
+};
+
+const isClientErrorResponseBody = (
+  error: unknown,
+): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
+  return (
+    axios.isAxiosError(error) &&
+    error.response !== undefined &&
+    (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
+      .message !== undefined
+  );
 };
 
 const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
@@ -67,16 +79,20 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       );
       onCloseModal();
       reset();
-    } catch (error) {
-      // TODO:500エラーと400エラーでメッセージを変える
+    } catch (error: unknown) {
+      // フロントバリデの関係で422は返って来るケースはないため、その場合は考慮しない。
+
       dispatch(
         setAlert({
           open: true,
-          message: 'ログインAPIがエラーになってるで',
+          // message: errorMessage,
+          message: isClientErrorResponseBody(error)
+            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              error.response!.data.message
+            : DEFAULT_ERROR_MESSAGE,
           severity: 'error',
         }),
       );
-      console.error('Error:', error);
     }
   };
 
