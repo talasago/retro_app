@@ -96,7 +96,6 @@ class TestUserFunction:
                 assert res_body["name"] == "user_data_for_login"
 
         class TestWhenUnmatchPassword:
-
             def test_return_401(self, login_api, user_data_for_login):
                 """パスワードが一致しない場合、エラーとなること"""
                 login_user_data = dict(user_data_for_login)
@@ -113,6 +112,14 @@ class TestUserFunction:
                     == "メールアドレスまたはパスワードが間違っています。"
                 )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
+
+        class TestWhenParamisNull:
+            def test_return_422(self, login_api):
+                response = login_api({}, True, is_assert_response_code_2xx=False)
+
+                res_body = response.json()
+                assert response.status_code == 422
+                assert res_body["detail"][0]["msg"] == "必須項目です。"
 
     class TestLogout:
         class TestWhenValidParam:

@@ -1,8 +1,10 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios from 'axios';
+import axios, { type AxiosResponse, type AxiosError } from 'axios';
+import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -18,7 +20,9 @@ interface LoginModalProps {
   onCloseModal: () => void;
 }
 
-const loginUser = async (requestBody: LoginFormSchema) => {
+const loginUser = async (
+  requestBody: LoginFormSchema,
+): Promise<AxiosResponse<apiSchemas['schemas']['TokenApiResponseBody']>> => {
   const params = new URLSearchParams();
   params.append('username', requestBody.name);
   params.append('password', requestBody.password);
@@ -28,6 +32,17 @@ const loginUser = async (requestBody: LoginFormSchema) => {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
+};
+
+const isClientErrorResponseBody = (
+  error: unknown,
+): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
+  return (
+    axios.isAxiosError(error) &&
+    error.response !== undefined &&
+    (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
+      .message !== undefined
+  );
 };
 
 const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
@@ -58,23 +73,26 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       dispatch(
         setAlert({
           open: true,
-          message: 'ログインしました',
+          message: response.data.message,
           severity: 'success',
         }),
       );
-      console.log('Response:', response.data);
       onCloseModal();
       reset();
-    } catch (error) {
-      // TODO:500エラーと400エラーでメッセージを変える
+    } catch (error: unknown) {
+      // フロントバリデの関係で422は返って来るケースはないため、その場合は考慮しない。
+
       dispatch(
         setAlert({
           open: true,
-          message: 'ログインAPIがエラーになってるで',
+          // message: errorMessage,
+          message: isClientErrorResponseBody(error)
+            ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+              error.response!.data.message
+            : DEFAULT_ERROR_MESSAGE,
           severity: 'error',
         }),
       );
-      console.error('Error:', error);
     }
   };
 
