@@ -29,7 +29,7 @@ export const useProtectedApi = (): ((
     let updatedAccessToken: string = '';
 
     if (!AuthToken.isLoginedCheck()) {
-      return [null, new Error(ERROR_MESSAGES.NOT_LOGINED)];
+      throw new Error(ERROR_MESSAGES.NOT_LOGINED);
     }
 
     if (AuthToken.isExistAccessToken()) {

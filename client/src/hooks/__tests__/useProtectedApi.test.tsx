@@ -81,13 +81,9 @@ describe('#useProtectedApi', () => {
     });
 
     it('Response must be null and error must have a message', async () => {
-      const [resultResponse, resultError] = await callProtectedApi(
-        'https://api.example.com',
-        'POST',
-      );
-
-      expect(resultResponse).toBeNull();
-      expect(resultError).toEqual(new Error('ログインしてください。'));
+      await expect(async () => {
+        await callProtectedApi('https://api.example.com', 'POST');
+      }).rejects.toThrow(new Error('ログインしてください。'));
     });
   });
 
