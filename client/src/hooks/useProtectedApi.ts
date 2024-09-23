@@ -65,34 +65,6 @@ const apiHeaders = (token: string): Record<string, string> => {
   };
 };
 
-const updateTokenUseRefreshToken = async (
-  refreshToken: string,
-  navigate: NavigateFunction,
-): Promise<string> => {
-  try {
-    // MEMO:モックするためにrequestとpostに分けている
-    const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
-      headers: apiHeaders(refreshToken),
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const updatedAccessToken: string = responseRefToken.data.access_token;
-    AuthToken.setTokens(updatedAccessToken, refreshToken);
-
-    return updatedAccessToken;
-  } catch (error) {
-    if (!isTokenExpired(error)) {
-      // TODO:これどんなときに発生する？422?
-      throw new Error(ERROR_MESSAGES.GENERIC);
-    }
-
-    AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
-    navigate('/login');
-
-    throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);
-  }
-};
-
 const callProtectedApiWithAccessToken = async (
   requestParams: ApiRequest,
   accessToken: string,
@@ -140,4 +112,32 @@ const callProtectedApiWithRefreshToken = async (
     data,
     headers: apiHeaders(updatedAccessToken),
   });
+};
+
+const updateTokenUseRefreshToken = async (
+  refreshToken: string,
+  navigate: NavigateFunction,
+): Promise<string> => {
+  try {
+    // MEMO:モックするためにrequestとpostに分けている
+    const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
+      headers: apiHeaders(refreshToken),
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+    const updatedAccessToken: string = responseRefToken.data.access_token;
+    AuthToken.setTokens(updatedAccessToken, refreshToken);
+
+    return updatedAccessToken;
+  } catch (error) {
+    if (!isTokenExpired(error)) {
+      // TODO:これどんなときに発生する？422?
+      throw new Error(ERROR_MESSAGES.GENERIC);
+    }
+
+    AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
+    navigate('/login');
+
+    throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);
+  }
 };
