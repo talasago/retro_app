@@ -31,39 +31,42 @@ export const useProtectedApi = (): ((
     if (!AuthToken.isLoginedCheck()) {
       throw new Error(ERROR_MESSAGES.NOT_LOGINED);
     }
+    // ここからは、ログイン済みの場合の処理
 
     if (AuthToken.isExistAccessToken()) {
-      const [response, error] = await callProtectedApiWithAxios(
-        url,
-        method,
-        data,
-        accessToken,
-      );
+      // callProtectedApiWithAccessToken
+      try {
+        const [response, _] = await callProtectedApiWithAxios(
+          url,
+          method,
+          data,
+          accessToken,
+        );
 
-      if (error === null) {
         return [response, null];
-      } else if (error !== null && !isTokenExpired(error)) {
-        return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
+      } catch (error) {
+        if (isTokenExpired(error)) {
+          // no-op: トークンが期限切れ場合は何もしない
+        } else {
+          throw error;
+        }
       }
     }
 
+    // ここからは、アクセストークンが期限切れの場合の処理
     updatedAccessToken = await updateTokenUseRefreshToken(
       refreshToken,
       navigate,
     );
 
-    const [response, error] = await callProtectedApiWithAxios(
+    const [response, _] = await callProtectedApiWithAxios(
       url,
       method,
       data,
       updatedAccessToken,
     );
 
-    if (error === null) {
-      return [response, null];
-    }
-
-    return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
+    return [response, null];
   };
 
   return callProtectedApi;
@@ -111,22 +114,19 @@ const updateTokenUseRefreshToken = async (
   }
 };
 
+// HACK:名前変えたい。もう少し具体的な名前にしたい
 const callProtectedApiWithAxios = async (
   url: string,
   method: Method,
   data: string,
   accessToken: string,
 ): Promise<[AxiosResponse | null, Error | null]> => {
-  try {
-    const response = await axios.request({
-      method,
-      url,
-      data,
-      headers: apiHeaders(accessToken),
-    });
+  const response = await axios.request({
+    method,
+    url,
+    data,
+    headers: apiHeaders(accessToken),
+  });
 
-    return [response, null];
-  } catch (error) {
-    return [null, error as Error];
-  }
+  return [response, null];
 };

@@ -80,7 +80,7 @@ describe('#useProtectedApi', () => {
       jest.spyOn(AuthToken, 'isLoginedCheck').mockImplementation(() => false);
     });
 
-    it('Response must be null and error must have a message', async () => {
+    it('error must have', async () => {
       await expect(async () => {
         await callProtectedApi('https://api.example.com', 'POST');
       }).rejects.toThrow(new Error('ログインしてください。'));
@@ -133,20 +133,14 @@ describe('#useProtectedApi', () => {
           jest.spyOn(axios, 'request').mockRejectedValue(mockResponseError404);
         });
 
-        it('Response must be null and error must have a message', async () => {
-          const [response, error] = await callProtectedApi(
-            'https://api.example.com',
-            'POST',
-          );
-
-          expect(response).toBeNull();
-          expect(error).toEqual(
-            new Error(
-              'エラーが発生しました。時間をおいて再実行してください。',
-              // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-              error!,
-            ),
-          );
+        it('error must have', async () => {
+          let actualError;
+          try {
+            await callProtectedApi('https://api.example.com', 'POST');
+          } catch (err) {
+            actualError = err;
+          }
+          expect(actualError).toEqual(mockResponseError404);
         });
       });
     });
@@ -247,22 +241,15 @@ describe('#useProtectedApi', () => {
               .spyOn(axios, 'request')
               .mockRejectedValue(mockResponseError404);
           });
-
-          it('Token is updated and error must have a message', async () => {
-            const [response, error] = await callProtectedApi(
-              'https://api.example.com',
-              'POST',
-            );
-
+          it('Token is updated and error must have', async () => {
+            let actualError;
+            try {
+              await callProtectedApi('https://api.example.com', 'POST');
+            } catch (err) {
+              actualError = err;
+            }
+            expect(actualError).toEqual(mockResponseError404);
             expect(mockSetTokens).toHaveBeenCalled();
-            expect(response).toBeNull();
-            expect(error).toEqual(
-              new Error(
-                'エラーが発生しました。時間をおいて再実行してください。',
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                error!,
-              ),
-            );
           });
         });
       });
@@ -361,21 +348,22 @@ describe('#useProtectedApi', () => {
         });
 
         describe('When protected API call failed with updatedAccessToken', () => {
-          it('Token is updated and error must have a message', async () => {
-            const [response, error] = await callProtectedApi(
-              'https://api.example.com',
-              'POST',
-            );
+          beforeAll(() => {
+            jest
+              .spyOn(axios, 'request')
+              .mockRejectedValueOnce(mockResponseError401TokenExpired)
+              .mockRejectedValue(mockResponseError404);
+          });
+          it('Error must have', async () => {
+            let actualError;
+            try {
+              await callProtectedApi('https://api.example.com', 'POST');
+            } catch (err) {
+              actualError = err;
+            }
+            expect(actualError).toEqual(mockResponseError404);
 
             expect(mockSetTokens).toHaveBeenCalled();
-            expect(response).toBeNull();
-            expect(error).toEqual(
-              new Error(
-                'エラーが発生しました。時間をおいて再実行してください。',
-                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                error!,
-              ),
-            );
           });
         });
       });
