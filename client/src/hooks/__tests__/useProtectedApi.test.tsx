@@ -64,7 +64,7 @@ describe('#useProtectedApi', () => {
     url: string,
     method: Method,
     data?: string | undefined,
-  ) => Promise<[AxiosResponse | null, Error | null]>;
+  ) => Promise<AxiosResponse>;
 
   beforeAll(() => {
     const wrapper = ({ children }: { children: ReactNode }) => (
@@ -118,13 +118,12 @@ describe('#useProtectedApi', () => {
         });
 
         it('Response have result and error must be null', async () => {
-          const [response, error] = await callProtectedApi(
+          const response = await callProtectedApi(
             'https://api.example.com',
             'POST',
           );
 
           expect(response).toEqual(mockSuccessResponse);
-          expect(error).toBeNull();
         });
       });
 
@@ -224,14 +223,13 @@ describe('#useProtectedApi', () => {
           });
 
           it('Token is updated and response must have result', async () => {
-            const [response, error] = await callProtectedApi(
+            const response = await callProtectedApi(
               'https://api.example.com',
               'POST',
             );
 
             expect(mockSetTokens).toHaveBeenCalled();
             expect(response).toEqual(mockSuccessResponse);
-            expect(error).toBeNull();
           });
         });
 
@@ -336,14 +334,13 @@ describe('#useProtectedApi', () => {
           });
 
           it('Token is updated and response must have result', async () => {
-            const [response, error] = await callProtectedApi(
+            const response = await callProtectedApi(
               'https://api.example.com',
               'POST',
             );
 
             expect(mockSetTokens).toHaveBeenCalled();
             expect(response).toEqual(mockSuccessResponse);
-            expect(error).toBeNull();
           });
         });
 

@@ -16,14 +16,14 @@ export const useProtectedApi = (): ((
   url: string,
   method: Method,
   data?: string,
-) => Promise<[AxiosResponse | null, Error | null]>) => {
+) => Promise<AxiosResponse>) => {
   const navigate = useNavigate();
 
   const callProtectedApi = async (
     url: string,
     method: Method,
     data = '',
-  ): Promise<[AxiosResponse | null, Error | null]> => {
+  ): Promise<AxiosResponse> => {
     // HACK: 結構複雑なので、何とかしたい...
     const { accessToken, refreshToken } = AuthToken.getTokens();
     let updatedAccessToken: string = '';
@@ -43,7 +43,7 @@ export const useProtectedApi = (): ((
           accessToken,
         );
 
-        return [response, null];
+        return response;
       } catch (error) {
         if (isTokenExpired(error)) {
           // no-op: トークンが期限切れ場合は何もしない
@@ -66,7 +66,7 @@ export const useProtectedApi = (): ((
       updatedAccessToken,
     );
 
-    return [response, null];
+    return response;
   };
 
   return callProtectedApi;
