@@ -2,14 +2,13 @@ import { type ReactNode } from 'react';
 import { renderHook } from '@testing-library/react';
 import axios, {
   type AxiosResponse,
-  type Method,
   type InternalAxiosRequestConfig,
   type AxiosResponseHeaders,
   type AxiosError,
 } from 'axios';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
-import { useProtectedApi } from '../useProtectedApi';
+import { useProtectedApi, type ApiRequest } from '../useProtectedApi';
 
 const mockSuccessResponse: AxiosResponse = {
   data: {},
@@ -60,11 +59,7 @@ const mockResponseError404: AxiosError = {
 // FIXME: BeforeAllとか、モックのクリアとかを見直す。テストケース間に依存があるので、それをなくすようにする。
 
 describe('#useProtectedApi', () => {
-  let callProtectedApi: (
-    url: string,
-    method: Method,
-    data?: string | undefined,
-  ) => Promise<AxiosResponse>;
+  let callProtectedApi: (requestParams: ApiRequest) => Promise<AxiosResponse>;
 
   beforeAll(() => {
     const wrapper = ({ children }: { children: ReactNode }) => (
@@ -82,7 +77,10 @@ describe('#useProtectedApi', () => {
 
     it('error must have', async () => {
       await expect(async () => {
-        await callProtectedApi('https://api.example.com', 'POST');
+        await callProtectedApi({
+          url: 'https://api.example.com',
+          method: 'POST',
+        });
       }).rejects.toThrow(new Error('ログインしてください。'));
     });
   });
@@ -118,10 +116,10 @@ describe('#useProtectedApi', () => {
         });
 
         it('Response have result and error must be null', async () => {
-          const response = await callProtectedApi(
-            'https://api.example.com',
-            'POST',
-          );
+          const response = await callProtectedApi({
+            url: 'https://api.example.com',
+            method: 'POST',
+          });
 
           expect(response).toEqual(mockSuccessResponse);
         });
@@ -135,7 +133,10 @@ describe('#useProtectedApi', () => {
         it('error must have', async () => {
           let actualError;
           try {
-            await callProtectedApi('https://api.example.com', 'POST');
+            await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
           } catch (err) {
             actualError = err;
           }
@@ -170,7 +171,10 @@ describe('#useProtectedApi', () => {
           mockAxiosForProtectedApiCall.mockReset();
 
           await expect(async () => {
-            await callProtectedApi('https://api.example.com', 'POST');
+            await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
           }).rejects.toThrow(
             new Error('エラーが発生しました。時間をおいて再実行してください。'),
           );
@@ -193,7 +197,10 @@ describe('#useProtectedApi', () => {
 
         it('Error must have and go to login page', async () => {
           await expect(async () => {
-            await callProtectedApi('https://api.example.com', 'POST');
+            await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
           }).rejects.toThrow(
             new Error(
               'ログイン有効期間を過ぎています。再度ログインしてください。',
@@ -223,10 +230,10 @@ describe('#useProtectedApi', () => {
           });
 
           it('Token is updated and response must have result', async () => {
-            const response = await callProtectedApi(
-              'https://api.example.com',
-              'POST',
-            );
+            const response = await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
 
             expect(mockSetTokens).toHaveBeenCalled();
             expect(response).toEqual(mockSuccessResponse);
@@ -242,7 +249,10 @@ describe('#useProtectedApi', () => {
           it('Token is updated and error must have', async () => {
             let actualError;
             try {
-              await callProtectedApi('https://api.example.com', 'POST');
+              await callProtectedApi({
+                url: 'https://api.example.com',
+                method: 'POST',
+              });
             } catch (err) {
               actualError = err;
             }
@@ -279,7 +289,10 @@ describe('#useProtectedApi', () => {
 
         it('Error must have', async () => {
           await expect(async () => {
-            await callProtectedApi('https://api.example.com', 'POST');
+            await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
           }).rejects.toThrow(
             new Error('エラーが発生しました。時間をおいて再実行してください。'),
           );
@@ -300,7 +313,10 @@ describe('#useProtectedApi', () => {
 
         it('Error must have and go to login page', async () => {
           await expect(async () => {
-            await callProtectedApi('https://api.example.com', 'POST');
+            await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
           }).rejects.toThrow(
             new Error(
               'ログイン有効期間を過ぎています。再度ログインしてください。',
@@ -334,10 +350,10 @@ describe('#useProtectedApi', () => {
           });
 
           it('Token is updated and response must have result', async () => {
-            const response = await callProtectedApi(
-              'https://api.example.com',
-              'POST',
-            );
+            const response = await callProtectedApi({
+              url: 'https://api.example.com',
+              method: 'POST',
+            });
 
             expect(mockSetTokens).toHaveBeenCalled();
             expect(response).toEqual(mockSuccessResponse);
@@ -354,7 +370,10 @@ describe('#useProtectedApi', () => {
           it('Error must have', async () => {
             let actualError;
             try {
-              await callProtectedApi('https://api.example.com', 'POST');
+              await callProtectedApi({
+                url: 'https://api.example.com',
+                method: 'POST',
+              });
             } catch (err) {
               actualError = err;
             }
