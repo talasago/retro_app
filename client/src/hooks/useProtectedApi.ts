@@ -36,7 +36,7 @@ export const useProtectedApi = (): ((
     if (AuthToken.isExistAccessToken()) {
       // callProtectedApiWithAccessToken
       try {
-        const [response, _] = await callProtectedApiWithAxios(
+        const response = await callProtectedApiWithAxios(
           url,
           method,
           data,
@@ -59,7 +59,7 @@ export const useProtectedApi = (): ((
       navigate,
     );
 
-    const [response, _] = await callProtectedApiWithAxios(
+    const response = await callProtectedApiWithAxios(
       url,
       method,
       data,
@@ -120,13 +120,12 @@ const callProtectedApiWithAxios = async (
   method: Method,
   data: string,
   accessToken: string,
-): Promise<[AxiosResponse | null, Error | null]> => {
-  const response = await axios.request({
+): Promise<AxiosResponse> => {
+  // MEMO:モックするためにrequestとpostに分けている
+  return await axios.request({
     method,
     url,
     data,
     headers: apiHeaders(accessToken),
   });
-
-  return [response, null];
 };
