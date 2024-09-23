@@ -70,6 +70,7 @@ const updateTokenUseRefreshToken = async (
   navigate: NavigateFunction,
 ): Promise<string> => {
   try {
+    // MEMO:モックするためにrequestとpostに分けている
     const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
       headers: apiHeaders(refreshToken),
     });
@@ -92,30 +93,21 @@ const updateTokenUseRefreshToken = async (
   }
 };
 
-// HACK:名前変えたい。もう少し具体的な名前にしたい
-const callProtectedApiWithAxios = async (
-  requestParams: ApiRequest,
-  accessToken: string,
-): Promise<AxiosResponse> => {
-  const { url, method, data = '' } = requestParams;
-
-  // MEMO:モックするためにrequestとpostに分けている
-  return await axios.request({
-    method,
-    url,
-    data,
-    headers: apiHeaders(accessToken),
-  });
-};
-
 const callProtectedApiWithAccessToken = async (
   requestParams: ApiRequest,
   accessToken: string,
   refreshToken: string,
   navigate: NavigateFunction,
 ): Promise<AxiosResponse> => {
+  const { url, method, data = '' } = requestParams;
   try {
-    return await callProtectedApiWithAxios(requestParams, accessToken);
+    // MEMO:モックするためにrequestとpostに分けている
+    return await axios.request({
+      method,
+      url,
+      data,
+      headers: apiHeaders(accessToken),
+    });
   } catch (error) {
     if (isTokenExpired(error)) {
       return await callProtectedApiWithRefreshToken(
@@ -139,5 +131,13 @@ const callProtectedApiWithRefreshToken = async (
     navigate,
   );
 
-  return await callProtectedApiWithAxios(requestParams, updatedAccessToken);
+  const { url, method, data = '' } = requestParams;
+
+  // MEMO:モックするためにrequestとpostに分けている
+  return await axios.request({
+    method,
+    url,
+    data,
+    headers: apiHeaders(updatedAccessToken),
+  });
 };
