@@ -47,14 +47,10 @@ export const useProtectedApi = (): ((
       }
     }
 
-    try {
-      updatedAccessToken = await updateTokenUseRefreshToken(
-        refreshToken,
-        navigate,
-      );
-    } catch (error) {
-      return [null, error as Error];
-    }
+    updatedAccessToken = await updateTokenUseRefreshToken(
+      refreshToken,
+      navigate,
+    );
 
     const [response, error] = await callProtectedApiWithAxios(
       url,
