@@ -45,11 +45,10 @@ export const useProtectedApi = (): ((
 
         return response;
       } catch (error) {
-        if (isTokenExpired(error)) {
-          // no-op: トークンが期限切れ場合は何もしない
-        } else {
+        if (!isTokenExpired(error)) {
           throw error;
         }
+        // no-op: トークンが期限切れ場合は何もしない
       }
     }
 
