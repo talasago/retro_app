@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 import React, { useState, useMemo } from 'react';
+import type { AxiosResponse } from 'axios';
+import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
@@ -33,8 +35,17 @@ const HeaderContainer: FC = () => {
     dispatch(openSignUpModal());
   };
 
+  const callLogoutApi = async (): Promise<
+    [
+      AxiosResponse<apiSchemas['schemas']['LogoutApiResponseBody']> | null,
+      Error | null,
+    ]
+  > => {
+    return await callProtectedApi(LOGOUT_URL, 'POST');
+  };
+
   const handleLogout = async (): Promise<void> => {
-    const [_, error] = await callProtectedApi(LOGOUT_URL, 'POST');
+    const [response, error] = await callLogoutApi();
 
     if (error) {
       dispatch(
@@ -52,7 +63,8 @@ const HeaderContainer: FC = () => {
     dispatch(
       setAlert({
         open: true,
-        message: 'ログアウトが成功しました',
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        message: response!.data.message,
         severity: 'success',
       }),
     );
