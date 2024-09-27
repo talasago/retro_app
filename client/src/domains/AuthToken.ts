@@ -1,36 +1,6 @@
 import { useState, useEffect, type SetStateAction, type Dispatch } from 'react';
 import Cookies from 'js-cookie';
 
-class AuthTokenSubject {
-  private static instance: AuthTokenSubject;
-  private observers: AuthTokenObserver[] = [];
-
-  static getInstance(): AuthTokenSubject {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!this.instance) {
-      this.instance = new AuthTokenSubject();
-    }
-
-    return this.instance;
-  }
-
-  addObserver(observer: AuthTokenObserver): void {
-    this.observers.push(observer);
-  }
-
-  deleteObserver(observer: AuthTokenObserver): void {
-    this.observers = this.observers.filter((obs) => obs !== observer);
-  }
-
-  notifyObservers(): void {
-    this.observers.forEach((observer) => {
-      observer.update();
-    });
-  }
-}
-
-const authTokenSubject = AuthTokenSubject.getInstance();
-
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
@@ -38,17 +8,21 @@ export class AuthToken {
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
   // TODO: tokenたちはプロパティに保存してもいいかも。そうなると、シングルトンにしないとだ。
   // isLoginedCheck()とか、getTokens()せずに、プロパティから取得してもいいと思ったので。
-  // updatedAccessTokenとかも呼び出し元で管理しなくてよくなるかも。
+  // useProtectedApi.tsのupdatedAccessTokenとか、呼び出し元で管理しなくてよくなるかも。
 
   /**
-   * Checks if the user is logged in.
-   * @returns {boolean} Returns true if the user is logged in, otherwise returns false.
+   * ユーザーがログインしているかどうかをチェックする。ログインしているかどうかの判定は、
+   * accessTokenが先に有効期限切れになるため、refreshTokenの有無で判断する。
+   * @returns {boolean} ユーザーがログインしている場合はtrueを返す。
    */
   static isLoginedCheck(): boolean {
-    // accessTokenが先に有効期限切れになる。refreshTokenの有無で、ログイン状態かどうかを判断する。
     return this.isExistRefreshToken();
   }
 
+  /**
+   * アクセストークンが存在するかどうかをチェックする。
+   * @returns {boolean} アクセストークンが存在する場合はtrueを返す。
+   */
   static isExistAccessToken(): boolean {
     const { accessToken } = this.getTokens();
 
@@ -56,6 +30,11 @@ export class AuthToken {
       accessToken !== '' && accessToken !== undefined && accessToken !== null
     );
   }
+
+  /**
+   * リフレッシュトークンが存在するかどうかをチェックする。
+   * @returns {boolean} リフレッシュトークンが存在する場合はtrueを返す。
+   */
 
   static isExistRefreshToken(): boolean {
     const { refreshToken } = this.getTokens();
@@ -107,6 +86,36 @@ export class AuthToken {
     authTokenSubject.notifyObservers();
   }
 }
+
+class AuthTokenSubject {
+  private static instance: AuthTokenSubject;
+  private observers: AuthTokenObserver[] = [];
+
+  static getInstance(): AuthTokenSubject {
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!this.instance) {
+      this.instance = new AuthTokenSubject();
+    }
+
+    return this.instance;
+  }
+
+  addObserver(observer: AuthTokenObserver): void {
+    this.observers.push(observer);
+  }
+
+  deleteObserver(observer: AuthTokenObserver): void {
+    this.observers = this.observers.filter((obs) => obs !== observer);
+  }
+
+  notifyObservers(): void {
+    this.observers.forEach((observer) => {
+      observer.update();
+    });
+  }
+}
+
+const authTokenSubject = AuthTokenSubject.getInstance();
 
 class AuthTokenObserver {
   setIsLogined: Dispatch<SetStateAction<boolean>>;

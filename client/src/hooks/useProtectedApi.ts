@@ -3,71 +3,47 @@ import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
 
-// TODO: レスポンス定義のinterfaceを作成する
-// swaggerからうまく連動できないものかなあ
-
 const ERROR_MESSAGES = {
   GENERIC: 'エラーが発生しました。時間をおいて再実行してください。',
   EXPIRED_TOKEN: 'ログイン有効期間を過ぎています。再度ログインしてください。',
   NOT_LOGINED: 'ログインしてください。',
 };
 
+export interface ApiRequest {
+  url: string;
+  method: Method;
+  data?: string;
+}
+
 export const useProtectedApi = (): ((
-  url: string,
-  method: Method,
-  data?: string,
-) => Promise<[AxiosResponse | null, Error | null]>) => {
+  requestParams: ApiRequest,
+) => Promise<AxiosResponse>) => {
   const navigate = useNavigate();
 
   const callProtectedApi = async (
-    url: string,
-    method: Method,
-    data = '',
-  ): Promise<[AxiosResponse | null, Error | null]> => {
-    // HACK: 結構複雑なので、何とかしたい...
+    requestParams: ApiRequest,
+  ): Promise<AxiosResponse> => {
     const { accessToken, refreshToken } = AuthToken.getTokens();
-    let updatedAccessToken: string = '';
 
     if (!AuthToken.isLoginedCheck()) {
-      return [null, new Error(ERROR_MESSAGES.NOT_LOGINED)];
+      throw new Error(ERROR_MESSAGES.NOT_LOGINED);
     }
 
+    // ここからは、ログイン済みの場合の処理
     if (AuthToken.isExistAccessToken()) {
-      const [response, error] = await callProtectedApiWithAxios(
-        url,
-        method,
-        data,
+      return await callProtectedApiWithAccessToken(
+        requestParams,
         accessToken,
-      );
-
-      if (error === null) {
-        return [response, null];
-      } else if (error !== null && !isTokenExpired(error)) {
-        return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
-      }
-    }
-
-    try {
-      updatedAccessToken = await updateTokenUseRefreshToken(
         refreshToken,
         navigate,
       );
-    } catch (error) {
-      return [null, error as Error];
     }
 
-    const [response, error] = await callProtectedApiWithAxios(
-      url,
-      method,
-      data,
-      updatedAccessToken,
+    return await callProtectedApiWithRefreshToken(
+      requestParams,
+      refreshToken,
+      navigate,
     );
-
-    if (error === null) {
-      return [response, null];
-    }
-
-    return [null, new Error(ERROR_MESSAGES.GENERIC, error)];
   };
 
   return callProtectedApi;
@@ -82,11 +58,60 @@ const isTokenExpired = (error: unknown): boolean => {
   );
 };
 
-const apiHeaders = (token: string) => {
+const apiHeaders = (token: string): Record<string, string> => {
   return {
     accept: 'application/json',
     Authorization: `Bearer ${token}`,
   };
+};
+
+const callProtectedApiWithAccessToken = async (
+  requestParams: ApiRequest,
+  accessToken: string,
+  refreshToken: string,
+  navigate: NavigateFunction,
+): Promise<AxiosResponse> => {
+  const { url, method, data = '' } = requestParams;
+  try {
+    // MEMO:モックするためにrequestとpostに分けている
+    return await axios.request({
+      method,
+      url,
+      data,
+      headers: apiHeaders(accessToken),
+    });
+  } catch (error) {
+    if (isTokenExpired(error)) {
+      return await callProtectedApiWithRefreshToken(
+        requestParams,
+        refreshToken,
+        navigate,
+      );
+    } else {
+      throw error;
+    }
+  }
+};
+
+const callProtectedApiWithRefreshToken = async (
+  requestParams: ApiRequest,
+  refreshToken: string,
+  navigate: NavigateFunction,
+): Promise<AxiosResponse> => {
+  const updatedAccessToken = await updateTokenUseRefreshToken(
+    refreshToken,
+    navigate,
+  );
+
+  const { url, method, data = '' } = requestParams;
+
+  // MEMO:モックするためにrequestとpostに分けている
+  return await axios.request({
+    method,
+    url,
+    data,
+    headers: apiHeaders(updatedAccessToken),
+  });
 };
 
 const updateTokenUseRefreshToken = async (
@@ -94,6 +119,7 @@ const updateTokenUseRefreshToken = async (
   navigate: NavigateFunction,
 ): Promise<string> => {
   try {
+    // MEMO:モックするためにrequestとpostに分けている
     const responseRefToken = await axios.post(REFRESH_TOKEN_URL, '', {
       headers: apiHeaders(refreshToken),
     });
@@ -105,6 +131,7 @@ const updateTokenUseRefreshToken = async (
     return updatedAccessToken;
   } catch (error) {
     if (!isTokenExpired(error)) {
+      // TODO:これどんなときに発生する？422?
       throw new Error(ERROR_MESSAGES.GENERIC);
     }
 
@@ -112,25 +139,5 @@ const updateTokenUseRefreshToken = async (
     navigate('/login');
 
     throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);
-  }
-};
-
-const callProtectedApiWithAxios = async (
-  url: string,
-  method: Method,
-  data: string,
-  accessToken: string,
-): Promise<[AxiosResponse | null, Error | null]> => {
-  try {
-    const response = await axios.request({
-      method,
-      url,
-      data,
-      headers: apiHeaders(accessToken),
-    });
-
-    return [response, null];
-  } catch (error) {
-    return [null, error as Error];
   }
 };

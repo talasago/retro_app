@@ -1,6 +1,10 @@
 import type { FC } from 'react';
 import React, { useState, useMemo } from 'react';
+import { isAxiosError } from 'axios';
+import type { AxiosResponse, AxiosError } from 'axios';
+import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
@@ -33,14 +37,43 @@ const HeaderContainer: FC = () => {
     dispatch(openSignUpModal());
   };
 
-  const handleLogout = async (): Promise<void> => {
-    const [_, error] = await callProtectedApi(LOGOUT_URL, 'POST');
+  const callLogoutApi = async (): Promise<
+    AxiosResponse<apiSchemas['schemas']['LogoutApiResponseBody']>
+  > => {
+    return await callProtectedApi({ url: LOGOUT_URL, method: 'POST' });
+  };
 
-    if (error) {
+  // FIXME:これは本来このファイルに書くべきロジックではない
+  const isClientErrorResponseBody = (
+    error: unknown,
+  ): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
+    // refreshTokenapiでエラーの場合、エラーレスポンスが返ってくる
+    return (
+      isAxiosError(error) &&
+      error.response !== undefined &&
+      (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
+        .message !== undefined
+    );
+  };
+
+  const handleLogout = async (): Promise<void> => {
+    let message: string = '';
+    try {
+      const response = await callLogoutApi();
+      message = response.data.message;
+    } catch (error) {
+      let errorMessage: string = DEFAULT_ERROR_MESSAGE;
+      if (isClientErrorResponseBody(error)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        errorMessage = error.response!.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       dispatch(
         setAlert({
           open: true,
-          message: error.message,
+          message: errorMessage,
           severity: 'error',
         }),
       );
@@ -52,7 +85,7 @@ const HeaderContainer: FC = () => {
     dispatch(
       setAlert({
         open: true,
-        message: 'ログアウトが成功しました',
+        message,
         severity: 'success',
       }),
     );
