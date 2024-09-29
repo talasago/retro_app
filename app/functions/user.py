@@ -137,6 +137,7 @@ def refresh_token(
         current_user: "UserModel" = auth_service.get_current_user_from_refresh_token(
             refresh_token=token
         )
+    # FIXME: それぞれ例外処理の内容が似ているし、DRYとしても良くない。「クリーンコード」の157ページの様な修正が必要かも
     except RetroAppRecordNotFoundError:
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
