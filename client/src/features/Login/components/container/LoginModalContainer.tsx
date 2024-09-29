@@ -62,30 +62,14 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
   });
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
+    let response: AxiosResponse<apiSchemas['schemas']['TokenApiResponseBody']>;
     try {
-      const response = await loginUser(loginFormData);
-
-      AuthToken.setTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-      );
-
-      dispatch(
-        setAlert({
-          open: true,
-          message: response.data.message,
-          severity: 'success',
-        }),
-      );
-      onCloseModal();
-      reset();
+      response = await loginUser(loginFormData);
     } catch (error: unknown) {
       // フロントバリデの関係で422は返って来るケースはないため、その場合は考慮しない。
-
       dispatch(
         setAlert({
           open: true,
-          // message: errorMessage,
           message: isClientErrorResponseBody(error)
             ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               error.response!.data.message
@@ -93,7 +77,24 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
           severity: 'error',
         }),
       );
+
+      return;
     }
+
+    AuthToken.setTokens(
+      response.data.access_token,
+      response.data.refresh_token,
+    );
+
+    dispatch(
+      setAlert({
+        open: true,
+        message: response.data.message,
+        severity: 'success',
+      }),
+    );
+    onCloseModal();
+    reset();
   };
 
   const memoizedLoginModalPresenter = useMemo(
