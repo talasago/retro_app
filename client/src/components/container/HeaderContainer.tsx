@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import React, { useState, useMemo } from 'react';
-import { isAxiosError } from 'axios';
-import type { AxiosResponse, AxiosError } from 'axios';
+import type { AxiosResponse } from 'axios';
+import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
@@ -43,19 +43,6 @@ const HeaderContainer: FC = () => {
     return await callProtectedApi({ url: LOGOUT_URL, method: 'POST' });
   };
 
-  // FIXME:これは本来このファイルに書くべきロジックではない
-  const isClientErrorResponseBody = (
-    error: unknown,
-  ): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
-    // refreshTokenapiでエラーの場合、エラーレスポンスが返ってくる
-    return (
-      isAxiosError(error) &&
-      error.response !== undefined &&
-      (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
-        .message !== undefined
-    );
-  };
-
   const handleLogout = async (): Promise<void> => {
     let message: string = '';
     try {
@@ -64,6 +51,7 @@ const HeaderContainer: FC = () => {
     } catch (error) {
       let errorMessage: string = DEFAULT_ERROR_MESSAGE;
       if (isClientErrorResponseBody(error)) {
+        // refreshTokenapiでエラーの場合にこのエラーレスポンスが返ってくる
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         errorMessage = error.response!.data.message;
       } else if (error instanceof Error) {

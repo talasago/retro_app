@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios, { type AxiosResponse, type AxiosError } from 'axios';
+import axios, { type AxiosResponse } from 'axios';
+import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
@@ -14,7 +15,6 @@ import { AuthToken } from 'domains/AuthToken';
 import LoginModalPresenter from '../presenter/LoginModalPresenter';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
-
 interface LoginModalProps {
   isOpen: boolean;
   onCloseModal: () => void;
@@ -34,17 +34,6 @@ const loginUser = async (
   });
 };
 
-const isClientErrorResponseBody = (
-  error: unknown,
-): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
-  return (
-    axios.isAxiosError(error) &&
-    error.response !== undefined &&
-    (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
-      .message !== undefined
-  );
-};
-
 const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { setAlert } = alertSlice.actions;
@@ -62,30 +51,14 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
   });
 
   const onSubmit: SubmitHandler<LoginFormSchema> = async (loginFormData) => {
+    let response: AxiosResponse<apiSchemas['schemas']['TokenApiResponseBody']>;
     try {
-      const response = await loginUser(loginFormData);
-
-      AuthToken.setTokens(
-        response.data.access_token,
-        response.data.refresh_token,
-      );
-
-      dispatch(
-        setAlert({
-          open: true,
-          message: response.data.message,
-          severity: 'success',
-        }),
-      );
-      onCloseModal();
-      reset();
+      response = await loginUser(loginFormData);
     } catch (error: unknown) {
       // フロントバリデの関係で422は返って来るケースはないため、その場合は考慮しない。
-
       dispatch(
         setAlert({
           open: true,
-          // message: errorMessage,
           message: isClientErrorResponseBody(error)
             ? // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
               error.response!.data.message
@@ -93,7 +66,24 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
           severity: 'error',
         }),
       );
+
+      return;
     }
+
+    AuthToken.setTokens(
+      response.data.access_token,
+      response.data.refresh_token,
+    );
+
+    dispatch(
+      setAlert({
+        open: true,
+        message: response.data.message,
+        severity: 'success',
+      }),
+    );
+    onCloseModal();
+    reset();
   };
 
   const memoizedLoginModalPresenter = useMemo(

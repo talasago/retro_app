@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Alert as MuiAlart } from '@mui/material';
+import { Alert as MuiAlert } from '@mui/material';
 import { useDispatch, useSelector } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AlertState } from 'stores/alert';
@@ -11,20 +11,20 @@ const Alert: FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { resetAlert } = alertSlice.actions;
 
-  const handleClose = () => {
+  const handleClose = (): void => {
     dispatch(resetAlert());
   };
 
   return (
     <>
       <Snackbar open={alert.open} autoHideDuration={5000} onClose={handleClose}>
-        <MuiAlart
+        <MuiAlert
           onClose={handleClose}
           severity={alert.severity}
-          sx={{ width: '100%' }}
+          sx={{ width: '100%', whiteSpace: 'pre-line' }}
         >
           {alert.message}
-        </MuiAlart>
+        </MuiAlert>
       </Snackbar>
     </>
   );
