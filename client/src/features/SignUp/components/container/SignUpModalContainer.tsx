@@ -2,8 +2,10 @@ import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios, { type AxiosResponse } from 'axios';
+import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,15 +52,23 @@ const SignUpModalContainer: FC = () => {
     try {
       // メッセージはフロントで変えたいのでresponceは使わない
       await registUser(data);
-    } catch (error) {
-      // TODO:500エラーと400エラーでメッセージを変える
+    } catch (error: unknown) {
+      let errorMessage = DEFAULT_ERROR_MESSAGE;
+      if (isClientErrorResponseBody(error)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        errorMessage = error.response!.data.message;
+      }
+
+      // 422の時の考慮が必要
       dispatch(
         setAlert({
           open: true,
-          message: 'ユーザー登録APIがエラーになってるで',
+          message: errorMessage,
           severity: 'error',
         }),
       );
+
+      return;
     }
 
     dispatch(
