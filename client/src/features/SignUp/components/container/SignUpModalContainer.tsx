@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios from 'axios';
+import axios, { type AxiosResponse } from 'axios';
+import { type apiSchemas } from 'domains/internal/apiSchema';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
@@ -13,7 +14,9 @@ import SignUpModalPresenter from '../presenter/SignUpModalPresenter';
 import { registrationFormSchema } from '../schemas/registrationFormSchema';
 import type { RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
-const registUser = async (data: RegistrationFormSchema) => {
+const registUser = async (
+  data: RegistrationFormSchema,
+): Promise<AxiosResponse<apiSchemas['schemas']['SignInApiResponseBody']>> => {
   return await axios.post(SIGN_UP_URL, data, {
     headers: {
       'Content-Type': 'application/json',
@@ -45,18 +48,8 @@ const SignUpModalContainer: FC = () => {
 
   const onSubmit: SubmitHandler<RegistrationFormSchema> = async (data) => {
     try {
-      const response = await registUser(data);
-      dispatch(
-        setAlert({
-          open: true,
-          message:
-            'ユーザー登録が成功しました。ログイン画面でログインしてください。',
-          severity: 'success',
-        }),
-      );
-      console.log('Response:', response.data);
-      handleCloseSignUpModal();
-      reset();
+      // メッセージはフロントで変えたいのでresponceは使わない
+      await registUser(data);
     } catch (error) {
       // TODO:500エラーと400エラーでメッセージを変える
       dispatch(
@@ -66,8 +59,18 @@ const SignUpModalContainer: FC = () => {
           severity: 'error',
         }),
       );
-      console.error('Error:', error);
     }
+
+    dispatch(
+      setAlert({
+        open: true,
+        message:
+          'ユーザー登録が成功しました。ログイン画面でログインしてください。',
+        severity: 'success',
+      }),
+    );
+    handleCloseSignUpModal();
+    reset();
   };
 
   const memoizedSignUpModalPresenter = useMemo(
