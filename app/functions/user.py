@@ -121,6 +121,7 @@ def sign_in(
             "model": ClientErrorResponseBody,
         }
     },
+    description="※422を返すパターンは恐らくないはず。",
 )
 def refresh_token(
     auth_service: "AuthService" = Depends(get_auth_service),

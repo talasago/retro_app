@@ -123,8 +123,10 @@ const updateTokenUseRefreshToken = async (
     return updatedAccessToken;
   } catch (error) {
     if (!isTokenExpired(error)) {
-      // MEMO: 500、トークン期限切れ以外の401になった時に発生する想定。
-      // 422の時も発生するが、フロントバリデで防いでいるため、実際にはここには来ない
+      // MEMO:
+      // 1. 500、トークン期限切れ以外の401になった時に発生する想定。
+      // 2. トークン期限切れ以外の401でもエラーメッセージを上書きする。
+      // 今のサーバー側のエラーメッセージだと、フロントでのエラーメッセージとしては不適切なため。
       throw new Error(ERROR_MESSAGES.GENERIC);
     }
 
