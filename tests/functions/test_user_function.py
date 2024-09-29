@@ -321,3 +321,22 @@ class TestUserFunction:
                 assert response.status_code == 401
                 assert res_body["message"] == "Tokenが間違っています。"
                 assert response.headers["www-authenticate"] == "Bearer"
+
+        class TestWhenRefreshTokenIsNull:
+            def test_return_401(self, refresh_token_api):
+                response = refresh_token_api(None)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                assert res_body["message"] == "Tokenが間違っています。"
+                assert response.headers["www-authenticate"] == "Bearer"
+
+        class TestWhenHeaderIsNull:
+            def test_return_401(self, refresh_token_api):
+                response = refresh_token_api(None, False)
+
+                res_body = response.json()
+                assert response.status_code == 401
+                # FastAPIのデフォルトのエラーメッセージ
+                assert res_body["detail"] == "Not authenticated"
+                assert response.headers["www-authenticate"] == "Bearer"

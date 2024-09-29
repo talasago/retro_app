@@ -61,13 +61,18 @@ def login_api(test_client):
 
 @pytest.fixture(scope="session")
 def refresh_token_api(test_client):
-    def _method(refresh_token: str) -> Response:
-        response: Response = test_client.post(
-            "/api/v1/refresh_token",
-            headers={
+    def _method(refresh_token: str, is_include_headers=True) -> Response:
+        headers = (
+            {
                 "accept": "application/json",
                 "Authorization": f"Bearer {refresh_token}",
-            },
+            }
+            if is_include_headers
+            else {}
+        )
+        response: Response = test_client.post(
+            "/api/v1/refresh_token",
+            headers=headers,
         )
         return response
 
