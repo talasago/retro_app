@@ -2,7 +2,10 @@ import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios, { type AxiosResponse } from 'axios';
-import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
+import {
+  isClientErrorResponseBody,
+  isHTTPValidationError,
+} from 'domains/internal/apiErrorUtil';
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { SIGN_UP_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
@@ -57,9 +60,13 @@ const SignUpModalContainer: FC = () => {
       if (isClientErrorResponseBody(error)) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         errorMessage = error.response!.data.message;
+      } else if (isHTTPValidationError(error)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        errorMessage = error
+          .response!.data.detail!.map((detail) => detail.msg)
+          .join('\n');
       }
 
-      // 422の時の考慮が必要
       dispatch(
         setAlert({
           open: true,

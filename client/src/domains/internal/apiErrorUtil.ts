@@ -11,3 +11,14 @@ export const isClientErrorResponseBody = (
       .message !== undefined
   );
 };
+
+export const isHTTPValidationError = (
+  error: unknown,
+): error is AxiosError<apiSchemas['schemas']['HTTPValidationError']> => {
+  return (
+    axios.isAxiosError(error) &&
+    error.response !== undefined &&
+    (error.response?.data as apiSchemas['schemas']['HTTPValidationError'])
+      .detail !== undefined
+  );
+};
