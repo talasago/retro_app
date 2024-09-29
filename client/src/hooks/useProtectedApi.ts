@@ -31,14 +31,23 @@ export const useProtectedApi = (): ((
 
     // ここからは、ログイン済みの場合の処理
     if (AuthToken.isExistAccessToken()) {
-      return await callProtectedApiWithAccessToken(
-        requestParams,
-        accessToken,
-        refreshToken,
-        navigate,
-      );
+      try {
+        return await callProtectedApiWithAccessToken(
+          requestParams,
+          accessToken,
+        );
+      } catch (error) {
+        if (isTokenExpired(error)) {
+          // ここでは何もせずに次の処理に進む
+        } else {
+          throw error;
+        }
+      }
     }
 
+    // ログインしているがアクセストークンが無くて、リフレッシュトークンがある場合
+    // access_tokenの有効期限が切れている場合、
+    // cookieが消えている場合が該当する
     return await callProtectedApiWithRefreshToken(
       requestParams,
       refreshToken,
@@ -68,29 +77,16 @@ const apiHeaders = (token: string): Record<string, string> => {
 const callProtectedApiWithAccessToken = async (
   requestParams: ApiRequest,
   accessToken: string,
-  refreshToken: string,
-  navigate: NavigateFunction,
 ): Promise<AxiosResponse> => {
   const { url, method, data = '' } = requestParams;
-  try {
-    // MEMO:モックするためにrequestとpostに分けている
-    return await axios.request({
-      method,
-      url,
-      data,
-      headers: apiHeaders(accessToken),
-    });
-  } catch (error) {
-    if (isTokenExpired(error)) {
-      return await callProtectedApiWithRefreshToken(
-        requestParams,
-        refreshToken,
-        navigate,
-      );
-    } else {
-      throw error;
-    }
-  }
+
+  // MEMO:モックするためにrequestとpostに分けている
+  return await axios.request({
+    method,
+    url,
+    data,
+    headers: apiHeaders(accessToken),
+  });
 };
 
 const callProtectedApiWithRefreshToken = async (
@@ -103,15 +99,11 @@ const callProtectedApiWithRefreshToken = async (
     navigate,
   );
 
-  const { url, method, data = '' } = requestParams;
-
   // MEMO:モックするためにrequestとpostに分けている
-  return await axios.request({
-    method,
-    url,
-    data,
-    headers: apiHeaders(updatedAccessToken),
-  });
+  return await callProtectedApiWithAccessToken(
+    requestParams,
+    updatedAccessToken,
+  );
 };
 
 const updateTokenUseRefreshToken = async (
@@ -131,7 +123,10 @@ const updateTokenUseRefreshToken = async (
     return updatedAccessToken;
   } catch (error) {
     if (!isTokenExpired(error)) {
-      // TODO:これどんなときに発生する？422?
+      // MEMO:
+      // 1. 500、トークン期限切れ以外の401になった時に発生する想定。
+      // 2. トークン期限切れ以外の401でもエラーメッセージを上書きする。
+      // 今のサーバー側のエラーメッセージだと、フロントでのエラーメッセージとしては不適切なため。
       throw new Error(ERROR_MESSAGES.GENERIC);
     }
 
