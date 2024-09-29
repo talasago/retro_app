@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import type { FC } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import axios, { type AxiosResponse, type AxiosError } from 'axios';
+import axios, { type AxiosResponse } from 'axios';
+import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGIN_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
@@ -14,7 +15,6 @@ import { AuthToken } from 'domains/AuthToken';
 import LoginModalPresenter from '../presenter/LoginModalPresenter';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
-
 interface LoginModalProps {
   isOpen: boolean;
   onCloseModal: () => void;
@@ -32,17 +32,6 @@ const loginUser = async (
       'Content-Type': 'application/x-www-form-urlencoded',
     },
   });
-};
-
-const isClientErrorResponseBody = (
-  error: unknown,
-): error is AxiosError<apiSchemas['schemas']['ClientErrorResponseBody']> => {
-  return (
-    axios.isAxiosError(error) &&
-    error.response !== undefined &&
-    (error.response?.data as apiSchemas['schemas']['ClientErrorResponseBody'])
-      .message !== undefined
-  );
 };
 
 const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
