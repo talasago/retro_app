@@ -17,7 +17,7 @@ const FeatureSection: FC<FeatureSectionProps> = ({ title, description }) => (
       <Typography variant="h5" fontWeight="bold">
         {title}
       </Typography>
-      <Typography variant="body1" sx={{ pt: 2 }}>
+      <Typography variant="body1" sx={{ pt: 2, whiteSpace: 'pre-line' }}>
         {description}
       </Typography>
     </Grid>
@@ -41,10 +41,7 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
       <Box sx={{ bgcolor: '#aaaaaa', py: 11 }}>
         <Container>
           <Typography variant="h4" gutterBottom>
-            アプリのキャッチコピー
-          </Typography>
-          <Typography variant="h4" gutterBottom>
-            すてきなテキストが入るエリア
+            自分に似合うふりかえり手法を、見つけよう
           </Typography>
           <Button
             variant="contained"
@@ -65,18 +62,21 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         </Typography>
 
         <FeatureSection
-          title="特徴1"
-          description="特徴1の説明が入ります。特徴1の説明が入ります。特徴1の説明が入ります。特徴1の説明が入ります。"
+          title="ふりかえり手法のランダム抽選で、毎日新しい発見を"
+          description="毎回異なる振り返り手法を試すことで、マンネリ化を防ぎ、新鮮な視点を得ることができます。"
         />
         <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
         <FeatureSection
-          title="特徴2"
-          description="特徴2の説明が入ります。特徴2の説明が入ります。特徴2の説明が入ります。特徴2の説明が入ります。"
+          title="試したふりかえり手法の感想を、みんなとシェアしよう。"
+          description="同じ手法を試した人の感想を見ることで、より効果的に振り返り手法を決めることができます。
+          あなたの経験を共有することで、誰かの役に立つかも。
+          ※感想コメントを登録するには、ユーザー登録が必要です。"
         />
         <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
         <FeatureSection
-          title="特徴3"
-          description="さらにユーザー登録をすることで、様々なメリットがうんたらかんたら～～ 特徴3でユーザー登録へ誘導するテキスト"
+          title="アプリ名の由来"
+          description="ふりかえり→ふりかえる→カエルの目を通して世界を見る→緑色のレンズを通して世界を見よう
+          という意味を込めています。"
         />
       </Container>
 
