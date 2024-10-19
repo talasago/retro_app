@@ -28,6 +28,14 @@ custom:
     maxRequestsPerSecond: 10
     maxConcurrentRequests: 10
   apiPrefix: /api/v1
+  vpcConfig:
+    securityGroupIds:
+      - sg-0bf8878f3a1baeba9
+    subnetIds:
+      # XXX:subnetを3つ使う必要があるかわかってない。
+      - subnet-0214fe79fe7b89a1a
+      - subnet-0047acbc1ef639c16
+      - subnet-0fbe6af2f37be64b1
 
 package:
   patterns:
@@ -52,14 +60,6 @@ provider:
         - ssm:GetParameter # SSMから環境変数を取得するために必要
         - kms:DecryptSecureString # SSMから環境変数を取得するために必要
       Resource: "*"
-  vpc:
-    securityGroupIds:
-      - sg-0bf8878f3a1baeba9
-    subnetIds:
-      # XXX:subnetを3つ使う必要があるかわかってない。
-      - subnet-0214fe79fe7b89a1a
-      - subnet-0047acbc1ef639c16
-      - subnet-0fbe6af2f37be64b1
   environment:
     # TODO:本番環境と開発環境で環境変数を分ける必要あり。
     POSTGRES_HOST: ${ssm:postgres_host}
@@ -91,6 +91,7 @@ provider:
 functions:
   user_function:
     handler: app.functions.main.handler
+    vpc: ${self:custom.vpcConfig}
     events:
       - http:
           path: ${self:custom.apiPrefix}/sign_up
@@ -106,6 +107,7 @@ functions:
           method: ANY
   comment_function:
     handler: app.functions.main.handler
+    vpc: ${self:custom.vpcConfig}
     events:
       - http:
           path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
