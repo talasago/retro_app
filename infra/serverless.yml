@@ -59,6 +59,9 @@ provider:
         - ec2:DeleteNetworkInterface # VPC設定のために必要
         - ssm:GetParameter # SSMから環境変数を取得するために必要
         - kms:DecryptSecureString # SSMから環境変数を取得するために必要
+        - states:CreateStateMachine # StepFunctionsの設定のために必要
+        - states:UpdateStateMachine # stepFunctionsの設定のために必要
+        - states:DeleteStateMachine # stepFunctionsの設定のために必要
       Resource: "*"
   environment:
     # TODO:本番環境と開発環境で環境変数を分ける必要あり。
@@ -170,7 +173,7 @@ resources:
                 "Type": "Task",
                 "Resource": "arn:aws:states:::lambda:invoke",
                 "Parameters": {
-                  "FunctionName": "${test_api.Arn}",
+                  "FunctionName": "!GetAtt testApi.Arn",
                   "Payload": "$"
                 },
                 "Next": "SendLineMessage"
@@ -179,7 +182,7 @@ resources:
                 "Type": "Task",
                 "Resource": "arn:aws:states:::lambda:invoke",
                 "Parameters": {
-                  "FunctionName":"${send_line_message.Arn}",
+                  "FunctionName":"!GetAtt sendLineMessage.Arn",
                   "Payload": "$"
                 },
                 "End": true
