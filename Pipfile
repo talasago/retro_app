@@ -15,6 +15,7 @@ pydantic-i18n = "*"
 boto3 = "*"
 pyjwt = "*"
 cryptography = "*"
+boto3-stubs = {version = "*", extras = ["stepfunctions"]}
 
 [dev-packages]
 flake8 = "*"
