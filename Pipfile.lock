@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8d4eb38e3035e1c7bcc14ed9e0acedba335561fac411d781b55d6fc5abfbea12"
+            "sha256": "bb9b2ecbbfb319ba044d5ddf16bf729fbc85883e1585e6ff5b4b78635588f3e1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1020,6 +1020,13 @@
                 "sha256:a4a0f197cecedf83b52fe666f3d0bdb3fbe43417fd5707a2a0378400be8eec98"
             ],
             "version": "==1.35.21"
+        },
+        "mypy-boto3-stepfunctions": {
+            "hashes": [
+                "sha256:5e45ca7ec904f55038dce5ee00cb5352000a1c2a7b14521ff7d75d269d7e8287",
+                "sha256:72b5375dce449124ab841a8d552fcb2106b8b2c88c36d23580da02be105e756b"
+            ],
+            "version": "==1.35.46"
         },
         "mypy-extensions": {
             "hashes": [
