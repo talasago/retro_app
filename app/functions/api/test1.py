@@ -1,3 +1,4 @@
+import json
 import time
 from typing import TYPE_CHECKING
 
@@ -11,6 +12,7 @@ app = FastAPI()
 if TYPE_CHECKING:
     from mypy_boto3_stepfunctions import SFNClient
     from mypy_boto3_stepfunctions.type_defs import StartExecutionOutputTypeDef
+
 
 @app.post("/api/v1/test")
 def test():
@@ -31,8 +33,11 @@ def test():
         response = client.describe_execution(executionArn=response["executionArn"])
         sfn_status = response["status"]
         print(f"status: {sfn_status}")
+
         # TODO:statusは要確認
         if sfn_status in ["SUCCEEDED", "FAILED", "TIMED_OUT", "ABORTED"]:
+            print(response["output"])
+            print(json.loads(response["output"])["Payload"])
             break
         time.sleep(1)
 
