@@ -163,29 +163,13 @@ resources:
       Type: AWS::StepFunctions::StateMachine
       Properties:
         StateMachineName: MyStateMachine
-        RoleArn:  !GetAtt StateMachineRole.Arn
-        # TODO:出来ればymlで定義したい
-        DefinitionString: !Sub |
-          {
-            "StartAt": "ProcessData",
-            "States": {
-              "ProcessData": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName": "arn:aws:lambda:ap-northeast-1:926198032577:function:retro-app-dev-test_api1:$LATEST",
-                  "Payload": {}
-                },
-                "Next": "SendLineMessage"
-              },
-              "SendLineMessage": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName": "arn:aws:lambda:ap-northeast-1:926198032577:function:retro-app-dev-test_lambda2:$LATEST",
-                  "Payload": {}
-                },
-                "End": true
-              }
-            }
-          }
+        RoleArn: !GetAtt StateMachineRole.Arn
+        Definition:
+          StartAt: SendLineMessage
+          States:
+            SendLineMessage:
+              Type: Task
+              Resource: arn:aws:states:::lambda:invoke
+              Parameters:
+                FunctionName: arn:aws:lambda:ap-northeast-1:926198032577:function:retro-app-dev-test_lambda2:$LATEST
+              End: true
