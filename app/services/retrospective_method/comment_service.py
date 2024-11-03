@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
     from app.schemas.retrospective_method.comment_schema import CommentSchema
 
+
 class CommentService:
     STATE_STATUS_CHECK_MAX_RETRY_TIMES: Final[int] = 15
 
