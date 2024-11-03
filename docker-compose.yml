@@ -8,10 +8,3 @@ services:
     environment:
       # NOTE:ローカルなのでパスワードはべた書き
       POSTGRES_PASSWORD: postgres_password
-  localstack:
-    image: localstack/localstack:latest
-    environment:
-      - SERVICES=stepfunctions
-      - TZ=Asia/Tokyo
-    ports:
-      - 4566:4566
