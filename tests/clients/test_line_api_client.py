@@ -9,6 +9,7 @@ from app.clients.line_api_client import LineApiClient
 def sut():
     return LineApiClient()
 
+
 class TestSendTextMessage:
     def test_normal_pattern(self, sut):
         with patch("requests.Session.post") as mock_post:
@@ -26,7 +27,9 @@ class TestSendTextMessage:
             actual_headers = mock_post.call_args[1]["headers"]
             actual_json = mock_post.call_args[1]["json"]
 
-            actual_headers.pop("X-Line-Retry-Key", None) # X-Line-Retry-Keyはランダムなので削除
+            actual_headers.pop(
+                "X-Line-Retry-Key", None
+            )  # X-Line-Retry-Keyはランダムなので削除
             expected_headers = {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer DAMMY_ACCESS_TOKEN",
@@ -38,4 +41,5 @@ class TestSendTextMessage:
                 "notificationDisabled": notification_disabled,
                 "customAggregationUnits": custom_aggregation_units,
             }
+
     # 他のテスト観点：500, 502, 503, 504、409ステータスコードが返ってきた場合のリトライ処理のテスト
