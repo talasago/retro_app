@@ -15,6 +15,7 @@ pydantic-i18n = "*"
 boto3 = "*"
 pyjwt = "*"
 cryptography = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -32,6 +33,7 @@ python-dotenv = "*"
 pytest-asyncio = "*"
 moto = {extras = ["stepfunctions"], version = "*"}
 boto3-stubs = {extras = ["ssm", "stepfunctions"], version = "*"}
+types-requests = "*"
 
 [requires]
 python_version = "3.10"
