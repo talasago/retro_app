@@ -5,6 +5,7 @@ from app.schemas.retrospective_method.comment_schema import CommentSchema
 
 db = get_db()
 
+
 def lambda_handler(event, context):
     # TODO: 例外の時どうする？
     print(f"Received data: {event}")
