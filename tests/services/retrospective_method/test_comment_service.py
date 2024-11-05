@@ -1,4 +1,3 @@
-# test_sut.py
 import json
 
 import boto3
@@ -10,34 +9,38 @@ from app.services.retrospective_method.comment_service import CommentService
 
 
 class TestCommentService:
-    @pytest.fixture
+    @pytest.fixture(scope="session")
     def mock_sfn_client(self):
         with mock_aws():
             client = boto3.client("stepfunctions", region_name="ap-northeast-1")
+            yield client
 
+    @pytest.fixture(scope="session")
+    def create_sfn(self, mock_sfn_client):
+        def _method():
+            # 本当はsls.ymlから取得したい
             state_machine_definition = {
-                "StartAt": "AddCommentState",
-                "States": {
-                    "AddCommentState": {
-                        "Type": "Task",
-                        "Resource": "arn:aws:lambda:ap-northeast-1:000000000000:function:add_comment_function",
-                        "End": True,
+                 "StartAt": "AddCommentState",
+                    "States": {
+                        "AddCommentState": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:lambda:ap-northeast-1:000000000000:function:add_comment_function",
+                            "End": True,
                     }
                 },
             }
 
-            response = client.create_state_machine(
+            response = mock_sfn_client.create_state_machine(
                 name="AddCommentStateMachine",
                 definition=json.dumps(state_machine_definition),
                 roleArn="arn:aws:iam::000000000000:role/StateMachineRole",
             )
+            return response
+        return _method
 
-            yield client, response["stateMachineArn"]
-
-    @pytest.fixture
-    def sut(self, mock_sfn_client):
-        client, state_machine_arn = mock_sfn_client
-        return CommentService(client, state_machine_arn)
+    @pytest.fixture(scope="session")
+    def sut(self, mock_sfn_client, create_sfn):
+        return CommentService(mock_sfn_client, create_sfn()["stateMachineArn"])
 
     class TestAddCommentFromApi:
         # 仮のテスト
