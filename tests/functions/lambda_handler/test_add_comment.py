@@ -10,7 +10,6 @@ from tests.test_helpers.create_test_user import create_test_user
 def sut():
     def _method(event: dict, context: dict):
         return lambda_handler(event, context)
-
     return _method
 
 
@@ -19,8 +18,8 @@ def test_lambda_handler(sut, monkeypatch, db, user_repo):
 
     user = create_test_user(user_repo, name="test_lambda_handler")
     event = {
-        "comment": "test comment",
-        "retrospective_method_id": 5,
+        "comment": "test comment test_lambda_handler",
+        "retrospective_method_id": 56,
         "user_id": user.id,
     }
     sut(event, {})
