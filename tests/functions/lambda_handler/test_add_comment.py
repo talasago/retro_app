@@ -10,6 +10,7 @@ from tests.test_helpers.create_test_user import create_test_user
 def sut():
     def _method(event: dict, context: dict):
         return lambda_handler(event, context)
+
     return _method
 
 
