@@ -31,7 +31,7 @@ STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
 
 def get_sfn_client():
-    return boto3.client("stepfunctions")
+    return boto3.client("stepfunctions", region_name="ap-northeast-1")
 
 
 @router.post(
