@@ -1,7 +1,11 @@
+import boto3
 import pytest
 from httpx import Response
+from moto import mock_aws
 
 from app.functions.lambda_handler.add_comment import lambda_handler
+from app.functions.main import app
+from app.functions.retrospective_method.comment import get_sfn_client
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 from tests.test_helpers.create_test_user import create_test_user
 
@@ -42,16 +46,10 @@ from tests.test_helpers.create_test_user import create_test_user
 #         roleArn=role_arn,
 #     )
 #
-# @pytest.fixture(scope="function")
-# def mock_sfn_client(mocker) -> "SFNClient":
-#     mock_client: "SFNClient" = boto3.client(
-#         "stepfunctions",
-#         endpoint_url="http://localhost:4566",
-#         region_name="ap-northeast-1",
-#     )
-#     mocker.patch("app.functions.retrospective_method.comment.sfn_client", mock_client)
-#     return mock_client
-# 各関数の引数のテストをしたい
+
+@mock_aws
+def override_get_sfn_client():
+    return boto3.client("stepfunctions", region_name="ap-northeast-1")
 
 
 @pytest.fixture(scope="session")
@@ -63,6 +61,8 @@ def add_comment_api(test_client):
         retrospective_method_id=1,
         option: dict = {},
     ) -> Response:
+
+        app.dependency_overrides[get_sfn_client] = override_get_sfn_client
         response = test_client.post(
             f"/api/v1/retrospective_method/{retrospective_method_id}/comment",
             json=comment_data,
@@ -72,6 +72,8 @@ def add_comment_api(test_client):
                 "Origin": "http://localhost",
             },
         )
+        app.dependency_overrides.clear()
+
         if is_assert_response_code_2xx:
             assert response.status_code == 201
         return response
