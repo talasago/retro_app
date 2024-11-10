@@ -1,6 +1,9 @@
 from typing import TYPE_CHECKING, Final
 
-from app.errors.retro_app_error import RetroAppStateMachineExecutionError
+from app.errors.retro_app_error import (
+    RetroAppStateMachineExecutionError,
+    RetroAppStateMachineMaxRetriesReachedError,
+)
 from app.services.notification_service import NotificationService
 
 if TYPE_CHECKING:
@@ -55,10 +58,8 @@ class CommentService:
             # time.sleep(1)
 
         else:
-            # TODO: エラー処理
-            print("Max retries reached")
+            raise RetroAppStateMachineMaxRetriesReachedError(
+                message="Max retries reached"
+            )
 
         print("execution finished")
-
-
-# enumを使って、ステータスを管理する
