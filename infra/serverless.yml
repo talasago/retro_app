@@ -70,6 +70,7 @@ provider:
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
     ORIGINS: ${ssm:origins}
+    STATE_MACHINE_ARN: !Ref StateMachineArn
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
@@ -114,21 +115,15 @@ functions:
     events:
       - http:
           path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
-          method: ANY
+          method: GET
+  comment_function_without_vpc:
+    handler: app.functions.main.handler
+    events:
       - http:
           path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
-          method: ANY      
-  test_api1:
-    handler: app.functions.api.test1.handler
-    events:
-      - http: 
-          path: ${self:custom.apiPrefix}/test
-          method: ANY
-  # process_data: # TODO:良い名前は後で考える。
-  #  handler: app.functions.process_data.lambda_handler
-  #  vpc: ${self:custom.vpcConfig}
-  test_lambda2:
-    handler: app.functions.api.test2.lambda_handler
+          method: POST
+  add_comment_function:
+    handler: app.functions.lambda_handler.add_comment.lambda_handler
     vpc: ${self:custom.vpcConfig}
 
 resources:
@@ -159,17 +154,23 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                   Resource: "*"
-    StateMachine:
+    AddCommentStateMachine:
       Type: AWS::StepFunctions::StateMachine
       Properties:
-        StateMachineName: MyStateMachine
+        StateMachineName: AddCommentStateMachine
         RoleArn: !GetAtt StateMachineRole.Arn
         Definition:
-          StartAt: SendLineMessage
+          StartAt: AddCommentState
           States:
-            SendLineMessage:
+            AddCommentState:
               Type: Task
               Resource: arn:aws:states:::lambda:invoke
               Parameters:
-                FunctionName: arn:aws:lambda:ap-northeast-1:926198032577:function:retro-app-dev-test_lambda2:$LATEST
+                FunctionName: !GetAtt [add_comment_functionLambdaFunction, Arn]
               End: true
+  Outputs:
+    StateMachineArn:
+      Description: "ARN of the Step Functions State Machine"
+      Value: !Ref AddCommentStateMachine
+      Export:
+        Name: "StateMachineArn"
