@@ -67,25 +67,31 @@ class TestCommentService:
 
             return _method
 
-        # ステートマシンが終了したとき
-        def test_add_comment_from_api(
-            self,
-            sut: CommentService,
-            mock_send_message_admin: MagicMock,
-            mock_describe_execution: MagicMock,
-        ):
-            comment = CommentSchema(
-                retrospective_method_id=1, user_id=1, comment="Test comment"
-            )
-            mock_describe_execution_sucessed = mock_describe_execution(
-                status="SUCCEEDED"
-            )
+        class TestWhenStatemachineSucceed:
+            def test_add_comment_from_api(
+                self,
+                sut: CommentService,
+                mock_send_message_admin: MagicMock,
+                mock_describe_execution: MagicMock,
+            ):
+                comment = CommentSchema(
+                    retrospective_method_id=1, user_id=1, comment="Test comment"
+                )
+                mock_describe_execution_sucessed = mock_describe_execution(
+                    status="SUCCEEDED"
+                )
 
-            sut.add_comment_from_api(comment)
+                sut.add_comment_from_api(comment)
 
-            mock_send_message_admin.assert_called_once_with(
-                message=comment.model_dump_json()
-            )
-            mock_describe_execution_sucessed.assert_called_once()
+                mock_describe_execution_sucessed.assert_called_once()
+                mock_send_message_admin.assert_called_once_with(
+                    message=comment.model_dump_json()
+                )
 
-        # ステートマシンがfailedの場合のテストが必要
+        class TestWhenStatemachineFailed:
+            # パラメタライズを使う
+            pass
+
+        class TestWhenStatemachineTimeout:
+            # パラメタライズを使う
+            pass

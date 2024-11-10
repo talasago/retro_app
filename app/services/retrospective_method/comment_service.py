@@ -4,6 +4,7 @@ from app.services.notification_service import NotificationService
 
 if TYPE_CHECKING:
     from mypy_boto3_stepfunctions import SFNClient
+    from mypy_boto3_stepfunctions.literals import ExecutionStatusType
     from mypy_boto3_stepfunctions.type_defs import (
         DescribeExecutionOutputTypeDef,
         StartExecutionOutputTypeDef,
@@ -38,7 +39,7 @@ class CommentService:
                     executionArn=start_execution_res["executionArn"]
                 )
             )
-            state_status = describe_execution_res["status"]
+            state_status: ExecutionStatusType = describe_execution_res["status"]
             print(f"status: {state_status}")
 
             if state_status in ["SUCCEEDED"]:
