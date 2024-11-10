@@ -1,8 +1,10 @@
 import json
+from unittest.mock import MagicMock
 
 import boto3
 import pytest
 from moto import mock_aws
+from mypy_boto3_stepfunctions import SFNClient
 
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 from app.services.retrospective_method.comment_service import CommentService
@@ -16,9 +18,10 @@ class TestCommentService:
             yield client
 
     @pytest.fixture(scope="session")
-    def create_sfn(self, mock_sfn_client):
+    # 実は不要？
+    def create_sfn(self, mock_sfn_client: SFNClient):
         def _method():
-            # 本当はsls.ymlから取得したい
+            # FIXME:本当はsls.ymlから取得したい
             state_machine_definition = {
                 "StartAt": "AddCommentState",
                 "States": {
@@ -39,22 +42,53 @@ class TestCommentService:
 
         return _method
 
-    @pytest.fixture(scope="session")
+    @pytest.fixture(scope="class")
     def sut(self, mock_sfn_client, create_sfn):
         return CommentService(mock_sfn_client, create_sfn()["stateMachineArn"])
 
     class TestAddCommentFromApi:
-        # 仮のテスト
-        def test_add_comment_from_api(self, sut):
+        @pytest.fixture()
+        def mock_send_message_admin(self, mocker):
+            # テストの度に毎回Line通知が行われるのを防ぐため
+            return mocker.patch(
+                "app.services.notification_service.NotificationService.send_message_admin"
+            )
+
+        @pytest.fixture()
+        def mock_describe_execution(self, mocker, sut):
+            # statusを設定するため
+            return mocker.patch.object(
+                sut.sfn_client,
+                "describe_execution",
+                return_value={
+                    "status": "SUCCEEDED",
+                    "output": json.dumps(
+                        {
+                            "Payload": {
+                                "retrospective_method_id": 1,
+                                "user_id": 1,
+                                "comment": "Test comment",
+                            }
+                        }
+                    ),
+                },
+            )
+
+        # ステートマシンが終了したとき
+        def test_add_comment_from_api(
+            self,
+            sut: CommentService,
+            mock_send_message_admin: MagicMock,
+            mock_describe_execution: MagicMock,
+        ):
             comment = CommentSchema(
                 retrospective_method_id=1, user_id=1, comment="Test comment"
             )
 
             sut.add_comment_from_api(comment)
 
-            # TODO:lineのためのメソッドを呼び出していることをテストしたいかも
-            executions = sut.sfn_client.list_executions(
-                stateMachineArn=sut.state_machine_arn
-            )
-            assert len(executions["executions"]) == 1
-            assert executions["executions"][0]["status"] == "RUNNING"  # 仮のテスト
+            mock_send_message_admin.assert_called_once_with(message=comment.model_dump())
+            mock_describe_execution.assert_called_once()
+
+
+        # ステートマシンがfailedの場合のテストが必要

@@ -1,6 +1,8 @@
 import json
 from typing import TYPE_CHECKING, Final
 
+from app.services.notification_service import NotificationService
+
 if TYPE_CHECKING:
     from mypy_boto3_stepfunctions import SFNClient
     from mypy_boto3_stepfunctions.type_defs import (
@@ -48,14 +50,19 @@ class CommentService:
                 if payload:
                     print(f"payload: {payload}")
                     # lineを呼び出すための関数を呼び出す
+                    NotificationService().send_message_admin(message=payload)
 
                 break
             elif state_status in ["FAILED", "TIMED_OUT", "ABORTED"]:
                 # TODO: エラー処理
                 print("error")
                 break
+            # time.sleep(1)
+
         else:
             # TODO: エラー処理
             print("Max retries reached")
 
         print("execution finished")
+
+# enumを使って、ステータスを管理する
