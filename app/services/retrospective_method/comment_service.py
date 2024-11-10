@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Final
 
+from app.errors.retro_app_error import RetroAppStateMachineExecutionError
 from app.services.notification_service import NotificationService
 
 if TYPE_CHECKING:
@@ -46,12 +47,11 @@ class CommentService:
                 NotificationService().send_message_admin(
                     message=comment.model_dump_json()
                 )
-
                 break
             elif state_status in ["FAILED", "TIMED_OUT", "ABORTED"]:
-                # TODO: エラー処理
-                print("error")
-                break
+                raise RetroAppStateMachineExecutionError(
+                    message=f"Unexpected state machine status: {state_status}"
+                )
             # time.sleep(1)
 
         else:
