@@ -25,27 +25,12 @@ class CommentService:
         self.state_machine_arn = state_machine_arn
 
     def add_comment_from_api(self, comment: "CommentSchema"):
-        # FIXME: 複雑化しているので、private関数に切り出したい
-        # 1. ステートマシンを起動
-        # 2. 特定の条件に合致してたらlineを呼び出す
-
-        start_execution_res: StartExecutionOutputTypeDef = (
-            self.sfn_client.start_execution(
-                stateMachineArn=self.state_machine_arn,
-                input=comment.model_dump_json(),
-            )
-        )
-        print("started execution")
+        start_execution_res = self.__start_state_machine_execution(comment=comment)
 
         for _ in range(self.STATE_STATUS_CHECK_MAX_RETRY_TIMES):
-            describe_execution_res: "DescribeExecutionOutputTypeDef" = (
-                self.sfn_client.describe_execution(
-                    executionArn=start_execution_res["executionArn"]
-                )
+            state_status = self.__get_state_status(
+                execution_arn=start_execution_res["executionArn"]
             )
-            state_status: ExecutionStatusType = describe_execution_res["status"]
-            print(f"status: {state_status}")
-
             if state_status in ["SUCCEEDED"]:
                 NotificationService().send_message_admin(
                     message=comment.model_dump_json()
@@ -63,3 +48,19 @@ class CommentService:
             )
 
         print("execution finished")
+
+    def __start_state_machine_execution(
+        self, comment: "CommentSchema"
+    ) -> "StartExecutionOutputTypeDef":
+        return self.sfn_client.start_execution(
+            stateMachineArn=self.state_machine_arn,
+            input=comment.model_dump_json(),
+        )
+
+    def __get_state_status(self, execution_arn: str) -> "ExecutionStatusType":
+        describe_execution_res: "DescribeExecutionOutputTypeDef" = (
+            self.sfn_client.describe_execution(executionArn=execution_arn)
+        )
+        state_status: "ExecutionStatusType" = describe_execution_res["status"]
+        print(f"status: {state_status}")
+        return state_status
