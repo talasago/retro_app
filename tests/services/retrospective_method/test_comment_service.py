@@ -143,7 +143,8 @@ class TestCommentService:
                 )
 
                 with pytest.raises(RetroAppStateMachineMaxRetriesReachedError):
-                    sut.add_comment_from_api(comment)
+                    # テストで時間をかけたくないため
+                    sut.add_comment_from_api(comment, sleep_time=0)
 
                 mock_describe_execution.assert_called()
                 mock_send_message_admin.assert_not_called()
