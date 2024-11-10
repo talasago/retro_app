@@ -43,3 +43,7 @@ class RetroAppTokenExpiredError(RetroAppBaseError):
 
 
 # TODO:HTTPステータスコードを含めたエラークラスを作ってもいいのでは。
+
+
+class RetroAppStateMachineExecutionError(RetroAppBaseError):
+    pass
