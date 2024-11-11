@@ -164,29 +164,14 @@ resources:
       Type: AWS::StepFunctions::StateMachine
       Properties:
         StateMachineName: MyStateMachine
-        RoleArn:  !GetAtt StateMachineRole.Arn
-        # TODO:出来ればymlで定義したい
-        DefinitionString: !Sub |
-          {
-            "StartAt": "ProcessData",
-            "States": {
-              "ProcessData": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName": "!GetAtt testApi.Arn",
-                  "Payload": "$"
-                },
-                "Next": "SendLineMessage"
-              },
-              "SendLineMessage": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName":"!GetAtt sendLineMessage.Arn",
-                  "Payload": "$"
-                },
-                "End": true
-              }
-            }
-          }
+        RoleArn: !GetAtt StateMachineRole.Arn
+        Definition:
+          StartAt: SendLineMessage
+          States:
+            SendLineMessage:
+              Type: Task
+              Resource: arn:aws:states:::lambda:invoke
+              Parameters:
+                #  TODO:stageをオプション引数で変更できるように変更したい
+                FunctionName: "arn:aws:lambda:${aws:region}:${aws:accountId}:function:retro-app-dev-add_comment_function:$LATEST"
+              End: true
