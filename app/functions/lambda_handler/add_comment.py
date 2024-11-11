@@ -4,7 +4,7 @@ from app.repository.retrospective_method.comment_repository import CommentReposi
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 
 
-def lambda_handler(event, context, db=get_db()):
+def lambda_handler(event, context, db=next(get_db())):
     print(f"Received data: {event}")
     comment = CommentSchema(**event)
     comment_repo = CommentRepository(db)
