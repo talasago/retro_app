@@ -115,17 +115,16 @@ functions:
     vpc: ${self:custom.vpcConfig}
     events:
       - http:
-          path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
-          method: ANY
-      - http:
-          path: ${self:custom.apiPrefix}/retrospectives/{retrospective_id}/comments
-          method: ANY      
-  test_api:
-    handler: app.functions.api.main.handler
+          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
+          method: GET
+  comment_function_without_vpc:
+    handler: app.functions.main.handler
     events:
-      - http: 
-          path: ${self:custom.apiPrefix}/test
-          method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
+          method: POST
+  add_comment_function:
+    handler: app.functions.lambda_handler.add_comment.lambda_handler
     vpc: ${self:custom.vpcConfig}
   # process_data: # TODO:良い名前は後で考える。
   #  handler: app.functions.process_data.lambda_handler
