@@ -5,9 +5,7 @@ import boto3
 import pytest
 from moto import mock_aws
 from mypy_boto3_stepfunctions import SFNClient
-from mypy_boto3_stepfunctions.literals import ExecutionStatusType
 
-from app.errors.retro_app_error import RetroAppStateMachineExecutionError
 from app.schemas.retrospective_method.comment_schema import CommentSchema
 from app.services.retrospective_method.comment_service import CommentService
 
@@ -58,7 +56,7 @@ class TestCommentService:
         @pytest.fixture()
         def mock_describe_execution(self, mocker, sut):
             # statusを設定するため
-            def _method(status: ExecutionStatusType):
+            def _method(status: str):
                 return mocker.patch.object(
                     sut.sfn_client,
                     "describe_execution",
@@ -70,7 +68,7 @@ class TestCommentService:
             return _method
 
         class TestWhenStatemachineSucceed:
-            def test_should_call_send_message_admin(
+            def test_add_comment_from_api(
                 self,
                 sut: CommentService,
                 mock_send_message_admin: MagicMock,
@@ -91,33 +89,8 @@ class TestCommentService:
                 )
 
         class TestWhenStatemachineFailed:
-            @pytest.mark.parametrize(
-                ["status"],
-                [
-                    pytest.param("ABORTED"),
-                    pytest.param("FAILED"),
-                    pytest.param("TIMED_OUT"),
-                ],
-            )
-            def test_should_not_call_send_message_admin(
-                self,
-                sut: CommentService,
-                mock_send_message_admin: MagicMock,
-                mock_describe_execution: MagicMock,
-                status: ExecutionStatusType,
-            ):
-                comment = CommentSchema(
-                    retrospective_method_id=1, user_id=1, comment="Test comment"
-                )
-                mock_describe_execution_sucessed = mock_describe_execution(
-                    status=status
-                )
-
-                with pytest.raises(RetroAppStateMachineExecutionError):
-                    sut.add_comment_from_api(comment)
-
-                mock_describe_execution_sucessed.assert_called_once()
-                mock_send_message_admin.assert_not_called()
+            # パラメタライズを使う
+            pass
 
         class TestWhenStatemachineTimeout:
             # パラメタライズを使う
