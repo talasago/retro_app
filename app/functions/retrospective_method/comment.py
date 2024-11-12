@@ -29,7 +29,6 @@ router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
 
 STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
-
 @router.post(
     "/{retrospective_method_id}/comment",
     summary="レビューコメントを登録します。",

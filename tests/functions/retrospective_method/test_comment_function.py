@@ -100,7 +100,9 @@ class TestCommentFunction:
 
         @pytest.fixture(scope="class", autouse=True)
         # FIXME: ほんとはlocalstack使ってapiを叩くことでデータを作成すべき。それがAPIテストの責務。
-        def create_comment(self, add_comment_from_lambda_function):
+        def create_comment(
+            self, add_comment_from_lambda_function
+        ):
             comments = [
                 {"comment": "test comment"},
                 {"comment": "test comment2"},
