@@ -1,4 +1,3 @@
-from time import sleep
 from typing import TYPE_CHECKING, Final
 
 from app.errors.retro_app_error import (
@@ -20,15 +19,12 @@ if TYPE_CHECKING:
 
 class CommentService:
     STATE_STATUS_CHECK_MAX_RETRY_TIMES: Final[int] = 15
-    DEFALT_SLEEP_TIME: Final[int] = 1
 
     def __init__(self, sfn_client: "SFNClient", state_machine_arn: str):
         self.sfn_client = sfn_client
         self.state_machine_arn = state_machine_arn
 
-    def add_comment_from_api(
-        self, comment: "CommentSchema", sleep_time=DEFALT_SLEEP_TIME
-    ):
+    def add_comment_from_api(self, comment: "CommentSchema"):
         start_execution_res = self.__start_state_machine_execution(comment=comment)
 
         for _ in range(self.STATE_STATUS_CHECK_MAX_RETRY_TIMES):
@@ -44,7 +40,7 @@ class CommentService:
                 raise RetroAppStateMachineExecutionError(
                     message=f"Unexpected state machine status: {state_status}"
                 )
-            sleep(sleep_time)
+            # time.sleep(1)
 
         else:
             raise RetroAppStateMachineMaxRetriesReachedError(
