@@ -45,11 +45,7 @@ class LineApiClient:
         if custom_aggregation_units != []:
             payload["customAggregationUnits"] = custom_aggregation_units
 
-        response = self.session.post(
-            URL,
-            headers=headers,
-            json=payload,
-        )
+        response = self.session.post(URL, headers=headers, json=payload,)
         res_json = response.json()
         print("response", res_json)
         response.raise_for_status()
