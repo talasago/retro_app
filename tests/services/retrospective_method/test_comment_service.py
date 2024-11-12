@@ -59,7 +59,7 @@ class TestCommentService:
             )
 
         @pytest.fixture()
-        def create_mock_describe_execution(self, mocker, sut):
+        def mock_describe_execution(self, mocker, sut):
             # statusを設定するため
             def _method(status: ExecutionStatusType):
                 return mocker.patch.object(
@@ -77,18 +77,18 @@ class TestCommentService:
                 self,
                 sut: CommentService,
                 mock_send_message_admin: MagicMock,
-                create_mock_describe_execution: MagicMock,
+                mock_describe_execution: MagicMock,
             ):
                 comment = CommentSchema(
                     retrospective_method_id=1, user_id=1, comment="Test comment"
                 )
-                mock_describe_execution = create_mock_describe_execution(
+                mock_describe_execution_sucessed = mock_describe_execution(
                     status="SUCCEEDED"
                 )
 
                 sut.add_comment_from_api(comment)
 
-                mock_describe_execution.assert_called_once()
+                mock_describe_execution_sucessed.assert_called_once()
                 mock_send_message_admin.assert_called_once_with(
                     message=comment.model_dump_json()
                 )
@@ -106,18 +106,20 @@ class TestCommentService:
                 self,
                 sut: CommentService,
                 mock_send_message_admin: MagicMock,
-                create_mock_describe_execution: MagicMock,
+                mock_describe_execution: MagicMock,
                 status: ExecutionStatusType,
             ):
                 comment = CommentSchema(
                     retrospective_method_id=1, user_id=1, comment="Test comment"
                 )
-                mock_describe_execution = create_mock_describe_execution(status=status)
+                mock_describe_execution_sucessed = mock_describe_execution(
+                    status=status
+                )
 
                 with pytest.raises(RetroAppStateMachineExecutionError):
                     sut.add_comment_from_api(comment)
 
-                mock_describe_execution.assert_called_once()
+                mock_describe_execution_sucessed.assert_called_once()
                 mock_send_message_admin.assert_not_called()
 
         class TestWhenStatemachineTimeout:
@@ -132,19 +134,19 @@ class TestCommentService:
                 self,
                 sut: CommentService,
                 mock_send_message_admin: MagicMock,
-                create_mock_describe_execution: MagicMock,
+                mock_describe_execution: MagicMock,
                 status: ExecutionStatusType,
             ):
                 comment = CommentSchema(
                     retrospective_method_id=1, user_id=1, comment="Test comment"
                 )
-                mock_describe_execution: MagicMock = create_mock_describe_execution(
+                mock_describe_execution_sucessed: MagicMock = mock_describe_execution(
                     status=status
                 )
 
                 with pytest.raises(RetroAppStateMachineMaxRetriesReachedError):
                     sut.add_comment_from_api(comment)
 
-                mock_describe_execution.assert_called()
+                mock_describe_execution_sucessed.assert_called()
                 mock_send_message_admin.assert_not_called()
-                assert mock_describe_execution.call_count == 15
+                assert mock_describe_execution_sucessed.call_count == 15
