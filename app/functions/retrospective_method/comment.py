@@ -29,8 +29,6 @@ router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
 
 STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
-def get_sfn_client():
-    return boto3.client("stepfunctions")
 
 @router.post(
     "/{retrospective_method_id}/comment",
@@ -42,7 +40,7 @@ def add_comment(
     retrospective_method_id: int,
     comment_params: CommentCreate,
     current_user: "UserModel" = Depends(get_current_user),
-    sfn_client: "SFNClient" = Depends(get_sfn_client),
+    sfn_client: "SFNClient" = Depends(lambda: boto3.client("stepfunctions")),
 ):
     """コメント登録のエンドポイント。"""
 
