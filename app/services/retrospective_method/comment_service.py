@@ -1,4 +1,3 @@
-import json
 from time import sleep
 from typing import TYPE_CHECKING, Final
 
@@ -28,14 +27,9 @@ class CommentService:
         self.state_machine_arn = state_machine_arn
 
     def add_comment_from_api(
-        self, comment: "CommentSchema", token: str,  sleep_time=DEFALT_SLEEP_TIME
+        self, comment: "CommentSchema", sleep_time=DEFALT_SLEEP_TIME
     ):
-
-        input = json.dumps({
-            "comment": comment.model_dump(),
-            "token": token,
-        })
-        start_execution_res = self.__start_state_machine_execution(input=input)
+        start_execution_res = self.__start_state_machine_execution(comment=comment)
 
         for _ in range(self.STATE_STATUS_CHECK_MAX_RETRY_TIMES):
             state_status = self.__get_state_status(
@@ -60,11 +54,11 @@ class CommentService:
         print("execution finished")
 
     def __start_state_machine_execution(
-        self, input: str
+        self, comment: "CommentSchema"
     ) -> "StartExecutionOutputTypeDef":
         return self.sfn_client.start_execution(
             stateMachineArn=self.state_machine_arn,
-            input=input,
+            input=comment.model_dump_json(),
         )
 
     def __get_state_status(self, execution_arn: str) -> "ExecutionStatusType":
