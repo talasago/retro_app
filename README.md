@@ -80,13 +80,13 @@ $ pyenv install 3.10.11
 $ python --version
 # 3.1.11となればOK!!
 $ which python
-# ${このリポジトリが存在するディレクトリ}配下が表示されればOK!!
 ```
 
 ### pipenv
 ```bash
 $ pip install --upgrade pip
 $ pip install pipenv
+$ export PIPENV_PYTHON=$PYENV_ROOT/shims/python 
 $ pipenv sync
 $ pipenv sync --dev
 # Pipfileのライブラリがローカルにインストールされる

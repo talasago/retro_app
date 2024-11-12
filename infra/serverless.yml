@@ -111,21 +111,7 @@ functions:
     events:
       - http:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
-          method: GET
-  comment_function_without_vpc:
-    handler: app.functions.main.handler
-    events:
-      - http:
-          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
-          method: POST
-  add_comment_function:
-    handler: app.functions.lambda_handler.add_comment.lambda_handler
-    vpc: ${self:custom.vpcConfig}
-  # process_data: # TODO:良い名前は後で考える。
-  #  handler: app.functions.process_data.lambda_handler
-  #  vpc: ${self:custom.vpcConfig}
-  send_line_message:
-    handler: app.functions.prosess_data.process_data.lambda_handler
+          method: ANY
 
 resources:
   Resources:
@@ -155,33 +141,3 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                   Resource: "*"
-    StateMachine:
-      Type: AWS::StepFunctions::StateMachine
-      Properties:
-        StateMachineName: MyStateMachine
-        RoleArn:  !GetAtt StateMachineRole.Arn
-        # TODO:出来ればymlで定義したい
-        DefinitionString: !Sub |
-          {
-            "StartAt": "ProcessData",
-            "States": {
-              "ProcessData": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName": "${test_api.Arn}",
-                  "Payload": "$"
-                },
-                "Next": "SendLineMessage"
-              },
-              "SendLineMessage": {
-                "Type": "Task",
-                "Resource": "arn:aws:states:::lambda:invoke",
-                "Parameters": {
-                  "FunctionName":"${send_line_message.Arn}",
-                  "Payload": "$"
-                },
-                "End": true
-              }
-            }
-          }
