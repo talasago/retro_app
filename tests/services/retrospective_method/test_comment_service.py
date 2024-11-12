@@ -18,6 +18,7 @@ class TestCommentService:
             yield client
 
     @pytest.fixture(scope="session")
+    # 実は不要？
     def create_sfn(self, mock_sfn_client: SFNClient):
         def _method():
             # FIXME:本当はsls.ymlから取得したい
@@ -56,16 +57,22 @@ class TestCommentService:
         @pytest.fixture()
         def mock_describe_execution(self, mocker, sut):
             # statusを設定するため
-            def _method(status: str):
-                return mocker.patch.object(
-                    sut.sfn_client,
-                    "describe_execution",
-                    return_value={
-                        "status": status,
-                    },
-                )
-
-            return _method
+            return mocker.patch.object(
+                sut.sfn_client,
+                "describe_execution",
+                return_value={
+                    "status": "SUCCEEDED",
+                    "output": json.dumps(
+                        {
+                            "Payload": {
+                                "retrospective_method_id": 1,
+                                "user_id": 1,
+                                "comment": "Test comment",
+                            }
+                        }
+                    ),
+                },
+            )
 
         # ステートマシンが終了したとき
         def test_add_comment_from_api(
@@ -77,15 +84,11 @@ class TestCommentService:
             comment = CommentSchema(
                 retrospective_method_id=1, user_id=1, comment="Test comment"
             )
-            mock_describe_execution_sucessed = mock_describe_execution(
-                status="SUCCEEDED"
-            )
 
             sut.add_comment_from_api(comment)
 
-            mock_send_message_admin.assert_called_once_with(
-                message=comment.model_dump_json()
-            )
-            mock_describe_execution_sucessed.assert_called_once()
+            mock_send_message_admin.assert_called_once_with(message=comment.model_dump())
+            mock_describe_execution.assert_called_once()
+
 
         # ステートマシンがfailedの場合のテストが必要

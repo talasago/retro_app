@@ -1,3 +1,4 @@
+import json
 from typing import TYPE_CHECKING, Final
 
 from app.services.notification_service import NotificationService
@@ -42,9 +43,14 @@ class CommentService:
             print(f"status: {state_status}")
 
             if state_status in ["SUCCEEDED"]:
-                NotificationService().send_message_admin(
-                    message=comment.model_dump_json()
-                )
+                output: dict = json.loads(describe_execution_res["output"])
+                print(f"output: {output}")
+                payload = output.get("Payload")
+
+                if payload:
+                    print(f"payload: {payload}")
+                    # lineを呼び出すための関数を呼び出す
+                    NotificationService().send_message_admin(message=payload)
 
                 break
             elif state_status in ["FAILED", "TIMED_OUT", "ABORTED"]:
