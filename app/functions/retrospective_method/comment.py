@@ -1,9 +1,7 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 
-import os
 from typing import TYPE_CHECKING
 
-import boto3
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
@@ -11,23 +9,20 @@ from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
 )
+from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
     GetCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
-from app.services.retrospective_method.comment_service import CommentService
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from mypy_boto3_stepfunctions import SFNClient
-
     from app.repository.retrospective_method.comment_repository import CommentRepository
 
 router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
 
-STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
 @router.post(
     "/{retrospective_method_id}/comment",
@@ -39,7 +34,7 @@ def add_comment(
     retrospective_method_id: int,
     comment_params: CommentCreate,
     current_user: "UserModel" = Depends(get_current_user),
-    sfn_client: "SFNClient" = Depends(lambda: boto3.client("stepfunctions")),
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント登録のエンドポイント。"""
 
@@ -49,8 +44,7 @@ def add_comment(
         user_id=current_user.id,
         comment=comment_params.comment,
     )
-    comment_service = CommentService(sfn_client, STATE_MACHINE_ARN)
-    comment_service.add_comment_from_api(comment)
+    comment_repo.save(CommentModel(**comment.model_dump()))
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,

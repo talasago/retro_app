@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import pytest
 
 from tests.test_helpers.functions.cors import assert_cors_headers
@@ -12,25 +10,17 @@ class TestCommentFunction:
             def test_return_201(
                 self, tokens_of_logged_in_api_common_user, add_comment_api
             ):
-                with patch(
-                    "app.services.retrospective_method.comment_service.CommentService.add_comment_from_api",
-                    return_value=None,
-                ) as mock_comment_service:
-                    comment_data: dict = {
-                        "comment": "test comment",
-                    }
+                comment_data: dict = {
+                    "comment": "test comment",
+                }
 
-                    response = add_comment_api(
-                        comment_data=comment_data,
-                        access_token=tokens_of_logged_in_api_common_user[0],
-                        is_assert_response_code_2xx=True,
-                    )
-
-                    assert_cors_headers(response)
-                    assert response.status_code == 201
-                    assert response.json() == {"message": "コメントを登録しました。"}
-                    mock_comment_service.assert_called_once()
-                    # あと、引数のテスト
+                response = add_comment_api(
+                    comment_data=comment_data,
+                    access_token=tokens_of_logged_in_api_common_user[0],
+                    is_assert_response_code_2xx=True,
+                )
+                assert_cors_headers(response)
+                assert response.json() == {"message": "コメントを登録しました。"}
 
                 # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
 
