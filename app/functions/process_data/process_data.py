@@ -1,3 +1,4 @@
-def lambda_handler(event, context):
+def lambda_hundler(event, context):
     # Get the data from the event
-    print(f"Received data: {event}")
+    data = event["data"]
+    print(f"Received data: {data}")
