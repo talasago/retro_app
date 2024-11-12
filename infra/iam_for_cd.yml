@@ -43,7 +43,7 @@ Resources:
               - "repo:talasago/retro_app:ref:refs/heads/main"
               - "repo:talasago/retro_app:ref:refs/heads/develop"
       MaxSessionDuration: 3600
-      Description: "Resources created by CFn iam_for_web.yml"
+      Description: "Resources created by CFn"
 
   IAMManagedPolicy:
     Type: "AWS::IAM::ManagedPolicy"
@@ -148,10 +148,6 @@ Resources:
           - "s3:PutObject"
           - "ssm:GetParameter"
           - "ssm:GetParameters"
-          - "states:CreateStateMachine"
-          - "states:UpdateStateMachine"
-          - "states:DeleteStateMachine"
-          - "states:TagResource"
           Resource: "*" 
           # TODO: セキュリティを考慮してリソースは指定した方が良い。
           # が、リソースごとにarnを指定する必要があり、その為にymlを変更するのが手間なので
