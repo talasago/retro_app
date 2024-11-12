@@ -1,36 +1,27 @@
 """WebAPIのエントリポイント。プレゼンテーション層。"""
 
-import os
 from typing import TYPE_CHECKING
 
-import boto3
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from app.functions.dependencies import (
     get_comment_repo,
-    oauth2_scheme,
+    get_current_user,
 )
+from app.models.retrospective_method.comment_model import CommentModel
+from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
     GetCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
-from app.services.retrospective_method.comment_service import CommentService
 
 # 型アノテーションだけのimport。これで本番実行時はインポートされなくなり、処理速度が早くなるはず
 if TYPE_CHECKING:
-    from mypy_boto3_stepfunctions import SFNClient
-
     from app.repository.retrospective_method.comment_repository import CommentRepository
 
 router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
-
-STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
-
-
-def get_sfn_client():
-    return boto3.client("stepfunctions", region_name="ap-northeast-1")
 
 
 @router.post(
@@ -42,26 +33,18 @@ def get_sfn_client():
 def add_comment(
     retrospective_method_id: int,
     comment_params: CommentCreate,
-    token: str = Depends(oauth2_scheme),
-    #current_user: "UserModel" = Depends(
-    #    get_current_user
-    #),  # TODO: この時点でDBアクセスしてるんだから、vpcの外じゃだめだ...
-    # add_comment_from_api()でcurrent_userを取得すればワンチャン...微妙だがこれしかないかも
-    sfn_client: "SFNClient" = Depends(get_sfn_client),
+    current_user: "UserModel" = Depends(get_current_user),
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント登録のエンドポイント。"""
 
     # ここでエラー発生時に、RequestValidationErrorを発生させれば良かっただけかもしれない...
     comment = CommentSchema(
         retrospective_method_id=retrospective_method_id,
-        user_id=1,
+        user_id=current_user.id,
         comment=comment_params.comment,
     )
-    comment_service = CommentService(sfn_client, STATE_MACHINE_ARN)
-    comment_service.add_comment_from_api(
-        comment=comment, token=token
-    )
-     # comment_params.comment or CommentCreate　と retrospective_method_idを引数にする
+    comment_repo.save(CommentModel(**comment.model_dump()))
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,

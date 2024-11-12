@@ -59,8 +59,6 @@ provider:
         - ec2:DeleteNetworkInterface # VPC設定のために必要
         - ssm:GetParameter # SSMから環境変数を取得するために必要
         - kms:DecryptSecureString # SSMから環境変数を取得するために必要
-        - states:DescribeStateMachine # StepFunctionsを使うために必要
-        - states:StartExecution # StepFunctionsを使うために必要
       Resource: "*"
   environment:
     # TODO:本番環境と開発環境で環境変数を分ける必要あり。
@@ -69,9 +67,6 @@ provider:
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
     ORIGINS: ${ssm:origins}
-    STATE_MACHINE_ARN: !GetAtt AddCommentStateMachine.Arn
-    LINE_ACCESS_TOKEN: ${ssm:line_access_token}
-    LINE_ADMIN_USER_ID: ${ssm:line_admin_user_id}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
@@ -116,21 +111,7 @@ functions:
     events:
       - http:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
-          method: GET
-  comment_function_without_vpc:
-    handler: app.functions.main.handler
-    events:
-      - http:
-          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
-          method: POST
-  add_comment_function:
-    handler: app.functions.lambda_handler.add_comment.lambda_handler
-    vpc: ${self:custom.vpcConfig}
-  # process_data: # TODO:良い名前は後で考える。
-  #  handler: app.functions.process_data.lambda_handler
-  #  vpc: ${self:custom.vpcConfig}
-  send_line_message:
-    handler: app.functions.prosess_data.process_data.lambda_handler
+          method: ANY
 
 resources:
   Resources:
@@ -160,19 +141,3 @@ resources:
                     - logs:CreateLogStream
                     - logs:PutLogEvents
                   Resource: "*"
-    StateMachine:
-      Type: AWS::StepFunctions::StateMachine
-      Properties:
-        StateMachineName: MyStateMachine
-        RoleArn: !GetAtt StateMachineRole.Arn
-        Definition:
-          StartAt: SendLineMessage
-          States:
-            SendLineMessage:
-              Type: Task
-              Resource: arn:aws:states:::lambda:invoke
-              Parameters:
-                #  TODO:stageをオプション引数で変更できるように変更したい
-                FunctionName: "arn:aws:lambda:${aws:region}:${aws:accountId}:function:retro-app-dev-add_comment_function:$LATEST"
-                Payload.$: "$"
-              End: true
