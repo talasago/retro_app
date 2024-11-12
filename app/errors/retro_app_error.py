@@ -47,7 +47,3 @@ class RetroAppTokenExpiredError(RetroAppBaseError):
 
 class RetroAppStateMachineExecutionError(RetroAppBaseError):
     pass
-
-
-class RetroAppStateMachineMaxRetriesReachedError(RetroAppBaseError):
-    pass
