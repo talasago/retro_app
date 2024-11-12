@@ -12,5 +12,4 @@ def test():
         content={"message": "test", "create_data": "data"},
     )
 
-
 handler = Mangum(app)
