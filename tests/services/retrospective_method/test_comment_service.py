@@ -53,4 +53,4 @@ class TestCommentService:
                 stateMachineArn=sut.state_machine_arn
             )
             assert len(executions["executions"]) == 1
-            assert executions["executions"][0]["status"] == "RUNNING"  # 仮のテスト
+            assert executions["executions"][0]["status"] == "RUNNING" # 仮のテスト
