@@ -93,6 +93,7 @@ def add_comment_from_lambda_function(user_repo, db):
             retrospective_method_id=retrospective_method_id,
             **comment_data,
         ).model_dump()
+        # 引数変えるかも、テスト側もこれを使うようにしよう
         lambda_handler(event=comment, context=None, db=db)
 
     return _method
