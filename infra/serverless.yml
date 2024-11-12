@@ -69,9 +69,6 @@ provider:
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${ssm:postgres_database}
     ORIGINS: ${ssm:origins}
-    STATE_MACHINE_ARN: !GetAtt AddCommentStateMachine.Arn
-    LINE_ACCESS_TOKEN: ${ssm:line_access_token}
-    LINE_ADMIN_USER_ID: ${ssm:line_admin_user_id}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
