@@ -31,7 +31,7 @@ pytest-mock = "*"
 pydeps = "*"
 python-dotenv = "*"
 pytest-asyncio = "*"
-boto3-stubs = {extras = ["stepfunctions", "iam", "ssm"], version = "*"}
+boto3-stubs = {version = "*", extras = ["ssm", "stepfunctions"]}
 
 [requires]
 python_version = "3.10"
