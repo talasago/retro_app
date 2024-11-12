@@ -20,12 +20,12 @@ class TestCommentService:
         def _method():
             # 本当はsls.ymlから取得したい
             state_machine_definition = {
-                "StartAt": "AddCommentState",
-                "States": {
-                    "AddCommentState": {
-                        "Type": "Task",
-                        "Resource": "arn:aws:lambda:ap-northeast-1:000000000000:function:add_comment_function",
-                        "End": True,
+                 "StartAt": "AddCommentState",
+                    "States": {
+                        "AddCommentState": {
+                            "Type": "Task",
+                            "Resource": "arn:aws:lambda:ap-northeast-1:000000000000:function:add_comment_function",
+                            "End": True,
                     }
                 },
             }
@@ -36,7 +36,6 @@ class TestCommentService:
                 roleArn="arn:aws:iam::000000000000:role/StateMachineRole",
             )
             return response
-
         return _method
 
     @pytest.fixture(scope="session")
