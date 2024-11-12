@@ -32,6 +32,8 @@ class TestCommentFunction:
                     mock_comment_service.assert_called_once()
                     # あと、引数のテスト
 
+                # TODO:コメントが実際に追加されているかどうかのテストは、コメント取得APIの時で代替する
+
         class TestInvalidParam:
             def test_return_401_when_invalid_access_token(
                 self,
@@ -99,10 +101,7 @@ class TestCommentFunction:
             return get_comment_api
 
         @pytest.fixture(scope="class", autouse=True)
-        # FIXME: ほんとはlocalstack使ってapiを叩くことでデータを作成すべき。それがAPIテストの責務。
-        def create_comment(
-            self, add_comment_from_lambda_function
-        ):
+        def create_comment(self, add_comment_api, tokens_of_logged_in_api_common_user):
             comments = [
                 {"comment": "test comment"},
                 {"comment": "test comment2"},
@@ -110,9 +109,10 @@ class TestCommentFunction:
             ]
 
             for comment_data in comments:
-                add_comment_from_lambda_function(
+                add_comment_api(
                     comment_data=comment_data,
                     retrospective_method_id=5,
+                    access_token=tokens_of_logged_in_api_common_user[0],
                 )
 
         class TestWhenDuringLogin:
