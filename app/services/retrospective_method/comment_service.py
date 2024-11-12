@@ -59,5 +59,4 @@ class CommentService:
 
         print("execution finished")
 
-
 # enumを使って、ステータスを管理する
