@@ -47,7 +47,6 @@ from tests.test_helpers.create_test_user import create_test_user
 #     )
 #
 
-
 @mock_aws
 def override_get_sfn_client():
     return boto3.client("stepfunctions", region_name="ap-northeast-1")

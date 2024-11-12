@@ -29,10 +29,8 @@ router = APIRouter(tags=["comment"], prefix="/api/v1/retrospective_method")
 
 STATE_MACHINE_ARN = os.environ["STATE_MACHINE_ARN"]
 
-
 def get_sfn_client():
     return boto3.client("stepfunctions")
-
 
 @router.post(
     "/{retrospective_method_id}/comment",
