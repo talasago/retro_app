@@ -1,6 +1,5 @@
 import os
 import uuid
-from dataclasses import dataclass, field
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -9,8 +8,6 @@ from urllib3.util import Retry
 
 class LineApiClient:
     ACCSESS_TOKEN = os.environ["LINE_ACCESS_TOKEN"]
-    API_BASE_URL = "https://api.line.me"
-    API_SEND_PUSH_MESSAGE_URL = f"{API_BASE_URL}/v2/bot/message/push"
 
     def __init__(self) -> None:
         self.session = requests.Session()
@@ -22,7 +19,6 @@ class LineApiClient:
         )
         self.session.mount("https://", HTTPAdapter(max_retries=retries))
 
-    # note:一旦単数めっせーじのみ対応
     def send_text_message(
         self,
         to: str,
@@ -30,46 +26,27 @@ class LineApiClient:
         notification_disabled=False,
         custom_aggregation_units: list[str] = [],
     ):
-        payload = self.__generate_payload(
-            to, message, notification_disabled, custom_aggregation_units
-        )
+        URL = "https://api.line.me/v2/bot/message/push"  # noqa: N806
 
-        return self.__send_request(
-            url=self.API_SEND_PUSH_MESSAGE_URL,
-            headers=self.__generate_headers(),
-            payload=payload,
-        )
-
-    @staticmethod
-    def get_admin_userid() -> str:
-        return os.environ["LINE_ADMIN_USER_ID"]
-
-    def __generate_headers(self) -> dict[str, str]:
-        return {
+        # FIXME:ここからprivateメソッドにする
+        headers = {
             "Content-Type": "application/json",
             "Authorization": f"Bearer {self.ACCSESS_TOKEN}",
             "X-Line-Retry-Key": str(uuid.uuid4()),
         }
 
-    def __generate_payload(
-        self,
-        to: str,
-        message: str,
-        notification_disabled: bool,
-        custom_aggregation_units: list[str],
-    ) -> dict:
-        line_message = LineTextMessage(text=message)
-        payload = LineSendPushMessage(
-            to=to,
-            messages=[line_message],
-            notification_disabled=notification_disabled,
-            custom_aggregation_units=custom_aggregation_units,
-        )
-        return payload.to_dict()
+        hoge = self.LineTextMessage(text=message)
+        ffmessage = hoge.message
+        payload = {
+            "to": to,
+            "messages": [ffmessage],
+            "notificationDisabled": notification_disabled,
+        }
+        if custom_aggregation_units != []:
+            payload["customAggregationUnits"] = custom_aggregation_units
 
-    def __send_request(self, url: str, headers: dict[str, str], payload: dict):
         response = self.session.post(
-            url,
+            URL,
             headers=headers,
             json=payload,
         )
@@ -78,30 +55,12 @@ class LineApiClient:
         response.raise_for_status()
         return res_json
 
+    @staticmethod
+    def get_admin_userid() -> str:
+        return os.environ["LINE_ADMIN_USER_ID"]
 
-@dataclass
-class LineTextMessage:
-    text: str
-    type: str = "text"
-
-    def to_dict(self) -> dict[str, str]:
-        return {
-            "type": self.type,
-            "text": self.text,
-        }
-
-
-@dataclass
-class LineSendPushMessage:
-    to: str
-    messages: list[LineTextMessage]
-    notification_disabled: bool = False
-    custom_aggregation_units: list[str] = field(default_factory=list)
-
-    def to_dict(self) -> dict:
-        return {
-            "to": self.to,
-            "messages": [message.to_dict() for message in self.messages],
-            "notificationDisabled": self.notification_disabled,
-            "customAggregationUnits": self.custom_aggregation_units,
-        }
+    # FIXME:dataclassを使ってもいいかも??それかpydentic。
+    # apischemaを定義したいかも
+    class LineTextMessage:
+        def __init__(self, text: str) -> None:
+            self.message = {"type": "text", "text": text}
