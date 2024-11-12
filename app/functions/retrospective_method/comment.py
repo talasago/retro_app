@@ -9,9 +9,8 @@ from fastapi.responses import JSONResponse
 
 from app.functions.dependencies import (
     get_comment_repo,
-    get_current_user,
+    oauth2_scheme,
 )
-from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
     GetCommentApiResponseBody,
@@ -43,7 +42,11 @@ def get_sfn_client():
 def add_comment(
     retrospective_method_id: int,
     comment_params: CommentCreate,
-    current_user: "UserModel" = Depends(get_current_user),
+    token: str = Depends(oauth2_scheme),
+    #current_user: "UserModel" = Depends(
+    #    get_current_user
+    #),  # TODO: この時点でDBアクセスしてるんだから、vpcの外じゃだめだ...
+    # add_comment_from_api()でcurrent_userを取得すればワンチャン...微妙だがこれしかないかも
     sfn_client: "SFNClient" = Depends(get_sfn_client),
 ):
     """コメント登録のエンドポイント。"""
@@ -51,11 +54,14 @@ def add_comment(
     # ここでエラー発生時に、RequestValidationErrorを発生させれば良かっただけかもしれない...
     comment = CommentSchema(
         retrospective_method_id=retrospective_method_id,
-        user_id=current_user.id,
+        user_id=1,
         comment=comment_params.comment,
     )
     comment_service = CommentService(sfn_client, STATE_MACHINE_ARN)
-    comment_service.add_comment_from_api(comment)
+    comment_service.add_comment_from_api(
+        comment=comment, token=token
+    )
+     # comment_params.comment or CommentCreate　と retrospective_method_idを引数にする
 
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
