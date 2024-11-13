@@ -20,6 +20,17 @@ def create_comment(db: Session):
     return _method
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_create_comments(create_comment):
+    create_comment(
+        CommentFactory(
+            retrospective_method_id=10, comment="retrospective_method_id=10"
+        )
+    )
+    create_comment(CommentFactory(retrospective_method_id=2))
+    create_comment(CommentFactory(retrospective_method_id=3))
+    create_comment(CommentFactory(retrospective_method_id=3))
+
 @pytest.mark.usefixtures("db")
 class TestCommentRepository:
     class TestSave:
@@ -58,17 +69,6 @@ class TestCommentRepository:
         @pytest.fixture(scope="class")
         def sut(self, db: Session) -> Callable:
             return CommentRepository(db).find
-
-        @pytest.fixture(scope="class", autouse=True)
-        def setup_create_comments(self, create_comment):
-            create_comment(
-                CommentFactory(
-                    retrospective_method_id=10, comment="retrospective_method_id=10"
-                )
-            )
-            create_comment(CommentFactory(retrospective_method_id=2))
-            create_comment(CommentFactory(retrospective_method_id=3))
-            create_comment(CommentFactory(retrospective_method_id=3))
 
         class TestWhenThereIsRetrospectiveMethodId:
             class TestWhenThereAreMatchingComments:
@@ -118,3 +118,18 @@ class TestCommentRepository:
 
                     with pytest.raises(TypeError):
                         sut(conditions=conditions)
+
+    class TestFindBy:
+        @pytest.fixture(scope="class")
+        def sut(self, db: Session) -> Callable:
+            return CommentRepository(db).find_by
+
+        # 詳細なテストは後
+
+        class TestWhenThereAreConditions:
+            class TestWhenThereAreMatchingComments:
+                def test_return_comments_by_retrospective_method_id(self, sut):
+                    conditions = {"retrospective_method_id": 10}
+                    result: CommentModel = sut(conditions=conditions)
+
+                    assert result.retrospective_method_id == 10
