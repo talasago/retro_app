@@ -24,13 +24,12 @@ def create_comment(db: Session):
 @pytest.fixture(scope="session", autouse=True)
 def setup_create_comments(create_comment):
     create_comment(
-        CommentFactory(
-            retrospective_method_id=10, comment="retrospective_method_id=10"
-        )
+        CommentFactory(retrospective_method_id=10, comment="retrospective_method_id=10")
     )
     create_comment(CommentFactory(retrospective_method_id=2))
     create_comment(CommentFactory(retrospective_method_id=3))
     create_comment(CommentFactory(retrospective_method_id=3))
+
 
 @pytest.mark.usefixtures("db")
 class TestCommentRepository:
@@ -141,8 +140,16 @@ class TestCommentRepository:
             return CommentRepository(db).delete
 
         def test_delete_comment(self, sut, db: Session, create_comment):
-            comment: CommentModel = create_comment(CommentFactory(retrospective_method_id=55, user_id=1, comment="delete comment"))
-            stmt = select(func.count()).select_from(CommentModel).filter(CommentModel.comment == comment.comment)
+            comment: CommentModel = create_comment(
+                CommentFactory(
+                    retrospective_method_id=55, user_id=1, comment="delete comment"
+                )
+            )
+            stmt = (
+                select(func.count())
+                .select_from(CommentModel)
+                .filter(CommentModel.comment == comment.comment)
+            )
             assert db.execute(stmt).scalar() == 1
 
             sut(comment)
