@@ -38,14 +38,14 @@ class CommentRepository:
 
         self.__db.refresh(comment)
 
-    # def delete(self, comment: CommentModel) -> None:
-    #     self.__db.delete(comment)
+    def delete(self, comment: CommentModel) -> None:
+        self.__db.delete(comment)
 
-    #     try:
-    #         self.__db.commit()
-    #     except Exception as e:
-    #         self.__db.rollback()
-    #         raise e
+        try:
+            self.__db.commit()
+        except Exception as e:
+            self.__db.rollback()
+            raise e
 
     def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
         if not isinstance(conditions, dict):

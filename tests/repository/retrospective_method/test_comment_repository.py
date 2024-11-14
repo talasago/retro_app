@@ -3,6 +3,7 @@ from typing import Callable
 import pytest
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
+from sqlalchemy.sql import func, select
 
 from app.models.retrospective_method.comment_model import CommentModel
 from app.repository.retrospective_method.comment_repository import CommentRepository
@@ -133,3 +134,17 @@ class TestCommentRepository:
                     result: CommentModel = sut(conditions=conditions)
 
                     assert result.retrospective_method_id == 10
+
+    class TestDelete:
+        @pytest.fixture(scope="class")
+        def sut(self, db: Session) -> Callable:
+            return CommentRepository(db).delete
+
+        def test_delete_comment(self, sut, db: Session, create_comment):
+            comment: CommentModel = create_comment(CommentFactory(retrospective_method_id=55, user_id=1, comment="delete comment"))
+            stmt = select(func.count()).select_from(CommentModel).filter(CommentModel.comment == comment.comment)
+            assert db.execute(stmt).scalar() == 1
+
+            sut(comment)
+
+            assert db.execute(stmt).scalar() == 0
