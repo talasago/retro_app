@@ -47,6 +47,7 @@ class CommentRepository:
             self.__db.rollback()
             raise e
 
+    # 名前が違うかも、find_all
     def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
@@ -65,6 +66,7 @@ class CommentRepository:
         # ここでクエリ発行
         return query.all()
 
+    # find_oneという名前が良いかも
     def find_by(self, conditions: CommentConditions = {}) -> CommentModel:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
@@ -76,9 +78,9 @@ class CommentRepository:
             getattr(CommentModel, key) == value for key, value in conditions.items()
         ]
         stmt = select(CommentModel).filter(*filters)
-        # # データが複数見つかった時はどうする？1番目でいいのか？
+        # MEMO:複数ヒットするような条件で検索するユースケースが無いので、複数ヒットするケースのロジックは作成しない。
         comment = self.__db.execute(stmt).scalars().first()
 
         if comment is None:
-            raise RetroAppRecordNotFoundError("Record not found")
+            raise RetroAppRecordNotFoundError(CommentModel.__tablename__)
         return comment

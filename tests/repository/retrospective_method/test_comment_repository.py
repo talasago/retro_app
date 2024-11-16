@@ -5,6 +5,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import func, select
 
+from app.errors.retro_app_error import RetroAppRecordNotFoundError
 from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.repository.retrospective_method.comment_repository import CommentRepository
@@ -43,6 +44,10 @@ def setup_create_comments(create_comment, setup_test_user):
 
 @pytest.mark.usefixtures("db")
 class TestCommentRepository:
+    @pytest.fixture(scope="class")
+    def comment_repo(self, db: Session) -> CommentRepository:
+        return CommentRepository(db)
+
     class TestSave:
         # 現状Saveで更新するユースケースはないので、UPDATEのテストは省略
         def test_create_comment(self, db: Session, create_comment, setup_test_user):
@@ -78,8 +83,8 @@ class TestCommentRepository:
 
     class TestFind:
         @pytest.fixture(scope="class")
-        def sut(self, db: Session) -> Callable:
-            return CommentRepository(db).find
+        def sut(self, comment_repo: CommentRepository) -> Callable:
+            return comment_repo.find
 
         class TestWhenThereIsRetrospectiveMethodId:
             class TestWhenThereAreMatchingComments:
@@ -132,18 +137,50 @@ class TestCommentRepository:
 
     class TestFindBy:
         @pytest.fixture(scope="class")
-        def sut(self, db: Session) -> Callable:
-            return CommentRepository(db).find_by
+        def sut(self, comment_repo: CommentRepository) -> Callable:
+            return comment_repo.find_by
 
-        # 詳細なテストは後
+        class TestWhenInvalidConditions:
+            @pytest.mark.parametrize("conditions", [1, "invalid_conditions", None, []])
+            def test_raise_type_error(self, sut, conditions):
+                with pytest.raises(TypeError):
+                    sut(conditions=conditions)
 
-        class TestWhenThereAreConditions:
-            class TestWhenThereAreMatchingComments:
-                def test_return_comments_by_retrospective_method_id(self, sut):
-                    conditions = {"retrospective_method_id": 10}
-                    result: CommentModel = sut(conditions=conditions)
+        class TestWhenEmptyConditions:
+            @pytest.mark.parametrize(
+                "invoke", [lambda sut: sut(), lambda sut: sut(conditions={})]
+            )
+            def test_raise_value_error(self, sut, invoke):
+                with pytest.raises(ValueError):
+                    invoke(sut)
 
-                    assert result.retrospective_method_id == 10
+        class TestWhenThereAreMatchingComments:
+            def test_return_comment_by_conditions(
+                self, sut, comment_repo: CommentRepository
+            ):
+                comments = comment_repo.find()
+
+                conditions = {
+                    "id": comments[0].id,
+                    "retrospective_method_id": comments[0].retrospective_method_id,
+                    "user_id": comments[0].user_id,
+                }
+                result: CommentModel = sut(conditions=conditions)
+
+                assert result.id == conditions["id"]
+                assert (
+                    result.retrospective_method_id
+                    == conditions["retrospective_method_id"]
+                )
+                assert result.user_id == conditions["user_id"]
+
+        class TestWhenThereIsNotMatchingComments:
+            def test_raise_error(self, sut):
+                conditions = {"retrospective_method_id": 99999}
+                with pytest.raises(RetroAppRecordNotFoundError) as e:
+                    sut(conditions=conditions)
+
+                assert str(e.value) == "条件に合致するレコードは存在しません。"
 
     class TestDelete:
         @pytest.fixture(scope="class")
