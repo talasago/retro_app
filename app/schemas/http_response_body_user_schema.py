@@ -74,6 +74,14 @@ class GetCommentApiResponseBody(BaseModel):
     )
 
 
+class DeleteCommentApiResponseBody(BaseModel):
+    message: str = Field(
+        default="コメントを削除しました。",
+        description="処理メッセージ",
+        examples=["コメントを削除しました。"],
+    )
+
+
 class ClientErrorResponseBody(BaseModel):
     message: str = Field(
         description="処理メッセージ",

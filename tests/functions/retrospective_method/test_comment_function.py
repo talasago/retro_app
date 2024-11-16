@@ -152,3 +152,45 @@ class TestCommentFunction:
                     response.json()["detail"][0]["msg"]
                     == "有効な整数を入力してください。"
                 )
+
+    class TestDeleteComment:
+        @pytest.fixture(scope="class")
+        def sut(self, delete_comment_api):
+            return delete_comment_api
+
+        @pytest.fixture(scope="class", autouse=True)
+        def setup_create_comments(
+            self, add_comment_api, tokens_of_logged_in_api_common_user, get_comment_api
+        ):
+            comments = [
+                {"comment": "test comment"},
+                {"comment": "test comment2"},
+            ]
+
+            for comment_data in comments:
+                add_comment_api(
+                    comment_data=comment_data,
+                    retrospective_method_id=6,
+                    access_token=tokens_of_logged_in_api_common_user[0],
+                )
+
+        @pytest.fixture(scope="class")
+        def get_created_comments(self, get_comment_api):
+            def _method() -> list[dict]:
+                response = get_comment_api(retrospective_method_id=6)
+                return response.json()["comments"]
+
+            return _method
+
+        def test_return_204(
+            self, sut, tokens_of_logged_in_api_common_user, get_created_comments
+        ):
+            response = sut(
+                access_token=tokens_of_logged_in_api_common_user[0],
+                retrospective_method_id=6,
+                comment_id=get_created_comments()[0]["id"],
+            )
+
+            assert_cors_headers(response)
+            assert response.json() == {"message": "コメントを削除しました。"}
+            # APIを使って削除されたか確認する

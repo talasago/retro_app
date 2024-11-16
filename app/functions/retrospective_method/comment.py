@@ -13,6 +13,7 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
+    DeleteCommentApiResponseBody,
     GetCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
@@ -75,4 +76,32 @@ def get_comment(
 
     return JSONResponse(
         content=GetCommentApiResponseBody(comments=result_comments).model_dump()
+    )
+
+
+@router.delete(
+    "/{retrospective_method_id}/comment/{comment_id}",
+    summary="レビューコメントを削除します。",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_comment(
+    retrospective_method_id: int,
+    comment_id: int,
+    current_user: "UserModel" = Depends(get_current_user),
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
+):
+    """コメント削除のエンドポイント。"""
+    comment = comment_repo.find_by(
+        conditions={
+            "id": comment_id,
+            "user_id": current_user.id,
+            "retrospective_method_id": retrospective_method_id,
+        }
+    )
+
+    comment_repo.delete(comment)
+
+    return JSONResponse(
+        status_code=status.HTTP_204_NO_CONTENT,
+        content=DeleteCommentApiResponseBody().model_dump(),
     )
