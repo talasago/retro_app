@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.sql import func, select
 
 from app.models.retrospective_method.comment_model import CommentModel
+from app.models.user_model import UserModel
 from app.repository.retrospective_method.comment_repository import CommentRepository
 from tests.conftest import create_test_user
 from tests.factories.retrospective_method.comment_factory import CommentFactory
@@ -21,10 +22,19 @@ def create_comment(db: Session):
     return _method
 
 
+@pytest.fixture(scope="session")
+def setup_test_user(user_repo) -> UserModel:
+    return create_test_user(user_repo)
+
+
 @pytest.fixture(scope="session", autouse=True)
-def setup_create_comments(create_comment):
+def setup_create_comments(create_comment, setup_test_user):
     create_comment(
-        CommentFactory(retrospective_method_id=10, comment="retrospective_method_id=10")
+        CommentFactory(
+            retrospective_method_id=10,
+            comment="retrospective_method_id=10",
+            user_id=setup_test_user.id,
+        )
     )
     create_comment(CommentFactory(retrospective_method_id=2))
     create_comment(CommentFactory(retrospective_method_id=3))
@@ -35,13 +45,14 @@ def setup_create_comments(create_comment):
 class TestCommentRepository:
     class TestSave:
         # 現状Saveで更新するユースケースはないので、UPDATEのテストは省略
-        def test_create_comment(self, db: Session, create_comment, user_repo):
-            user_id = create_test_user(user_repo).id
-            comment: CommentModel = create_comment(CommentFactory(user_id=user_id))
+        def test_create_comment(self, db: Session, create_comment, setup_test_user):
+            comment: CommentModel = create_comment(
+                CommentFactory(user_id=setup_test_user.id)
+            )
 
             created_comment: CommentModel = db.query(CommentModel).filter_by(id=comment.id).one()  # type: ignore
             assert created_comment.retrospective_method_id == 1
-            assert created_comment.user_id == user_id
+            assert created_comment.user_id == setup_test_user.id
             assert created_comment.comment == "This is a valid comment."
 
         class TestWhenCommitError:
