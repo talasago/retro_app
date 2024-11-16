@@ -81,10 +81,10 @@ class TestCommentRepository:
 
                 assert db.rollback.call_count == 1  # type: ignore
 
-    class TestFind:
+    class TestFindAll:
         @pytest.fixture(scope="class")
         def sut(self, comment_repo: CommentRepository) -> Callable:
-            return comment_repo.find
+            return comment_repo.find_all
 
         class TestWhenThereIsRetrospectiveMethodId:
             class TestWhenThereAreMatchingComments:
@@ -135,10 +135,10 @@ class TestCommentRepository:
                     with pytest.raises(TypeError):
                         sut(conditions=conditions)
 
-    class TestFindBy:
+    class TestFindOne:
         @pytest.fixture(scope="class")
         def sut(self, comment_repo: CommentRepository) -> Callable:
-            return comment_repo.find_by
+            return comment_repo.find_one
 
         class TestWhenInvalidConditions:
             @pytest.mark.parametrize("conditions", [1, "invalid_conditions", None, []])
@@ -158,7 +158,7 @@ class TestCommentRepository:
             def test_return_comment_by_conditions(
                 self, sut, comment_repo: CommentRepository
             ):
-                comments = comment_repo.find()
+                comments = comment_repo.find_all()
 
                 conditions = {
                     "id": comments[0].id,

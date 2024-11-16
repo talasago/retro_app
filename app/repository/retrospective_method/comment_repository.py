@@ -47,8 +47,7 @@ class CommentRepository:
             self.__db.rollback()
             raise e
 
-    # 名前が違うかも、find_all
-    def find(self, conditions: CommentConditions = {}) -> list[CommentModel]:
+    def find_all(self, conditions: CommentConditions = {}) -> list[CommentModel]:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 
@@ -66,8 +65,7 @@ class CommentRepository:
         # ここでクエリ発行
         return query.all()
 
-    # find_oneという名前が良いかも
-    def find_by(self, conditions: CommentConditions = {}) -> CommentModel:
+    def find_one(self, conditions: CommentConditions = {}) -> CommentModel:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 

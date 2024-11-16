@@ -65,7 +65,7 @@ def get_comment(
 ):
     """コメント取得のエンドポイント。"""
 
-    comments = comment_repo.find(
+    comments = comment_repo.find_all(
         conditions={"retrospective_method_id": retrospective_method_id}
     )
 
@@ -91,7 +91,7 @@ def delete_comment(
     comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント削除のエンドポイント。"""
-    comment = comment_repo.find_by(
+    comment = comment_repo.find_one(
         conditions={
             "id": comment_id,
             "user_id": current_user.id,
