@@ -14,9 +14,8 @@ from tests.factories.retrospective_method.comment_factory import CommentFactory
 
 
 @pytest.fixture(scope="session")
-def create_comment(db: Session):
+def create_comment(comment_repo: CommentRepository):
     def _method(comment_model: CommentModel) -> CommentModel:
-        comment_repo = CommentRepository(db)
         comment_repo.save(comment_model)
         return comment_model
 
@@ -42,12 +41,13 @@ def setup_create_comments(create_comment, setup_test_user):
     create_comment(CommentFactory(retrospective_method_id=3))
 
 
+@pytest.fixture(scope="session")
+def comment_repo(db: Session) -> CommentRepository:
+    return CommentRepository(db)
+
+
 @pytest.mark.usefixtures("db")
 class TestCommentRepository:
-    @pytest.fixture(scope="class")
-    def comment_repo(self, db: Session) -> CommentRepository:
-        return CommentRepository(db)
-
     class TestSave:
         # 現状Saveで更新するユースケースはないので、UPDATEのテストは省略
         def test_create_comment(self, db: Session, create_comment, setup_test_user):
@@ -184,8 +184,8 @@ class TestCommentRepository:
 
     class TestDelete:
         @pytest.fixture(scope="class")
-        def sut(self, db: Session) -> Callable:
-            return CommentRepository(db).delete
+        def sut(self, comment_repo: CommentRepository) -> Callable:
+            return comment_repo.delete
 
         def test_delete_comment(self, sut, db: Session, create_comment):
             comment: CommentModel = create_comment(
