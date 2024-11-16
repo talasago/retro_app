@@ -187,12 +187,19 @@ class TestCommentRepository:
         def sut(self, comment_repo: CommentRepository) -> Callable:
             return comment_repo.delete
 
-        def test_delete_comment(self, sut, db: Session, create_comment):
-            comment: CommentModel = create_comment(
-                CommentFactory(
-                    retrospective_method_id=55, user_id=1, comment="delete comment"
+        @pytest.fixture(scope="class")
+        def setup_test_comment_for_delete(self, create_comment):
+            def _method() -> CommentModel:
+                return create_comment(
+                    CommentFactory(
+                        retrospective_method_id=55, user_id=1, comment="delete comment"
+                    )
                 )
-            )
+
+            return _method
+
+        def test_delete_comment(self, sut, db: Session, setup_test_comment_for_delete):
+            comment: CommentModel = setup_test_comment_for_delete()
             stmt = (
                 select(func.count())
                 .select_from(CommentModel)
@@ -203,3 +210,27 @@ class TestCommentRepository:
             sut(comment)
 
             assert db.execute(stmt).scalar() == 0
+
+        class TestWhenCommitError:
+            def test_expect_rollback(
+                self, db: Session, mocker, sut, setup_test_comment_for_delete
+            ):
+                """commit時にエラーが発生した場合、rollbackされることを確認する"""
+                comment: CommentModel = setup_test_comment_for_delete()
+                # commit時に強制的にエラーを発生させる
+                mocker.patch.object(
+                    db,
+                    "commit",
+                    side_effect=OperationalError(
+                        "Simulated OperationalError", None, None  # type: ignore
+                    ),
+                )
+
+                mocker.patch.object(
+                    db, "rollback"
+                )  # rollbackメソッドを呼び出されたか確認したいためモック
+
+                with pytest.raises(OperationalError):
+                    sut(comment=comment)
+
+                assert db.rollback.call_count == 1  # type: ignore
