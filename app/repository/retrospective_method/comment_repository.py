@@ -65,9 +65,7 @@ class CommentRepository:
         # ここでクエリ発行
         return query.all()
 
-    def find_by(
-        self, conditions: CommentConditions = {}
-    ) -> CommentModel:
+    def find_by(self, conditions: CommentConditions = {}) -> CommentModel:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 
