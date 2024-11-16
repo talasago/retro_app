@@ -66,20 +66,21 @@ class CommentRepository:
         return query.all()
 
     def find_by(
-        self, conditions: CommentConditions = {}, raise_exception=True
-    ) -> CommentModel | None:
+        self, conditions: CommentConditions = {}
+    ) -> CommentModel:
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 
-        if conditions == {} and raise_exception:
+        if conditions == {}:
             raise ValueError("conditions must be set")
 
         filters: list["BinaryExpression"] = [
             getattr(CommentModel, key) == value for key, value in conditions.items()
         ]
         stmt = select(CommentModel).filter(*filters)
+        # # データが複数見つかった時はどうする？1番目でいいのか？
         comment = self.__db.execute(stmt).scalars().first()
 
-        if raise_exception and comment is None:
+        if comment is None:
             raise RetroAppRecordNotFoundError("Record not found")
         return comment
