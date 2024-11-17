@@ -252,7 +252,6 @@ class TestCommentFunction:
                     assert response.json()["detail"][0]["msg"] == expected_data[1]
 
             class TestWhenInvalidCommentId:
-                @pytest.mark.skip(reason="まだ未実装")
                 def test_return_404(self, sut, tokens_of_logged_in_api_common_user):
                     response = sut(
                         access_token=tokens_of_logged_in_api_common_user[0],
@@ -262,4 +261,6 @@ class TestCommentFunction:
                     )
 
                     assert response.status_code == 404
-                    # assert response.json() == {"detail": "コメントが見つかりません。"}
+                    assert response.json() == {
+                        "detail": "指定されたコメントは存在しません。"
+                    }

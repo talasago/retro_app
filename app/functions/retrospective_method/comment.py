@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
+from app.errors.retro_app_error import RetroAppRecordNotFoundError
 from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
@@ -91,13 +92,19 @@ def delete_comment(
     comment_repo: "CommentRepository" = Depends(get_comment_repo),
 ):
     """コメント削除のエンドポイント。"""
-    comment = comment_repo.find_one(
-        conditions={
-            "id": comment_id,
-            "user_id": current_user.id,
-            "retrospective_method_id": retrospective_method_id,
-        }
-    )
+    try:
+        comment = comment_repo.find_one(
+            conditions={
+                "id": comment_id,
+                "user_id": current_user.id,
+                "retrospective_method_id": retrospective_method_id,
+            }
+        )
+    except RetroAppRecordNotFoundError as e:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": e.message},
+        )
 
     comment_repo.delete(comment)
 
