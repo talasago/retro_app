@@ -182,15 +182,84 @@ class TestCommentFunction:
 
             return _method
 
-        def test_return_204(
-            self, sut, tokens_of_logged_in_api_common_user, get_created_comments
-        ):
-            response = sut(
-                access_token=tokens_of_logged_in_api_common_user[0],
-                retrospective_method_id=6,
-                comment_id=get_created_comments()[0]["id"],
-            )
+        class TestWhenValidParam:
+            def test_return_204(
+                self, sut, tokens_of_logged_in_api_common_user, get_created_comments
+            ):
+                delete_target_comment_id: int = get_created_comments()[0]["id"]
 
-            assert_cors_headers(response)
-            assert response.json() == {"message": "コメントを削除しました。"}
-            # APIを使って削除されたか確認する
+                response = sut(
+                    access_token=tokens_of_logged_in_api_common_user[0],
+                    retrospective_method_id=6,
+                    comment_id=delete_target_comment_id,
+                )
+
+                assert_cors_headers(response)
+                assert response.json() == {"message": "コメントを削除しました。"}
+
+                comments_after_delete: list[dict] = get_created_comments()
+
+                assert delete_target_comment_id not in [
+                    comment["id"] for comment in comments_after_delete
+                ]
+
+        class TestWhenInvalidParam:
+            class TestWhenInvalidAccessToken:
+                def test_return_401(
+                    self,
+                    call_api_with_invalid_access_token_assert_401,
+                    sut,
+                ):
+                    call_api_with_invalid_access_token_assert_401(sut, comment_id=1)
+
+            class TestWhenInvalidRetrospectiveMethodId:
+                @pytest.mark.parametrize(
+                    # expected_dataに直接書いてないテスト観点
+                    # i18nに沿った日本語に変換されていること
+                    ["input_param", "expected_data"],
+                    [
+                        pytest.param(
+                            {"retrospective_method_id": "invalid", "comment_id": 1},
+                            # このパターンは実際にはフロントエンド側で発生しない想定
+                            [422, "有効な整数を入力してください。"],
+                            id="When CreateSchema error",
+                        ),
+                        pytest.param(
+                            {"retrospective_method_id": 1, "comment_id": None},
+                            [
+                                422,
+                                "有効な整数を入力してください。",
+                            ],  # このパターンは実際にはフロントエンド側で発生しない想定
+                            id="When retrospective_method_id is None",
+                        ),
+                    ],
+                )
+                def test_return_422_by_validation_error(
+                    self,
+                    sut,
+                    tokens_of_logged_in_api_common_user,
+                    input_param,
+                    expected_data,
+                ):
+                    response = sut(
+                        access_token=tokens_of_logged_in_api_common_user[0],
+                        retrospective_method_id=input_param["retrospective_method_id"],
+                        comment_id=input_param["comment_id"],
+                        is_assert_response_code_2xx=False,
+                    )
+
+                    assert response.status_code == expected_data[0]
+                    assert response.json()["detail"][0]["msg"] == expected_data[1]
+
+            class TestWhenInvalidCommentId:
+                @pytest.mark.skip(reason="まだ未実装")
+                def test_return_404(self, sut, tokens_of_logged_in_api_common_user):
+                    response = sut(
+                        access_token=tokens_of_logged_in_api_common_user[0],
+                        retrospective_method_id=6,
+                        comment_id=999,
+                        is_assert_response_code_2xx=False,
+                    )
+
+                    assert response.status_code == 404
+                    # assert response.json() == {"detail": "コメントが見つかりません。"}
