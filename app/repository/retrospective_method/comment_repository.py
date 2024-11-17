@@ -80,5 +80,7 @@ class CommentRepository:
         comment = self.__db.execute(stmt).scalars().first()
 
         if comment is None:
-            raise RetroAppRecordNotFoundError(CommentModel.__tablename__)
+            raise RetroAppRecordNotFoundError(
+                CommentModel.__tablename__, message="指定されたコメントは存在しません。"
+            )
         return comment

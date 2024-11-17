@@ -180,7 +180,7 @@ class TestCommentRepository:
                 with pytest.raises(RetroAppRecordNotFoundError) as e:
                     sut(conditions=conditions)
 
-                assert str(e.value) == "条件に合致するレコードは存在しません。"
+                assert str(e.value) == "指定されたコメントは存在しません。"
 
     class TestDelete:
         @pytest.fixture(scope="class")
