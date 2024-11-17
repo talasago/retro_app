@@ -72,7 +72,7 @@ def delete_comment_api(test_client):
             },
         )
         if is_assert_response_code_2xx:
-            assert response.status_code == 204
+            assert response.status_code == 200
         return response
 
     return _method

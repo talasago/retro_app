@@ -14,6 +14,7 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
+    ClientErrorResponseBody,
     DeleteCommentApiResponseBody,
     GetCommentApiResponseBody,
 )
@@ -83,7 +84,13 @@ def get_comment(
 @router.delete(
     "/{retrospective_method_id}/comment/{comment_id}",
     summary="レビューコメントを削除します。",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_200_OK,
+    response_model=DeleteCommentApiResponseBody,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ClientErrorResponseBody,
+        }
+    },
 )
 def delete_comment(
     retrospective_method_id: int,
@@ -103,12 +110,12 @@ def delete_comment(
     except RetroAppRecordNotFoundError as e:
         return JSONResponse(
             status_code=status.HTTP_404_NOT_FOUND,
-            content={"detail": e.message},
+            content=ClientErrorResponseBody(message=e.message).model_dump(),
         )
 
     comment_repo.delete(comment)
 
     return JSONResponse(
-        status_code=status.HTTP_204_NO_CONTENT,
+        status_code=status.HTTP_200_OK,
         content=DeleteCommentApiResponseBody().model_dump(),
     )

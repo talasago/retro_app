@@ -183,7 +183,7 @@ class TestCommentFunction:
             return _method
 
         class TestWhenValidParam:
-            def test_return_204(
+            def test_return_200(
                 self, sut, tokens_of_logged_in_api_common_user, get_created_comments
             ):
                 delete_target_comment_id: int = get_created_comments()[0]["id"]
@@ -262,5 +262,5 @@ class TestCommentFunction:
 
                     assert response.status_code == 404
                     assert response.json() == {
-                        "detail": "指定されたコメントは存在しません。"
+                        "message": "指定されたコメントは存在しません。"
                     }
