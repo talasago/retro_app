@@ -18,8 +18,9 @@ class RetroAppValueError(RetroAppBaseError):
 
 
 class RetroAppRecordNotFoundError(RetroAppBaseError):
-    def __init__(self, model_name: str):
-        message: str = "条件に合致するレコードは存在しません。"
+    def __init__(
+        self, model_name: str, message: str = "条件に合致するレコードは存在しません。"
+    ):
         super().__init__(message)
         self.message = message
         self.model_name = model_name

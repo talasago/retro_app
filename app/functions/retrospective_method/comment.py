@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
+from app.errors.retro_app_error import RetroAppRecordNotFoundError
 from app.functions.dependencies import (
     get_comment_repo,
     get_current_user,
@@ -13,6 +14,8 @@ from app.models.retrospective_method.comment_model import CommentModel
 from app.models.user_model import UserModel
 from app.schemas.http_response_body_user_schema import (
     AddCommentApiResponseBody,
+    ClientErrorResponseBody,
+    DeleteCommentApiResponseBody,
     GetCommentApiResponseBody,
 )
 from app.schemas.retrospective_method.comment_schema import CommentCreate, CommentSchema
@@ -64,7 +67,7 @@ def get_comment(
 ):
     """コメント取得のエンドポイント。"""
 
-    comments = comment_repo.find(
+    comments = comment_repo.find_all(
         conditions={"retrospective_method_id": retrospective_method_id}
     )
 
@@ -75,4 +78,44 @@ def get_comment(
 
     return JSONResponse(
         content=GetCommentApiResponseBody(comments=result_comments).model_dump()
+    )
+
+
+@router.delete(
+    "/{retrospective_method_id}/comment/{comment_id}",
+    summary="レビューコメントを削除します。",
+    status_code=status.HTTP_200_OK,
+    response_model=DeleteCommentApiResponseBody,
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "model": ClientErrorResponseBody,
+        }
+    },
+)
+def delete_comment(
+    retrospective_method_id: int,
+    comment_id: int,
+    current_user: "UserModel" = Depends(get_current_user),
+    comment_repo: "CommentRepository" = Depends(get_comment_repo),
+):
+    """コメント削除のエンドポイント。"""
+    try:
+        comment = comment_repo.find_one(
+            conditions={
+                "id": comment_id,
+                "user_id": current_user.id,
+                "retrospective_method_id": retrospective_method_id,
+            }
+        )
+    except RetroAppRecordNotFoundError as e:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content=ClientErrorResponseBody(message=e.message).model_dump(),
+        )
+
+    comment_repo.delete(comment)
+
+    return JSONResponse(
+        status_code=status.HTTP_200_OK,
+        content=DeleteCommentApiResponseBody().model_dump(),
     )

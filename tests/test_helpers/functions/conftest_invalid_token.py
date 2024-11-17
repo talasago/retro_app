@@ -19,11 +19,11 @@ def call_api_with_invalid_access_token_assert_401():
         None
     """
 
-    def _method(method_for_calling_api: Callable) -> None:
+    def _method(method_for_calling_api: Callable, **kwargs) -> None:
         """デコードしたペイロードのuuidがuuidの形式でない場合、エラーを返す"""
         token: str = generate_test_token(TokenType.ACCESS_TOKEN, "dummy")
         response: Response = method_for_calling_api(
-            access_token=token, is_assert_response_code_2xx=False
+            access_token=token, is_assert_response_code_2xx=False, **kwargs
         )
 
         assert response.status_code == 401
