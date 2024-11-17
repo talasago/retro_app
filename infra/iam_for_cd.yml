@@ -146,8 +146,10 @@ Resources:
           - "s3:PutBucketPolicy"
           - "s3:PutEncryptionConfiguration"
           - "s3:PutObject"
+          - "s3:PutBucketVersioning"
           - "ssm:GetParameter"
           - "ssm:GetParameters"
+          - "ssm:putParameter"
           Resource: "*" 
           # TODO: セキュリティを考慮してリソースは指定した方が良い。
           # が、リソースごとにarnを指定する必要があり、その為にymlを変更するのが手間なので
