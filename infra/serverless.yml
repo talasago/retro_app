@@ -112,6 +112,9 @@ functions:
       - http:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
           method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment/{comment_id}
+          method: ANY
 
 resources:
   Resources:
