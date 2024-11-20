@@ -11,6 +11,7 @@ if TYPE_CHECKING:
 from app.errors.retro_app_error import (
     RetroAppRecordNotFoundError,
 )
+from app.repository.repository_base import RepositoryBase
 
 
 class CommentConditions(TypedDict, total=False):
@@ -23,7 +24,7 @@ class CommentConditions(TypedDict, total=False):
     # updated_at: "datetime"
 
 
-class CommentRepository:
+class CommentRepository(RepositoryBase):
     def __init__(self, db: Session):
         self.__db: Session = db
 

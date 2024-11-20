@@ -15,8 +15,10 @@ from app.models.user_model import UserModel
 if TYPE_CHECKING:
     from uuid import UUID
 
+from app.repository.repository_base import RepositoryBase
 
-class UserRepository:
+
+class UserRepository(RepositoryBase):
     def __init__(self, db: Session):
         self.__db: Session = db
 
@@ -49,7 +51,7 @@ class UserRepository:
         self, column: str, value: Union[str, "UUID", int], raise_exception=True
     ) -> UserModel | None:
         """条件に合致するレコードを検索して返す"""
-
+        # FIXME:Baseクラスの引数と違うので修正したい。
         # FIXME:columnはstg型ではなく、Modelのカラム名を指定した方が良いかも
 
         if raise_exception is None:
