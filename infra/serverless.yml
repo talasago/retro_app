@@ -4,6 +4,7 @@ frameworkVersion: '>=4.0.0 <5.0.0'
 plugins:
   - serverless-python-requirements
   - serverless-api-gateway-throttling
+  - serverless-domain-manager 
 
 custom:
   pythonRequirements:
@@ -36,6 +37,13 @@ custom:
       - subnet-0214fe79fe7b89a1a
       - subnet-0047acbc1ef639c16
       - subnet-0fbe6af2f37be64b1
+  customDomain:
+    domainName: ${ssm:api_domain_name} 
+    stage: ${self:provider.stage}
+    createRoute53Record: false
+    endpointType: REGIONAL
+    certificateArn: ${ssm:acm_certificate_arn} 
+    securityPolicy: tls_1_2
 
 package:
   patterns:
