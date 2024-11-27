@@ -9,7 +9,7 @@ def is_local_execution() -> bool:
 
 
 def is_ci_execution() -> bool:
-    return os.getenv("GITHUB_ACTIONS") is True
+    return os.getenv("GITHUB_ACTIONS") == "true"
 
 
 def load_env_for_local() -> None:
