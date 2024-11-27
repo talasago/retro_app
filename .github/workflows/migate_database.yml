@@ -19,6 +19,18 @@ jobs:
         id: python_version
         run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
 
+      - name: Set POSTGRES_DATABASE based on branch
+        id: set_database
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE_PROD }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" == "develop" ]; then
+            echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE_DEV }}" >> $GITHUB_ENV
+          else
+            echo "This workflow can only be run on 'main' or 'develop' branches."
+            exit 1
+          fi
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -57,12 +69,11 @@ jobs:
       - name: migrate database
         run: pipenv run alembic upgrade head
         env:
-          # TODO:本番環境と開発環境で環境変数を分ける必要あり。
-          # host以外はssm見ても良い気がする。
+          # MEMO:host以外はssm見ても良い気がする。
           POSTGRES_HOST: ${{secrets.POSTGRES_HOST}}
           POSTGRES_USER: ${{secrets.POSTGRES_USER}}
           POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
-          POSTGRES_DATABASE: ${{secrets.POSTGRES_DATABASE}}
+          POSTGRES_DATABASE: ${{ env.POSTGRES_DATABASE }}
 
       # migrate失敗してもportは閉じる
       - name: Put original firewall configuration
