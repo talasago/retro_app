@@ -1,0 +1,8 @@
+**/node_modules/
+.serverless/
+requirements.txt
+**/__pycache__/
+
+# フロント用
+client/dist/
+client/build/

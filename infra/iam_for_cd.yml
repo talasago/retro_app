@@ -1,0 +1,161 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "manage iam for cd"
+Resources:
+  IAMRoleGithubActionsMigrateDatabase:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: "github_actions_migrate_database"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+        - Effect: "Allow"
+          Principal: 
+            Federated: 
+              Fn::Sub: "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+          Action: "sts:AssumeRoleWithWebIdentity"
+          Condition: 
+            StringEquals: 
+              token.actions.githubusercontent.com:sub: 
+              - "repo:talasago/retro_app:ref:refs/heads/main"
+              - "repo:talasago/retro_app:ref:refs/heads/develop"
+      MaxSessionDuration: 3600
+      ManagedPolicyArns: 
+      - !Ref IAMManagedPolicy
+      Description: "Resources created by CFn"
+
+  IAMRoleGithubActionsDeployLambdaFunction:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Path: "/"
+      RoleName: "github_actions_deploy_lambda_function"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+        - Effect: "Allow"
+          Principal: 
+            Federated: 
+              Fn::Sub: "arn:aws:iam::${AWS::AccountId}:oidc-provider/token.actions.githubusercontent.com"
+          Action: "sts:AssumeRoleWithWebIdentity"
+          Condition: 
+            StringEquals: 
+              token.actions.githubusercontent.com:sub: 
+              - "repo:talasago/retro_app:ref:refs/heads/main"
+              - "repo:talasago/retro_app:ref:refs/heads/develop"
+      MaxSessionDuration: 3600
+      Description: "Resources created by CFn"
+
+  IAMManagedPolicy:
+    Type: "AWS::IAM::ManagedPolicy"
+    Properties:
+      ManagedPolicyName: "github_actions_migrate_database2"
+      Path: "/"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+        - Sid: "VisualEditor0"
+          Effect: "Allow"
+          Action: 
+          - "lightsail:PutInstancePublicPorts"
+          - "lightsail:GetInstancePortStates"
+          Resource: "*"
+
+  IAMPolicy:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      Roles: 
+        - !Ref IAMRoleGithubActionsDeployLambdaFunction
+      PolicyName: "github_actions_deploy_lambda_function"
+      PolicyDocument: 
+        Version: "2012-10-17"
+        Statement: 
+        - Effect: "Allow"
+          Action: 
+          - "apigateway:DELETE"
+          - "apigateway:GET"
+          - "apigateway:PATCH"
+          - "apigateway:POST"
+          - "apigateway:PUT"
+          - "apigateway:AddCertificateToDomain"
+          - "apigateway:RemoveCertificateFromDomain"
+          - "cloudformation:CancelUpdateStack"
+          - "cloudformation:CreateChangeSet"
+          - "cloudformation:CreateStack"
+          - "cloudformation:DeleteChangeSet"
+          - "cloudformation:DeleteStack"
+          - "cloudformation:DescribeChangeSet"
+          - "cloudformation:DescribeStackEvents"
+          - "cloudformation:DescribeStackResource"
+          - "cloudformation:DescribeStackResources"
+          - "cloudformation:DescribeStacks"
+          - "cloudformation:ExecuteChangeSet"
+          - "cloudformation:GetTemplate"
+          - "cloudformation:ListStackResources"
+          - "cloudformation:ListStacks"
+          - "cloudformation:SetStackPolicy"
+          - "cloudformation:UpdateStack"
+          - "cloudformation:UpdateTerminationProtection"
+          - "cloudformation:ValidateTemplate"
+          - "ec2:DescribeSecurityGroups"
+          - "ec2:DescribeSubnets"
+          - "ec2:DescribeVpcs"
+          - "iam:AttachRolePolicy"
+          - "iam:CreateRole"
+          - "iam:DeleteRole"
+          - "iam:DeleteRolePolicy"
+          - "iam:DetachRolePolicy"
+          - "iam:Get*"
+          - "iam:List*"
+          - "iam:PassRole"
+          - "iam:PutRolePolicy"
+          - "iam:TagRole"
+          - "iam:UntagRole"
+          - "lambda:AddPermission"
+          - "lambda:CreateAlias"
+          - "lambda:CreateFunction"
+          - "lambda:DeleteAlias"
+          - "lambda:DeleteFunction"
+          - "lambda:Get*"
+          - "lambda:InvokeFunction"
+          - "lambda:List*"
+          - "lambda:PublishVersion"
+          - "lambda:RemovePermission"
+          - "lambda:TagResource"
+          - "lambda:UntagResource"
+          - "lambda:UpdateAlias"
+          - "lambda:UpdateFunctionCode"
+          - "lambda:UpdateFunctionConfiguration"
+          - "logs:CreateLogGroup"
+          - "logs:DeleteLogGroup"
+          - "logs:DeleteResourcePolicy"
+          - "logs:DeleteRetentionPolicy"
+          - "logs:Describe*"
+          - "logs:Get*"
+          - "logs:List*"
+          - "logs:PutResourcePolicy"
+          - "logs:PutRetentionPolicy"
+          - "logs:TagLogGroup"
+          - "logs:UntagLogGroup"
+          - "s3:CreateBucket"
+          - "s3:DeleteBucket"
+          - "s3:DeleteBucketPolicy"
+          - "s3:DeleteObject"
+          - "s3:GetBucketPolicy"
+          - "s3:GetEncryptionConfiguration"
+          - "s3:GetObject"
+          - "s3:ListBucket"
+          - "s3:PutBucketAcl"
+          - "s3:PutBucketPolicy"
+          - "s3:PutEncryptionConfiguration"
+          - "s3:PutObject"
+          - "s3:PutBucketVersioning"
+          - "ssm:GetParameter"
+          - "ssm:GetParameters"
+          - "ssm:putParameter"
+          - "acm:ListCertificates"
+          - "acm:DescribeCertificate"
+          Resource: "*" 
+          # TODO: セキュリティを考慮してリソースは指定した方が良い。
+          # が、リソースごとにarnを指定する必要があり、その為にymlを変更するのが手間なので
+          # 対応は後回し。以下例。
+          #  - !Sub 'arn:aws:iam:*:${AWS::AccountId}:*retro-app-*'

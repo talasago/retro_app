@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "serverless": "^4.2.5",
+    "serverless-api-gateway-throttling": "^2.0.3",
+    "serverless-domain-manager": "^8.0.0",
+    "serverless-python-requirements": "^6.1.1"
+  }
+}

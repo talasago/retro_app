@@ -1,0 +1,39 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+fastapi = "*"
+mangum = "*"
+sqlalchemy = "*"
+alembic = "*" # これはlambdaにデプロイする必要ないからdevでもいいかもな
+passlib = {version = "*", extras = ["bcrypt"]}
+python-multipart = "*"
+psycopg2-binary = "*"
+pydantic-i18n = "*"
+boto3 = "*"
+pyjwt = "*"
+cryptography = "*"
+
+[dev-packages]
+flake8 = "*"
+flake8-quotes = "*"
+uvicorn = {version = "*", extras = ["standard"]}
+pytest = "*"
+httpx = "*"
+factory-boy = "*"
+mypy = "*"
+ruff = "*"
+black = "*"
+pytest-mock = "*"
+pydeps = "*"
+python-dotenv = "*"
+boto3-stubs = {version = "*", extras = ["ssm"]}
+pytest-asyncio = "*"
+
+[requires]
+python_version = "3.10"
+
+[scripts]
+format_and_lint = "bash -c '(pipenv run black app/ tests/ || true) && (pipenv run ruff check app/ tests/ --fix || true) && pipenv run mypy app/ tests/'"

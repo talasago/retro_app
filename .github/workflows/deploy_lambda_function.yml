@@ -1,0 +1,81 @@
+name: deploy_lambda_function
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: Deploy lambda function
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Read Node.js version from .nvmrc
+      id: nvmrc
+      run: echo "node_version=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ steps.nvmrc.outputs.node_version }}
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
+    - name: Read python version from .python-version
+      id: python_version
+      run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ steps.python_version.outputs.python_version }}
+        # cache: pip
+
+    - name: Install pipenv
+      run: pip install pipenv
+
+    # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      with:
+        platforms: linux/arm64
+
+    # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/arm64
+
+    - name: Assume role
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DEPLOY_LAMBDA_IAM_ROLE_NAME }}
+        aws-region: ap-northeast-1
+
+    - name: sls deploy
+      env:
+        SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+
+      # TODO: 別ジョブにしたい。set-upの次に行いたい。ただ、やるとするとcacheを復元する手順とかが必要で、処理時間的に分けるメリットがなさそうと判断して一旦対応しない、
+      run: |
+        cd ./infra/
+        pipenv requirements > requirements.txt
+        npx serverless create_domain
+        npx sls deploy
+      # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ

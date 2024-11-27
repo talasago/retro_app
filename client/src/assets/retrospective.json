@@ -1,0 +1,743 @@
+{
+  "retrospectives": [
+    {
+      "title": "Norm Kerth の最優先指令",
+      "easyToUseScenes": [
+        1
+      ],
+      "wayOfProceeding": "ふりかえりを始めるまえに、全員で読み上げる\n「非難なし（no blame）」ルールに賛同できるか、\n全員に問う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=19",
+      "id": 1
+    },
+    {
+      "title": "DPA",
+      "easyToUseScenes": [
+        1
+      ],
+      "wayOfProceeding": "ふりかえりをどんな雰囲気でやりたいか？を\n書いて共有し、全員が合意できるものを選ぶ\nその雰囲気にするためにどんなことをするか？を\n書いて共有し、全員が合意できるものを選ぶ",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=20",
+      "id": 2
+    },
+    {
+      "title": "チームの心得",
+      "easyToUseScenes": [
+        1
+      ],
+      "wayOfProceeding": "「チームの心得」をみんなで考えて付箋に書く\n「チームの心得」に投票する。全員がいいと\n思ったものを選ぶ\n「チームの心得」を全員で復唱する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=21",
+      "id": 3
+    },
+    {
+      "title": "あたりまえ探し",
+      "easyToUseScenes": [
+        1
+      ],
+      "wayOfProceeding": "あたりまえ体操（YouTube）を全員で見る\nチームにとってあたりまえなことを付箋で挙げる\n全員で共有して、リスト化する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=22",
+      "id": 4
+    },
+    {
+      "title": "信号機",
+      "easyToUseScenes": [
+        1,
+        3,
+        4,
+        5
+      ],
+      "wayOfProceeding": "ふりかえりのテーマについて、ふりかえりの最初\nと最後に、今の心境を信号機の色で表す\n最初と最後の付箋の変化を見て、チームの変化を\n話し合う\n不安が残っていたら、不安を解消する活動の時間\nを設定し、別途話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=23",
+      "id": 5
+    },
+    {
+      "title": "Good & New",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "Good（よかったこと）を貼る or 言う\nNew（新しい気づき・発見）を貼る or 言う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=24",
+      "id": 6
+    },
+    {
+      "title": "Keep + W（わかったこと）",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "Keepを思い出してバラバラに貼る\nKeepを共有する\nKeepからわかったことを書き出す\nわかったことを共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=25",
+      "id": 7
+    },
+    {
+      "title": "一言チェックイン（亜種）",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "テーマを決めて一言ずつ話す\n今の気持ちを漢字一文字で表す\n今週の感触を三行で表す\n今週の感想を動物で表す\n今週のトピックを5-7-5で表す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=26",
+      "id": 8
+    },
+    {
+      "title": "発想ゲーム／連想ゲーム",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "マイク代わりにペンを用意する\n何かテーマを決める\nペンを持っている人がテーマについて短く話し、\n次の人にペンを回す\n時間の限り話し続ける",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=27",
+      "id": 9
+    },
+    {
+      "title": "タイムラインのハピネスレーダー",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "3種類の顔文字と、時系列を書く\n時系列ごとにイベントを並べて、顔文字の場所\nに付箋を表現\n付箋を眺めて話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=28",
+      "id": 10
+    },
+    {
+      "title": "デイリーハッスル",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "デイリーハッスル（日々感じている不愉快な\n出来事や心配事）をひたすら付箋に書く\nみんなで共有する\nどうデイリーハッスルを解消できるか考える",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=29",
+      "id": 11
+    },
+    {
+      "title": "今日のトレンド",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "今日のトレンド（面白かった、楽しかった）を\n思い出す\nトレンドを貼って共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=30",
+      "id": 12
+    },
+    {
+      "title": "タイムライン（イベント別）",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "時系列順×イベント別に出来事を並べる\n出来事は事実と感情を合わせて書く\n並べた出来事をみんなで共有して掘り下げる",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=31",
+      "id": 13
+    },
+    {
+      "title": "感情グラフ",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "時系列で感情の高低に合わせて線を引く\n感情の高低の変化があった部分や、その理由\nなどを全員で共有する\nチームの変化や傾向を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=32",
+      "id": 14
+    },
+    {
+      "title": "チームストーリー（過去）",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "①事実を時系列順に書き、共有する\n②続けることを書き、①の近くに貼り共有する\n③避けることを書き、①の近くに貼り共有する\n④コミュニケーション・コラボレーションした\nことを書き、②③の近くに貼り共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=33",
+      "id": 15
+    },
+    {
+      "title": "喜、怒、哀",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "喜、怒、哀それぞれに関して思い浮かんだ\n出来事を付箋に書く\n共有してグルーピングする\n気付いた事や傾向・パターンなどを話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=34",
+      "id": 16
+    },
+    {
+      "title": "カラーコードドット",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "タイムライン上で、感情や熱量が上がったもの\n下がったものにドットを付ける\nドットのついた出来事が、なぜ「上がったか」\n「下がったか」を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=35",
+      "id": 17
+    },
+    {
+      "title": "ストレングス・トーク",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "起こった出来事と、自分・チームの行動を話し\n合う\n行動を深く掘り下げる（どんな思考が浮かんだ\nか、どんな感情になったか、身体の感覚がどう\n変化したか）\n隠れた強みを4タイプで分類する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=36",
+      "id": 18
+    },
+    {
+      "title": "小さなカイゼンアイデア",
+      "easyToUseScenes": [
+        3
+      ],
+      "wayOfProceeding": "ブレインストーミングの4原則（左図）を伝える\n1%でも変化を起こせるアイデアを、とにかく\nたくさん挙げて共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=37",
+      "id": 19
+    },
+    {
+      "title": "斜に構える、構えないを繰り返す",
+      "easyToUseScenes": [
+        3
+      ],
+      "wayOfProceeding": "ある物事に対して、斜に構えて（穿った見方\nで）コメントをする\n今度は、斜に構えないで（素直に）コメントを\nする\nこれを繰り返す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=38",
+      "id": 20
+    },
+    {
+      "title": "Starfish",
+      "easyToUseScenes": [
+        3
+      ],
+      "wayOfProceeding": "Keep（続けるもの）を挙げる\nLess of（減らすもの）を挙げる\nStop（やめるもの）を挙げる\nMore of（増やすもの）を挙げる\nStart（はじめるもの）を挙げる",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=39",
+      "id": 21
+    },
+    {
+      "title": "Small Starfish",
+      "easyToUseScenes": [
+        3
+      ],
+      "wayOfProceeding": "Keep（続けるもの）を挙げる\nLess of（減らすもの、やめるもの）を挙げる。\nKeepから派生でもよい\nMore of（増やすもの、はじめるもの）を挙げる。\nKeepから派生でもよい",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=40",
+      "id": 22
+    },
+    {
+      "title": "5つのなぜ",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "物事の要因を一段階ずつ掘り下げる\n一番下の要因（真因）を見つける\n真因の中で最も影響の大きいものを見つける",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=41",
+      "id": 23
+    },
+    {
+      "title": "Celebration Grid",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "成功・失敗×ミス・実験・プラクティスの6分類\nで付箋に出来事を書き、共有する\n学びを話し合い、祝い合う\n傾向を見てアクションを検討する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=42",
+      "id": 24
+    },
+    {
+      "title": "学びと成長",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "学びを思い出して貼り付ける\n学びを共有する\n成長したこと（または今後の成長）を書く\n成長を共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=43",
+      "id": 25
+    },
+    {
+      "title": "Win / Learn / Try",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "Win（成果・なしとげたこと）を書いて話し合う\nLearn（学び）を書いて話し合う\nWin・LearnからTry（次につなげたい行動）を\n書いて話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=44",
+      "id": 26
+    },
+    {
+      "title": "Fun / Done / Learn",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "Fun, Done, Learnをそれぞれ挙げて貼って共有\n傾向を話し合う\n今後どうしたいかを話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=45",
+      "id": 27
+    },
+    {
+      "title": "Fun / Learn",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "チームの出来事を挙げてFun, Learnの軸で分類\n傾向を話し合う\n今後どうしたいかを話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=46",
+      "id": 28
+    },
+    {
+      "title": "気になっていること",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "以下の順に書いて話し合う\n①今気になっていること\n②それを胸の内にしまっていたらどうなるか\n③それを誰かと共有しているか\n④どのような行動に起こすか",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=47",
+      "id": 29
+    },
+    {
+      "title": "SMARTな目標",
+      "easyToUseScenes": [
+        4
+      ],
+      "wayOfProceeding": "アクションをSMARTのフレームワークに沿って\n具体化する\nSMARTすべてに当てはまらなくてもOK",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=48",
+      "id": 30
+    },
+    {
+      "title": "アクションのフォローアップ",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "過去のアクションを Added（追加されたばかり）,Doing（実行中）,Pending（保留中）,Dropped（行われなくなった）,Closed（完了）で分類\nアクションを見直し、次どうするかを決める",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=49",
+      "id": 31
+    },
+    {
+      "title": "555",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "グループに分かれて、グループごとに話をする\n話をした内容はそのままにして、グループを\n入れ替える\n入れ替わった先で、話をさらに膨らませる",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=50",
+      "id": 32
+    },
+    {
+      "title": "KPT",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "チームに起こった出来事を話し合う\nKeep（続けること）を話し合う\nProblem（問題・課題）を話し合う\nTry（試したいこと）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=51",
+      "id": 33
+    },
+    {
+      "title": "KPTA",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "チームに起こった出来事を話し合う\nKeep（続けること）を話し合う\nProblem（問題・課題）を話し合う\nTry（試したいこと）を話し合う\nAction（やること）を決める",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=52",
+      "id": 34
+    },
+    {
+      "title": "お気持ちから始めるKPT",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "「今のお気持ち」を話し合う\nKeep（続けること）を話し合う\nProblem（問題・課題）を話し合う\nTry（試したいこと）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=53",
+      "id": 35
+    },
+    {
+      "title": "YWT",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Y（やったこと）を話し合う\nW（わかったこと）を話し合う\nT（つぎやること）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=55",
+      "id": 36
+    },
+    {
+      "title": "YWTM",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Y（やったこと）を話し合う\nW（わかったこと）を話し合う\nT（つぎやること）を話し合う\nM（メリット）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=56",
+      "id": 37
+    },
+    {
+      "title": "YOW",
+      "easyToUseScenes": [
+        2
+      ],
+      "wayOfProceeding": "Y（やったこと）を考えて付箋に書く\nO（おこったこと）を考えて付箋に書く\nW（わかったこと）を考えて付箋に書く\nYOWについてみんなで話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=57",
+      "id": 38
+    },
+    {
+      "title": "実験・練習",
+      "easyToUseScenes": [
+        3,
+        4
+      ],
+      "wayOfProceeding": "「実験」または「練習」のアイデアを挙げる\nアイデアを共有して、やりたいものを決める\n「実験」成功するかわからないけれど、\nチャレンジしてみたいもの\n「練習」結果が見えているが、\nうまくなりたいもの",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=58",
+      "id": 39
+    },
+    {
+      "title": "Good, Bad, Next",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Good（うまくいったこと）を共有する\nBad（うまくいかなかったこと）を共有する\nNext（つぎにどうするか）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=59",
+      "id": 40
+    },
+    {
+      "title": "Good, Bad, Ideas, Action",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Good（うまくいったこと）を共有する\nBad（うまくいかなかったこと）を共有する\nIdeas（アイデア）を話し合う\nAction（アクション）を話し合って具体化する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=60",
+      "id": 41
+    },
+    {
+      "title": "Good, Bad, Change",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Good（うまくいったこと）を共有する\nBad（うまくいかなかったこと）を共有する\nChange（変えること）を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=61",
+      "id": 42
+    },
+    {
+      "title": "ORID",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Objective Question（事実）を付箋に貼る\nRからReflective Question（感情）を引き出す\nIからInterpretative Question（学び）を引き出す\nDからDecision Question（アクション）を引き出す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=62",
+      "id": 43
+    },
+    {
+      "title": "4Ls",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Liked（好きなもの）を挙げて共有する\nLearned（学び・教訓）を挙げて共有する\nLacked（足りないもの）を挙げて共有する\nLonged for （望むもの）を挙げてアクションを\n決める",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=63",
+      "id": 44
+    },
+    {
+      "title": "3Ls",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Liked（好きなもの）を挙げて共有する\nLearned（学び・教訓）を挙げて共有する\nLonged for（望むもの）を挙げてアクションを\n決める",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=64",
+      "id": 45
+    },
+    {
+      "title": "FLAP",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Accomplishment（成果）を話す\nLesson Learned（学び・教訓）を話す\nProblem（課題）を話す\nFuture Concerned（将来の懸念）を話す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=65",
+      "id": 46
+    },
+    {
+      "title": "フォースフィールドアナリシス",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "分析する問題や変更（アクション）を決める\nそれをサポートする要因と、抑制する要因を\n挙げる。線の太さがフォースの強さを表す\nサポートをどのように強められるか、抑制を\nどのように弱められるかを議論する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=66",
+      "id": 47
+    },
+    {
+      "title": "FMEA",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Failure（問題）を挙げる\nAnalysis（原因）を探る\nEvaluation（重大度・再発率）を定義する\nAction（アクション）を検討する\n効果をVerification（検証）する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=67",
+      "id": 48
+    },
+    {
+      "title": "クネビンフレームワーク",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "クネビンフレームワーク（単純・困難・複雑・\nカオス・無秩序）に沿って、チームの問題を分\n類する\n問題を話し合い、深堀りする\nアプローチすべき問題を話し合う\n問題に対する一歩目のアクションを決める",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=68",
+      "id": 49
+    },
+    {
+      "title": "業務日誌・日報・日記",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "好きな方法で日記を書く\n誰かに見せたり、コメントしあったりする",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=69",
+      "id": 50
+    },
+    {
+      "title": "Six Thinking Hats",
+      "easyToUseScenes": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "wayOfProceeding": "帽子を被り替えながら議論を進めていく\n（例）青（テーマ）→白（事実）→黄（ポジティブ）→黒（ネガティブ）→赤（感情）→緑（アイデア）→青（決定）",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=70",
+      "id": 51
+    },
+    {
+      "title": "KPT as ART",
+      "easyToUseScenes": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "K, P, T を思い思いに書いていく\nアートする",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=71",
+      "id": 52
+    },
+    {
+      "title": "ポジティブ星人",
+      "easyToUseScenes": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Norm Kerthの最優先指令を読む\n「ポジティブ星人からの言葉」を伝える\nみんなでポジティブ星人になりきる\n「お祝い」をテーマにアイデアを話し合う\n「成功の種」をテーマにアイデアを話し合う\n「どの種をどんな風に育てるか」を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=72",
+      "id": 53
+    },
+    {
+      "title": "Lean Coffee",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "テーマを個別に書いて、みんなに共有する\nテーマに投票して並び替え、Readyに入れる\n一番上のテーマから話し合う。7分議論したら、\n継続するか投票する。満場一致の場合は+7分、\n過半数の場合は+3分。話し終わったら\nDiscussedに入れる\nふりかえりの時間いっぱいまで繰り返す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=73",
+      "id": 54
+    },
+    {
+      "title": "闇鍋",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "箱から1枚付箋を引いて、そのテーマで話す\n一定時間が経ったら次のテーマへ",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=74",
+      "id": 55
+    },
+    {
+      "title": "Blokus",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "表を準備する\nふりかえりの内容をマスに埋めたら、自分の色に\nする\n他の人の内容にリプライしたら、リプライ先も\n自分の色にする",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=75",
+      "id": 56
+    },
+    {
+      "title": "フィッシュボウル",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "中央に数人集まって、話し合う\n周りの人は話を聞いていて、話したいときに\n中央へ\n聞きたくなったら周りに行く",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=76",
+      "id": 57
+    },
+    {
+      "title": "ポジティブふりかえりマッピング",
+      "easyToUseScenes": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "Norm Kerthの最優先指令,No Blameルールを話す\n今週の素晴らしかった点を付箋に3枚書く\n全カードを読み上げたあと、黙って分類する\nもっとよいやり方を考え、付箋に3枚以上書く\n最も重要なものに投票する\n実験する内容をグループ別に議論する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=77",
+      "id": 58
+    },
+    {
+      "title": "感謝",
+      "easyToUseScenes": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "wayOfProceeding": "「○○さん、○○をしてくれてありがとう」\nと思いついた人から感謝を伝える\n感謝の言葉が出てこなくなるまで行う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=78",
+      "id": 59
+    },
+    {
+      "title": "Kudo Cards",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "日ごろからKudo Cards（感謝や賞賛）を書き溜めておく\n壁に貼ってふりかえりに使う（Kudo Wall）\n箱に入れてふりかえりに使う（Kudo Box）",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=79",
+      "id": 60
+    },
+    {
+      "title": "Kudo Wall",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "日ごろからKudo Cards（感謝や賞賛）を書き\n溜めておく\n壁に貼っておく\nふりかえりの時に壁を見て、みんなで祝い合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=80",
+      "id": 61
+    },
+    {
+      "title": "Kudo Box",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "日ごろからKudo Cards（感謝や賞賛）を書き\n溜めて、Boxに入れておく\nふりかえりの時にBoxを空けて、Cardを\n受け取った人を祝い合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=81",
+      "id": 62
+    },
+    {
+      "title": "Happiness Door",
+      "easyToUseScenes": [
+        5
+      ],
+      "wayOfProceeding": "4段階（天気や顔文字など）の絵をドアに描く\n好きなタイミングまたはワークの終了時に、\n4段階の絵に沿って、感想の付箋を書いて貼る\n付箋の中身は書いてもいいし、書かなくてもよい",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=82",
+      "id": 63
+    },
+    {
+      "title": "+/Δ",
+      "easyToUseScenes": [
+        3,
+        5
+      ],
+      "wayOfProceeding": "＋（良かったこと、うまくいったこと）と\nΔ（カイゼンしたいこと）を思いついた人から\n発言し、ホワイトボードに書き出していく\n一定時間が経過するか、＋またはΔのどちらかが\n一定数に達したら終了する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=83",
+      "id": 64
+    },
+    {
+      "title": "温度計",
+      "easyToUseScenes": [
+        5
+      ],
+      "wayOfProceeding": "感謝、気づき、興味、提案、希望の5つの問いに\n順に答えていく\n1つの問いで意見が出なくなるまで対話を続け、\nしばらく待っても意見が出ないのであれば次の\n問いに進む",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=84",
+      "id": 65
+    },
+    {
+      "title": "レトロスペクティブツアー",
+      "easyToUseScenes": [
+        5
+      ],
+      "wayOfProceeding": "チームでふりかえりした結果を、別のチームに\n伝える\n聞いていたチームは質問やフィードバックをする\n色んなチームの話を聞きに行く",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=85",
+      "id": 66
+    },
+    {
+      "title": "みんぐる",
+      "easyToUseScenes": [
+        1,
+        2
+      ],
+      "wayOfProceeding": "2人のペアを作って一人30秒で話す\n2人で話し合ったら、手が空いた別の人を探す\n新しいペアでまた一人30秒で話す\n繰り返す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=86",
+      "id": 67
+    },
+    {
+      "title": "360度感謝",
+      "easyToUseScenes": [
+        1,
+        5
+      ],
+      "wayOfProceeding": "一人に対して、全員から感謝を伝える\n伝え終わったら、次の人にバトンタッチ\nこれを全員繰り返す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=87",
+      "id": 68
+    },
+    {
+      "title": "360度フィードバック",
+      "easyToUseScenes": [
+        1,
+        5
+      ],
+      "wayOfProceeding": "一人に対して、全員からフィードバックを\n伝える\n伝え終わったら、次の人にバトンタッチ\nこれを全員繰り返す",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=88",
+      "id": 69
+    },
+    {
+      "title": "チームストーリー（未来）",
+      "easyToUseScenes": [
+        2,
+        3
+      ],
+      "wayOfProceeding": "①未来（ありたい姿）を書いて共有する\n②現在地（変化の兆候や現在の状況）を書いて\n共有する\n③崖（②①への阻害要因）を書いて共有する\n④脱出（③の打破策）を書いて共有する\n⑤加速装置（①への加速要因）を書いて共有する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=89",
+      "id": 70
+    },
+    {
+      "title": "露天風呂",
+      "easyToUseScenes": [
+        1,
+        2,
+        3
+      ],
+      "wayOfProceeding": "①風呂（心や体が温まった出来事）を書く\n②絶景（未来に目指したい・行きたい場所）を\n書く\nみんなで内容を話し合う",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=90",
+      "id": 71
+    },
+    {
+      "title": "ありたい姿",
+      "easyToUseScenes": [
+        2,
+        3,
+        4
+      ],
+      "wayOfProceeding": "ありたい姿を付箋に書いて共有する\n現状を付箋に書いて共有する\nギャップを話し合って付箋に書く\nギャップを埋めるためのアクションを検討する",
+      "reference": "https://speakerdeck.com/viva_tweet_x/retrospective-catalog-59bd3a29-314c-45dd-911b-f8e5f1308333?slide=91",
+      "id": 72
+    }
+  ]
+}

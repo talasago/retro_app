@@ -1,0 +1,81 @@
+name: migrate_database
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read python version from .python-version
+        id: python_version
+        run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+      - name: Set POSTGRES_DATABASE based on branch
+        id: set_database
+        run: |
+          if [ "${{ github.ref_name }}" == "main" ]; then
+            echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE_PROD }}" >> $GITHUB_ENV
+          elif [ "${{ github.ref_name }}" == "develop" ]; then
+            echo "POSTGRES_DATABASE=${{ secrets.POSTGRES_DATABASE_DEV }}" >> $GITHUB_ENV
+          else
+            echo "This workflow can only be run on 'main' or 'develop' branches."
+            exit 1
+          fi
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python_version.outputs.python_version }}
+          # cache: pip
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: install dependencies
+        run: pipenv sync
+
+      - name: Assume role
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DB_MIGRATE_IAM_ROLE_NAME }}
+          aws-region: ap-northeast-1
+
+      - name: Get firewall JSON
+        run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json |
+             jq -r '.portStates' | sed '/state/d' > org_firewall.json
+             # stateとportStatesを消さないと更新用のjsonにならない
+
+      - name: Put updated firewall configuration
+        run: |
+          current_ip=$(curl http://checkip.amazonaws.com/)
+          if grep -q "5432" org_firewall.json; then
+            # 5432のものにcurrent_ipを追加
+            jq '. |= map(if .fromPort == 5432 then .cidrs = ["'"${current_ip}"'/32"] else . end)' org_firewall.json
+          else
+            # 5432のものを新たに追加
+            jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json
+          fi > firewall.json
+          aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
+
+      - name: migrate database
+        run: pipenv run alembic upgrade head
+        env:
+          # MEMO:host以外はssm見ても良い気がする。
+          POSTGRES_HOST: ${{secrets.POSTGRES_HOST}}
+          POSTGRES_USER: ${{secrets.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
+          POSTGRES_DATABASE: ${{ env.POSTGRES_DATABASE }}
+
+      # migrate失敗してもportは閉じる
+      - name: Put original firewall configuration
+        if: always()
+        run: aws lightsail put-instance-public-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json

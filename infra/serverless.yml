@@ -1,0 +1,154 @@
+service: retro-app
+frameworkVersion: '>=4.0.0 <5.0.0'
+
+plugins:
+  - serverless-python-requirements
+  - serverless-api-gateway-throttling
+  - serverless-domain-manager 
+
+custom:
+  pythonRequirements:
+    # 2023/9/10時点でtrueに変更し手もデプロイできない問題あり。修正されているがリリースされていない模様。
+    # https://github.com/serverless/serverless-python-requirements/pull/780
+    usePipenv: false
+    pipCmdExtraArgs:
+      - '--platform'
+      - 'manylinux2014_aarch64'
+      #- '--implementation'
+      #- 'cp'
+      #- '--python-version'
+      #- '3.10'
+      - '--only-binary=:all:'
+    #dockerizePip: true
+    #useDownloadCache: true
+    #useStaticCache: true
+    #cacheLocation: ./.serverless/.requirements_cache
+    # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
+    dockerBuildCmdExtraArgs: ['--platforms', 'linux/arm64']
+  apiGatewayThrottling:
+    maxRequestsPerSecond: 10
+    maxConcurrentRequests: 10
+  apiPrefix: /api/v1
+  vpcConfig:
+    securityGroupIds:
+      - sg-0bf8878f3a1baeba9
+    subnetIds:
+      # XXX:subnetを3つ使う必要があるかわかってない。
+      - subnet-0214fe79fe7b89a1a
+      - subnet-0047acbc1ef639c16
+      - subnet-0fbe6af2f37be64b1
+  customDomain:
+    domainName: ${ssm:api_domain_name} 
+    stage: ${self:provider.stage}
+    createRoute53Record: false
+    endpointType: REGIONAL
+    certificateArn: ${ssm:acm_certificate_arn} 
+    securityPolicy: tls_1_2
+
+package:
+  patterns:
+    - '!../**'
+    # ホワイトリスト方式
+    - '../app/**'
+
+provider:
+  name: aws
+  architecture: arm64
+  stage: dev # TODO:オプション引数で変更できるように変更したい
+  runtime: python3.10
+  region: ap-northeast-1
+  timeout: 30 # seconds
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - ec2:DescribeInstances # 何で必要なんだっけ...
+        - ec2:CreateNetworkInterface # VPC設定のために必要
+        - ec2:DescribeNetworkInterfaces # VPC設定のために必要
+        - ec2:DeleteNetworkInterface # VPC設定のために必要
+        - ssm:GetParameter # SSMから環境変数を取得するために必要
+        - kms:DecryptSecureString # SSMから環境変数を取得するために必要
+      Resource: "*"
+  environment:
+    # TODO:本番環境と開発環境で環境変数を分ける必要あり。
+    POSTGRES_HOST: ${ssm:postgres_host}
+    POSTGRES_USER: ${ssm:postgres_user}
+    POSTGRES_PASSWORD: ${ssm:postgres_password}
+    POSTGRES_DATABASE: ${ssm:postgres_database}
+    ORIGINS: ${ssm:origins}
+  logs:
+    # Enable REST API logs
+    # This can either be set to `restApi: true` to use defaults, or configured via subproperties
+    # Can only be configured if the API is created by Serverless Framework
+    restApi:
+      accessLogging: true
+      # Log format to use for access logs
+      # format: '{ "requestId":"$context.requestId", "ip": "$context.identity.sourceIp", "requestTime":"$context.requestTime", "httpMethod":"$context.httpMethod","routeKey":"$context.routeKey", "status":"$context.status", "protocol":"$context.protocol", "responseLength":"$context.responseLength" }'
+      
+      executionLogging: true
+      # Log level to use for execution logging
+      level: INFO
+      # Log full requests/responses for execution logging
+      fullExecutionData: false
+
+      # NOTE:ロールは自動で作成されるので、それを使うように設定する
+      # Existing IAM role to use for API Gateway when writing CloudWatch Logs (default: automatically created)
+      # role: arn:aws:iam::123456:role
+      # Whether the API Gateway CloudWatch Logs role setting is not managed by Serverless (default: false)
+      roleManagedExternally: false 
+
+functions:
+  user_function:
+    handler: app.functions.main.handler
+    vpc: ${self:custom.vpcConfig}
+    events:
+      - http:
+          path: ${self:custom.apiPrefix}/sign_up
+          method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/token
+          method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/refresh_token
+          method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/logout
+          method: ANY
+  comment_function:
+    handler: app.functions.main.handler
+    vpc: ${self:custom.vpcConfig}
+    events:
+      - http:
+          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment
+          method: ANY
+      - http:
+          path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment/{comment_id}
+          method: ANY
+
+resources:
+  Resources:
+    StateMachineRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: states.amazonaws.com
+              Action: sts:AssumeRole
+        Policies:
+          - PolicyName: StateMachinePolicy
+            PolicyDocument:
+              Version: '2012-10-17'
+              Statement:
+                - Effect: Allow
+                  Action:
+                    - lambda:InvokeFunction
+                  Resource: "*"
+                - Effect: Allow
+                  Action:
+                    # TODO: 他に必要な権限があるかもしれない
+                    - logs:CreateLogGroup
+                    - logs:CreateLogStream
+                    - logs:PutLogEvents
+                  Resource: "*"

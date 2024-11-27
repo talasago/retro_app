@@ -1,0 +1,177 @@
+name: ci
+
+on:
+  pull_request:
+    paths:
+      - 'app/**.py'
+      - 'app/*.py'
+      - 'tests/**.py'
+      - 'tests/*.py'
+      - 'Pipfile.lock' # dependabot用
+
+permissions:
+  checks: write
+  contents: write
+  pull-requests: write
+
+jobs:
+  lint_and_format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1.0.6
+        with:
+          reviewdog_version: latest
+
+      # TODO: Pythonのセットアップとかは共通化したい気持ち
+      - name: Read python version from .python-version
+        id: python_version
+        run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python_version.outputs.python_version }}
+          # cache: pip
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: Install dependencies
+        run: pipenv sync --dev
+
+      - name: Output changing files
+        uses: technote-space/get-diff-action@v6
+        with:
+          PATTERNS: |
+            app/**/*.py
+            app/*.py
+            tests/**/*.py
+            tests/*.py
+          SEPARATOR: ' '
+
+      - name: Trim single quotes
+        id: changed_files
+        run: |
+          no_quotes=$(echo ${{ env.GIT_DIFF }} | tr -d "'")
+          echo "changed_files=$(echo ${no_quotes})" >> $GITHUB_OUTPUT
+
+      - name: Execute Black(Fomatter)
+        uses: psf/black@stable
+        with:
+          options: ""
+          src: ${{ steps.changed_files.outputs.changed_files }}
+
+      - name: Auto-commit Black results
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply Code Formatter(Black) Change
+
+      - name: Execute ruff(Linter and formatter)
+        # NOTE: rerunしたときに自動コミットが異常終了する。それでも後続処理を続けるために指定
+        # なぜ異常終了するかの詳細は調べてない。
+        if: ${{ !cancelled() }}
+        run: |
+          pipenv run ruff ${{ steps.changed_files.outputs.changed_files }} --fix |\
+          sed '$d' |\
+          reviewdog -name="ruff" -efm="%f:%l:%c: %m" -reporter=github-pr-review -level=error  -diff="git diff FETCH_HEAD"
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-commit ruff results
+        if: ${{ !cancelled() }}
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Apply Code Formatter(ruff) Change
+
+      - name: Execute mypy(Linter)
+        # NOTE: rerunしたときに自動コミットが異常終了する。それでも後続処理を続けるために指定
+        # なぜ異常終了するかの詳細は調べてない。
+        if: ${{ steps.changed_files.outputs.changed_files && !cancelled() }}
+        uses: tsuyoshicho/action-mypy@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-check
+          # github-pr-reviewだとなぜか出力できない時があるので使用しない
+          # エラーメッセージ→422 Unprocessable Entity [{Resource: Field: Code: Message:Pull request review thread line must be part of the diff and Pull request review thread diff hunk can't be blank}]
+          level: error
+          target: ${{ steps.changed_files.outputs.changed_files }}
+          fail_on_error: true
+          ignore_note: false
+          filter_mode: 'nofilter' # このオプションはreviewdog用。mypy用ではない。
+          # NOTE:mypy実行時にすでに対象ファイルを絞っているため、reviewdogで絞る必要はない。
+          # もしaddedを指定してしまい、fail_on_errorをtrueとしていると、mypyでは怒っているのに、reviewdog出力対象では無くなる。その結果
+          # PRにコメント付かないけどエラーになってしまいハマってしまう。
+          setup_method: 'nothing'
+          install_types: false
+          execute_command: 'pipenv run mypy'
+
+      - name: Post comments
+        if: ${{ failure() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
+          gh pr comment ${PR_NUMBER} -b "Linterがコードの違反を見つけたで！詳細をチェックや！！${url}"
+
+  unit_tests_and_component_integration_test: # TODO:後で名前変更
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    if: ${{ !cancelled() }}
+    needs: lint_and_format
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup postgres
+        run: |
+          docker compose up -d
+
+      - name: Read python version from .python-version
+        id: python_version
+        run: echo "python_version=$(cat .python-version)" >> $GITHUB_OUTPUT
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ steps.python_version.outputs.python_version }}
+          # cache: pip
+
+      - name: Install pipenv
+        run: pip install pipenv
+
+      - name: install dependencies
+        run: pipenv sync --dev
+
+      - name: Set environment variables from .env.ci
+        run: |
+          while read -r line
+          do
+            echo "$line" >> $GITHUB_ENV
+          done < .env.ci
+
+      - name: Exceute alembic migrations
+        if: ${{ !cancelled() }}
+        run: |
+          pipenv run alembic upgrade head
+
+      - name: Execute unit tests and component integration tests
+        if: ${{ !cancelled() }}
+        run: |
+          pipenv run pytest
+
+      - name: Post comments
+        if: ${{ failure() }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+        run: |
+          url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
+          gh pr comment ${PR_NUMBER} -b "Testが落ちたで！詳細をチェックや！！${url}"
