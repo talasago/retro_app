@@ -50,6 +50,18 @@ jobs:
     - name: Install pipenv
       run: pip install pipenv
 
+    - name: Set STAGE based on branch
+      id: set_stage
+      run: |
+        if [ "${{ github.ref_name }}" == "main" ]; then
+          echo "STAGE=prod" >> $GITHUB_ENV
+        elif [ "${{ github.ref_name }}" == "develop" ]; then
+          echo "STAGE=dev" >> $GITHUB_ENV
+        else
+          echo "This workflow can only be run on 'main' or 'develop' branches."
+          exit 1
+        fi
+
     # 多分これが無いと、amd64(x86_64)の上でarm64用のLambdaをデプロイ/ビルド使用とするのでエラーになる
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -77,5 +89,5 @@ jobs:
         cd ./infra/
         pipenv requirements > requirements.txt
         npx serverless create_domain
-        npx sls deploy
+        npx sls deploy --stage ${{ env.STAGE }}
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
