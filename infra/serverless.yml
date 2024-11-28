@@ -141,19 +141,3 @@ resources:
               Principal:
                 Service: states.amazonaws.com
               Action: sts:AssumeRole
-        Policies:
-          - PolicyName: StateMachinePolicy
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - lambda:InvokeFunction
-                  Resource: "*"
-                - Effect: Allow
-                  Action:
-                    # TODO: 他に必要な権限があるかもしれない
-                    - logs:CreateLogGroup
-                    - logs:CreateLogStream
-                    - logs:PutLogEvents
-                  Resource: "*"
