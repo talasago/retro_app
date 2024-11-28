@@ -44,7 +44,12 @@ custom:
     endpointType: REGIONAL
     certificateArn: ${ssm:acm_certificate_arn} 
     securityPolicy: tls_1_2
-
+  defaultStage: dev
+  stages:
+    dev:
+      POSTGRES_DATABASE: ${ssm:postgres_database_dev}
+    prod:
+      POSTGRES_DATABASE: ${ssm:postgres_database_prod}
 package:
   patterns:
     - '!../**'
@@ -54,7 +59,7 @@ package:
 provider:
   name: aws
   architecture: arm64
-  stage: dev # TODO:オプション引数で変更できるように変更したい
+  stage: ${opt:stage, self:custom.defaultStage}
   runtime: python3.10
   region: ap-northeast-1
   timeout: 30 # seconds
@@ -73,7 +78,7 @@ provider:
     POSTGRES_HOST: ${ssm:postgres_host}
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
-    POSTGRES_DATABASE: ${ssm:postgres_database}
+    POSTGRES_DATABASE: ${self:custom.stages.${self:provider.stage}.POSTGRES_DATABASE}
     ORIGINS: ${ssm:origins}
   logs:
     # Enable REST API logs
