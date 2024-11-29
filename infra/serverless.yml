@@ -48,8 +48,10 @@ custom:
   stages:
     dev:
       POSTGRES_DATABASE: ${ssm:postgres_database_dev}
+      ORIGINS: ${ssm:origins_dev}
     prod:
       POSTGRES_DATABASE: ${ssm:postgres_database_prod}
+      ORIGINS: ${ssm:origins_prod}
 package:
   patterns:
     - '!../**'
@@ -79,7 +81,7 @@ provider:
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${self:custom.stages.${self:provider.stage}.POSTGRES_DATABASE}
-    ORIGINS: ${ssm:origins}
+    ORIGINS: ${self:custom.stages.${self:provider.stage}.ORIGINS}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
