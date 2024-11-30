@@ -85,6 +85,8 @@ provider:
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${self:custom.stages.${self:provider.stage}.POSTGRES_DATABASE}
     ORIGINS: ${self:custom.stages.${self:provider.stage}.ORIGINS}
+    SECRET_KEY: ${ssm:jwt_secret_key}
+    ALGORITHM: ${ssm:jwt_algorithm}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
