@@ -38,20 +38,24 @@ custom:
       - subnet-0047acbc1ef639c16
       - subnet-0fbe6af2f37be64b1
   customDomain:
-    domainName: ${ssm:api_domain_name} 
+    domainName: ${self:custom.stages.${self:provider.stage}.DOMAIN_NAME}
     stage: ${self:provider.stage}
     createRoute53Record: false
     endpointType: REGIONAL
-    certificateArn: ${ssm:acm_certificate_arn} 
+    certificateArn: ${self:custom.stages.${self:provider.stage}.CERTIFICATE_ARN}
     securityPolicy: tls_1_2
   defaultStage: dev
   stages:
     dev:
       POSTGRES_DATABASE: ${ssm:postgres_database_dev}
       ORIGINS: ${ssm:origins_dev}
+      CERTIFICATE_ARN: ${ssm:acm_certificate_arn_dev}
+      DOMAIN_NAME: ${ssm:api_domain_name_dev}
     prod:
       POSTGRES_DATABASE: ${ssm:postgres_database_prod}
       ORIGINS: ${ssm:origins_prod}
+      CERTIFICATE_ARN: ${ssm:acm_certificate_arn_prod}
+      DOMAIN_NAME: ${ssm:api_domain_name_prod}
 package:
   patterns:
     - '!../**'
