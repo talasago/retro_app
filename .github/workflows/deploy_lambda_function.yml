@@ -88,6 +88,6 @@ jobs:
       run: |
         cd ./infra/
         pipenv requirements > requirements.txt
-        npx serverless create_domain
+        npx serverless create_domain --stage ${{ env.STAGE }}
         npx sls deploy --stage ${{ env.STAGE }}
       # TODO:sls deploy時のrequirements.txtからの内容のライブラリインストールを、キャッシュ化したいなあ
