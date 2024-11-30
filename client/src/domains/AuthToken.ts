@@ -63,7 +63,7 @@ export class AuthToken {
     Cookies.set(this.ACCESS_TOKEN_KEY, accessToken, {
       expires: accessTokenExpireDateAfter9Minutes,
       path: '/',
-      // domain: // TODO: 本番公開前までに修正する
+      // domain: // サーバーにcookieを送信しないので指定しない
       secure: true,
       sameSite: 'Strict',
     });
@@ -71,7 +71,7 @@ export class AuthToken {
     Cookies.set(this.REFRESH_TOKEN_KEY, refreshToken, {
       expires: REFRESH_TOKEN_EXPIRE_DAYS,
       path: '/',
-      // domain: '*', // TODO: 本番公開前までに修正する
+      // domain: '*', // サーバーにcookieを送信しないので指定しない
       secure: true,
       sameSite: 'Strict',
     });
