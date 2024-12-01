@@ -69,8 +69,6 @@ provider:
   runtime: python3.10
   region: ap-northeast-1
   timeout: 30 # seconds
-  apiGateway:
-    disableDefaultEndpoint: true
   iamRoleStatements:
     - Effect: Allow
       Action:
