@@ -1,13 +1,13 @@
+import os
+
 import jwt
 import jwt.exceptions as jwt_exceptions
 
 
 class JwtWrapper:
     # JWT関連の設定
-    # FIXME:シークレットキーは機密情報なので、本番実行時には環境変数など別の場所に記載する。
-    # アルゴリズムも環境変数化しておこう
-    SECRET_KEY = "secret_key"
-    ALGORITHM = "HS256"
+    SECRET_KEY = os.environ["SECRET_KEY"]
+    ALGORITHM = os.environ["ALGORITHM"]
 
     @classmethod
     def decode(cls, token: str) -> dict:

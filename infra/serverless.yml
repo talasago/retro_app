@@ -69,6 +69,8 @@ provider:
   runtime: python3.10
   region: ap-northeast-1
   timeout: 30 # seconds
+  apiGateway:
+    disableDefaultEndpoint: true
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -80,12 +82,13 @@ provider:
         - kms:DecryptSecureString # SSMから環境変数を取得するために必要
       Resource: "*"
   environment:
-    # TODO:本番環境と開発環境で環境変数を分ける必要あり。
     POSTGRES_HOST: ${ssm:postgres_host}
     POSTGRES_USER: ${ssm:postgres_user}
     POSTGRES_PASSWORD: ${ssm:postgres_password}
     POSTGRES_DATABASE: ${self:custom.stages.${self:provider.stage}.POSTGRES_DATABASE}
     ORIGINS: ${self:custom.stages.${self:provider.stage}.ORIGINS}
+    SECRET_KEY: ${ssm:jwt_secret_key}
+    ALGORITHM: ${ssm:jwt_algorithm}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
@@ -147,19 +150,3 @@ resources:
               Principal:
                 Service: states.amazonaws.com
               Action: sts:AssumeRole
-        Policies:
-          - PolicyName: StateMachinePolicy
-            PolicyDocument:
-              Version: '2012-10-17'
-              Statement:
-                - Effect: Allow
-                  Action:
-                    - lambda:InvokeFunction
-                  Resource: "*"
-                - Effect: Allow
-                  Action:
-                    # TODO: 他に必要な権限があるかもしれない
-                    - logs:CreateLogGroup
-                    - logs:CreateLogStream
-                    - logs:PutLogEvents
-                  Resource: "*"
