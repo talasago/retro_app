@@ -1,0 +1,108 @@
+# devとprodで共通。これだけローカルでデプロイ。CIを作成してない。
+service: retro-app-waf-web-acl
+frameworkVersion: '>=4.0.0 <5.0.0'
+
+package:
+  patterns:
+    - '!../**'
+    # ホワイトリスト方式
+
+provider:
+  name: aws
+  stage: common
+  region: ap-northeast-1
+  timeout: 30 # seconds
+
+resources:
+  Resources:
+    StateMachineRole:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Principal:
+                Service: states.amazonaws.com
+              Action: sts:AssumeRole
+    WAFWebACL:
+      Type: "AWS::WAFv2::WebACL"
+      Properties:
+        DefaultAction:
+          Allow: {}
+        Scope: REGIONAL
+        VisibilityConfig:
+          CloudWatchMetricsEnabled: true
+          MetricName: "webACL"
+          SampledRequestsEnabled: true
+        Name: "retro-app-webACL"
+        Rules:
+          - Name: "AWS-AWSManagedRulesCommonRuleSet"
+            Priority: 1
+            OverrideAction:
+              None: {}
+            Statement:
+              ManagedRuleGroupStatement:
+                VendorName: "AWS"
+                Name: "AWSManagedRulesCommonRuleSet"
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: "AWSManagedRulesCommonRuleSet"
+              SampledRequestsEnabled: true
+          - Name: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+            Priority: 2
+            OverrideAction:
+              None: {}
+            Statement:
+              ManagedRuleGroupStatement:
+                VendorName: "AWS"
+                Name: "AWSManagedRulesKnownBadInputsRuleSet"
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: "AWSManagedRulesKnownBadInputsRuleSet"
+              SampledRequestsEnabled: true
+          - Name: "AWS-AWSManagedRulesSQLiRuleSet"
+            Priority: 3
+            OverrideAction:
+              None: {}
+            Statement:
+              ManagedRuleGroupStatement:
+                VendorName: "AWS"
+                Name: "AWSManagedRulesSQLiRuleSet"
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: "AWSManagedRulesSQLiRuleSet"
+              SampledRequestsEnabled: true
+          - Name: "AWS-AWSManagedRulesLinuxRuleSet"
+            Priority: 4
+            OverrideAction:
+              None: {}
+            Statement:
+              ManagedRuleGroupStatement:
+                VendorName: "AWS"
+                Name: "AWSManagedRulesLinuxRuleSet"
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: "AWSManagedRulesLinuxRuleSet"
+              SampledRequestsEnabled: true
+          - Name: "AWS-AWSManagedRulesAnonymousIpList"
+            Priority: 5
+            OverrideAction:
+              None: {}
+            Statement:
+              ManagedRuleGroupStatement:
+                VendorName: "AWS"
+                Name: "AWSManagedRulesAnonymousIpList"
+            VisibilityConfig:
+              CloudWatchMetricsEnabled: true
+              MetricName: "AnonymousIPList"
+              SampledRequestsEnabled: true
+  Outputs:
+    WebACLArn:
+      Description: "WebACL Arn"
+      Value:
+        Fn::GetAtt:
+        - WAFWebACL
+        - Arn
+      Export:
+        Name: ${self:service}-WebACLArn
