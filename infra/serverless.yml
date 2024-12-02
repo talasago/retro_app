@@ -150,86 +150,13 @@ resources:
               Principal:
                 Service: states.amazonaws.com
               Action: sts:AssumeRole
-    WAFWebACL:
-      Type: "AWS::WAFv2::WebACL"
-      Properties:
-        DefaultAction:
-          Allow: {}
-        Scope: REGIONAL
-        VisibilityConfig:
-          CloudWatchMetricsEnabled: true
-          MetricName: "webACL"
-          SampledRequestsEnabled: true
-        Name: "retro-app-webACL"
-        Rules:
-          - Name: "AWS-AWSManagedRulesCommonRuleSet"
-            Priority: 1
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesCommonRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesCommonRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
-            Priority: 2
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesKnownBadInputsRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesKnownBadInputsRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesSQLiRuleSet"
-            Priority: 3
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesSQLiRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesSQLiRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesLinuxRuleSet"
-            Priority: 4
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesLinuxRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesLinuxRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesAnonymousIpList"
-            Priority: 5
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesAnonymousIpList"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AnonymousIPList"
-              SampledRequestsEnabled: true
     WebACLAssociation:
       Type: "AWS::WAFv2::WebACLAssociation"
       Properties:
-        ResourceArn: 
-          Fn::Sub: arn:aws:apigateway:${AWS::Region}::/restapis/${cf:${self:service}-${self:provider.stage}.ApiGatewayRestApiId}/stages/${self:provider.stage}
-        WebACLArn:
-          Fn::GetAtt: [WAFWebACL, Arn]
-      DependsOn: WAFWebACL
+        ResourceArn: !Sub
+          - arn:aws:apigateway:${self:provider.region}::/restapis/${ApiGatewayId}/stages/${self:provider.stage}
+          - ApiGatewayId: !ImportValue retro-app-${self:provider.stage}-ApiGatewayRestApiId
+        WebACLArn: !ImportValue "retro-app-waf-web-acl-WebACLArn"
   Outputs:
     ApiGatewayRestApiId:
       Description: "API Gateway RestApi Id"
