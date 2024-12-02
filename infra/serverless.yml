@@ -225,7 +225,8 @@ resources:
     WebACLAssociation:
       Type: "AWS::WAFv2::WebACLAssociation"
       Properties:
-        ResourceArn: arn:aws:apigateway:${self:provider.region}::/restapis/${cf:retro-app-${self:provider.stage}.ApiGatewayRestApiId}/stages/${self:provider.stage}
+        ResourceArn: 
+          Fn::Sub: arn:aws:apigateway:${AWS::Region}::/restapis/${cf:${self:service}-${self:provider.stage}.ApiGatewayRestApiId}/stages/${self:provider.stage}
         WebACLArn:
           Fn::GetAtt: [WAFWebACL, Arn]
       DependsOn: WAFWebACL
@@ -234,3 +235,5 @@ resources:
       Description: "API Gateway RestApi Id"
       Value:
         Ref: ApiGatewayRestApi
+      Export:
+        Name: ${self:service}-${self:provider.stage}-ApiGatewayRestApiId
