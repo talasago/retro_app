@@ -149,6 +149,7 @@ Resources:
           - "s3:PutEncryptionConfiguration"
           - "s3:PutObject"
           - "s3:PutBucketVersioning"
+          - "s3:GetBucketLocation"
           - "ssm:GetParameter"
           - "ssm:GetParameters"
           - "ssm:putParameter"
