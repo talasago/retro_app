@@ -112,13 +112,13 @@ class TestCommentFunction:
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
 
-                # 2回ループしたくない
                 sorted_comments = sorted(comments, key=lambda x: x["created_at"])
                 assert comments == sorted_comments
 
                 assert sorted_comments[0]["comment"] == "test commenttttttttttttt"
                 assert sorted_comments[1]["comment"] == "test commentt2"
                 assert sorted_comments[2]["comment"] == "test comment3"
+
                 for comment in comments:
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
@@ -133,13 +133,13 @@ class TestCommentFunction:
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
 
-                # 2回ループしたくない
                 sorted_comments = sorted(comments, key=lambda x: x["created_at"])
                 assert comments == sorted_comments
 
                 assert sorted_comments[0]["comment"] == "test commenttttttttttttt"
                 assert sorted_comments[1]["comment"] == "test commentt2"
                 assert sorted_comments[2]["comment"] == "test comment3"
+
                 for comment in comments:
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5
