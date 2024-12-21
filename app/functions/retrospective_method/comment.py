@@ -68,7 +68,8 @@ def get_comment(
     """コメント取得のエンドポイント。"""
 
     comments = comment_repo.find_all(
-        conditions={"retrospective_method_id": retrospective_method_id}
+        conditions={"retrospective_method_id": retrospective_method_id},
+        order_by_cols=[CommentModel.created_at],
     )
 
     result_comments: list[dict] = []
