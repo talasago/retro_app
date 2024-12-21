@@ -135,6 +135,36 @@ class TestCommentRepository:
                     with pytest.raises(TypeError):
                         sut(conditions=conditions)
 
+        class TestWhenOrderCols:
+            def test_return_comments_ordered_by_created_at(self, sut, db: Session):
+                """引数で与えられた昇順に並び替えられたコメントを返すこと"""
+                conditions = {"retrospective_method_id": 3}
+                order_by = (CommentModel.created_at.asc(), CommentModel.id.asc())
+                results = sut(conditions=conditions, order_by_cols=order_by)
+
+                actual_comments = (
+                    db.query(CommentModel)
+                    .filter_by(retrospective_method_id=3)
+                    .order_by(CommentModel.created_at.asc(), CommentModel.id.asc())
+                    .all()
+                )
+
+                for result, actual_comment in zip(results, actual_comments):
+                    assert result.id == actual_comment.id
+
+        class TestWhenNothingOrderCols:
+            def test_return_comments_ordered_by_created_at(self, sut, db: Session):
+                """エラーなくコメントを返すこと"""
+                conditions = {"retrospective_method_id": 3}
+                results = sut(conditions=conditions)
+
+                actual_comments = (
+                    db.query(CommentModel).filter_by(retrospective_method_id=3).all()
+                )
+
+                for result, actual_comment in zip(results, actual_comments):
+                    assert result.id == actual_comment.id
+
     class TestFindOne:
         @pytest.fixture(scope="class")
         def sut(self, comment_repo: CommentRepository) -> Callable:
