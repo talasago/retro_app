@@ -38,8 +38,8 @@ class UserModel(Base):
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default= lambda: datetime.now(timezone.utc),
-        onupdate= lambda: datetime.now(timezone.utc),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     # 外部キーの設定
