@@ -97,6 +97,20 @@ resources:
               CloudWatchMetricsEnabled: true
               MetricName: "AnonymousIPList"
               SampledRequestsEnabled: true
+
+    WAFLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties: 
+        LogGroupName: aws-waf-logs-retro-app
+        RetentionInDays: 30
+
+    WAFLogConfig:
+      Type: AWS::WAFv2::LoggingConfiguration
+      Properties:
+        LogDestinationConfigs: 
+          - !GetAtt WAFLogGroup.Arn
+        ResourceArn: !GetAtt WAFWebACL.Arn
+  
   Outputs:
     WebACLArn:
       Description: "WebACL Arn"
