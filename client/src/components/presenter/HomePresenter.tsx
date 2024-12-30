@@ -24,13 +24,6 @@ const FeatureSection: FC<FeatureSectionProps> = ({ title, description }) => (
   </Grid>
 );
 
-const Footer = styled(Box)({
-  backgroundColor: '#aaaaaa',
-  height: '80px',
-  display: 'flex',
-  alignItems: 'center',
-});
-
 interface HomePresenterProps {
   onOpenSignUpModal: () => void;
 }
@@ -85,34 +78,6 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
           ユーザー登録してはじめる
         </Button>
       </Box>
-
-      <Footer>
-        <Grid
-          container
-          justifyContent="space-between"
-          alignItems="center"
-          sx={{ px: { xs: 0.5, sm: 5, md: 20 } }}
-        >
-          <Grid item xs={4} sx={{ textAlign: { xs: 'center', sm: 'left' } }}>
-            <Typography variant="body2">© Copyright __sakopon 2024</Typography>
-          </Grid>
-          <Grid
-            item
-            xs={2}
-            container
-            sx={{ textAlign: { xs: 'center', sm: 'right' } }}
-          >
-            <Typography variant="body2" sx={{ mx: 1 }}>
-              <Link
-                to="/service_term"
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
-                利用規約
-              </Link>
-            </Typography>
-          </Grid>
-        </Grid>
-      </Footer>
     </Box>
   );
 };
