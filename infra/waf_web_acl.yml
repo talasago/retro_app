@@ -49,44 +49,8 @@ resources:
               CloudWatchMetricsEnabled: true
               MetricName: "AWSManagedRulesCommonRuleSet"
               SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
-            Priority: 2
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesKnownBadInputsRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesKnownBadInputsRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesSQLiRuleSet"
-            Priority: 3
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesSQLiRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesSQLiRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesLinuxRuleSet"
-            Priority: 4
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesLinuxRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesLinuxRuleSet"
-              SampledRequestsEnabled: true
           - Name: "AWS-AWSManagedRulesAnonymousIpList"
-            Priority: 5
+            Priority: 2
             OverrideAction:
               None: {}
             Statement:
