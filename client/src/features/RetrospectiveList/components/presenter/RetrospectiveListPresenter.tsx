@@ -2,7 +2,6 @@ import React from 'react';
 import {
   Box,
   Container,
-  Typography,
   Button,
   Checkbox,
   Grid,
@@ -10,7 +9,14 @@ import {
 } from '@mui/material';
 import RetrospectiveCard from './RetrospectiveCard';
 
-// TODO: checkboxのやつコンポーネント化できないか？文字列の配列だけ外だししたい。
+const checkboxLabels = [
+  'ふりかえりの場をつくる',
+  '出来事を思い出す',
+  'アイデアを出し合う',
+  'ふりかえりを改善する',
+  'アクションを決める',
+];
+
 const RetrospectiveListPresenter: React.FC = () => {
   return (
     <Box>
@@ -23,67 +29,17 @@ const RetrospectiveListPresenter: React.FC = () => {
                 justifyContent="space-between"
                 flexWrap="wrap"
               >
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="ふりかえりの場をつくる"
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="出来事を思い出す"
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="アイデアを出し合う"
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="ふりかえりを改善する"
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label="アクションを決める"
-                  />
-                </Box>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  gap={1}
-                  sx={{ width: '33%' }}
-                ></Box>
+                {checkboxLabels.map((label, index) => (
+                  <Box
+                    key={index}
+                    display="flex"
+                    alignItems="center"
+                    sx={{ width: '33%' }}
+                  >
+                    <FormControlLabel control={<Checkbox />} label={label} />
+                  </Box>
+                ))}
+                <Box sx={{ width: '33%' }}></Box>
               </Box>
             </Grid>
 
