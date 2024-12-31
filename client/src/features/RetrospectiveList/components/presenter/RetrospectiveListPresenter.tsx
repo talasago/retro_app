@@ -95,7 +95,7 @@ const RetrospectiveListPresenter: React.FC = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
           {Array.from({ length: 12 }).map((_, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveCard />
             </Grid>
           ))}
