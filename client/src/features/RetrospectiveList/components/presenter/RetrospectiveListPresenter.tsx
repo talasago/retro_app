@@ -17,7 +17,7 @@ const checkboxLabels = [
   'アクションを決める',
 ];
 
-// TODO:受け取るデータは仮の型
+// TODO:データ型は別のところで定義したい。全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
 interface RetrospectiveListPresenterProps {
   RetrospectiveMethods: Array<{
     title: string;

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/extensions
 import retrospectiveData from '../../../../assets/retrospective.json';
 import RetrospectiveListPresenter from '../presenter/RetrospectiveListPresenter';
 
