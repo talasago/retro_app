@@ -12,55 +12,82 @@ import RetrospectiveCard from './RetrospectiveCard';
 // TODO: checkboxのやつコンポーネント化できないか？文字列の配列だけ外だししたい。
 const RetrospectiveListPresenter: React.FC = () => {
   return (
-    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
-      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
+    <Box>
+      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 10 }}>
         <Container maxWidth="md">
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
+          <Grid>
+            <Grid xs={12}>
               <Box
                 display="flex"
                 justifyContent="space-between"
                 flexWrap="wrap"
               >
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                >
                   <Checkbox />
                   <Typography>ふりかえりの場をつくる</Typography>
                 </Box>
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                >
                   <Checkbox />
                   <Typography>出来事を思い出す</Typography>
                 </Box>
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                >
                   <Checkbox />
                   <Typography>アイデアを出し合う</Typography>
                 </Box>
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                >
                   <Checkbox />
                   <Typography>ふりかえりを改善する</Typography>
                 </Box>
-                <Box display="flex" alignItems="center" gap={1}>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                >
                   <Checkbox />
                   <Typography>アクションを決める</Typography>
                 </Box>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  gap={1}
+                  sx={{ width: '33%' }}
+                ></Box>
               </Box>
             </Grid>
 
-            <Grid item xs={12}>
-              <Box display="flex" justifyContent="space-between">
-                <Box display="flex" flexDirection="column" alignItems="center">
-                  <Button
-                    variant="contained"
-                    sx={{
-                      mt: 4,
-                      borderRadius: 50,
-                      px: 4,
-                    }}
-                  >
-                    ランダム表示
-                  </Button>
-                </Box>
-              </Box>
-            </Grid>
+            <Box display="flex" flexDirection="column" alignItems="center">
+              <Button
+                variant="contained"
+                sx={{
+                  mt: 3,
+                  borderRadius: 100,
+                  px: 4,
+                }}
+              >
+                ランダム表示
+              </Button>
+            </Box>
           </Grid>
         </Container>
       </Box>
