@@ -19,7 +19,7 @@ const checkboxLabels = [
 
 // TODO:データ型は別のところで定義したい。全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
 interface RetrospectiveListPresenterProps {
-  RetrospectiveMethods: Array<{
+  retrospectiveMethods: Array<{
     title: string;
     easyToUseScenes: number[];
     wayOfProceeding: string;
@@ -29,7 +29,7 @@ interface RetrospectiveListPresenterProps {
 }
 
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
-  RetrospectiveMethods,
+  retrospectiveMethods,
 }) => {
   return (
     <Box>
@@ -75,7 +75,7 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
 
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
-          {RetrospectiveMethods.map((method, index) => (
+          {retrospectiveMethods.map((method, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveCard
                 title={method.title}
