@@ -9,14 +9,6 @@ import {
 } from '@mui/material';
 import RetrospectiveCard from './RetrospectiveCard';
 
-const checkboxLabels = [
-  'ふりかえりの場をつくる',
-  '出来事を思い出す',
-  'アイデアを出し合う',
-  'ふりかえりを改善する',
-  'アクションを決める',
-];
-
 // TODO:データ型は別のところで定義したい。全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
 interface RetrospectiveListPresenterProps {
   retrospectiveMethods: Array<{
@@ -26,10 +18,12 @@ interface RetrospectiveListPresenterProps {
     reference: string;
     id: number;
   }>;
+  retrospectiveSceneName: Record<string, string>;
 }
 
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   retrospectiveMethods,
+  retrospectiveSceneName,
 }) => {
   return (
     <Box>
@@ -42,14 +36,17 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
                 justifyContent="space-between"
                 flexWrap="wrap"
               >
-                {checkboxLabels.map((label, index) => (
+                {Object.entries(retrospectiveSceneName).map((SceneNames, _) => (
                   <Box
-                    key={index}
+                    key={SceneNames[0]}
                     display="flex"
                     alignItems="center"
                     sx={{ width: '33%' }}
                   >
-                    <FormControlLabel control={<Checkbox />} label={label} />
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={SceneNames[1]}
+                    />
                   </Box>
                 ))}
                 <Box sx={{ width: '33%' }}></Box>
