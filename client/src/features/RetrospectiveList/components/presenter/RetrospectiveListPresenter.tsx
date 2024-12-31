@@ -49,7 +49,8 @@ const RetrospectiveListPresenter: React.FC = () => {
                 sx={{
                   mt: 3,
                   borderRadius: 100,
-                  px: 4,
+                  px: 10,
+                  height: 50,
                 }}
               >
                 ランダム表示
