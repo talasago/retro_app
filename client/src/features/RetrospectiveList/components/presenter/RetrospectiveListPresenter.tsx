@@ -6,6 +6,7 @@ import {
   Button,
   Checkbox,
   Grid,
+  FormControlLabel,
 } from '@mui/material';
 import RetrospectiveCard from './RetrospectiveCard';
 
@@ -28,8 +29,10 @@ const RetrospectiveListPresenter: React.FC = () => {
                   gap={1}
                   sx={{ width: '33%' }}
                 >
-                  <Checkbox />
-                  <Typography>ふりかえりの場をつくる</Typography>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="ふりかえりの場をつくる"
+                  />
                 </Box>
                 <Box
                   display="flex"
@@ -37,8 +40,10 @@ const RetrospectiveListPresenter: React.FC = () => {
                   gap={1}
                   sx={{ width: '33%' }}
                 >
-                  <Checkbox />
-                  <Typography>出来事を思い出す</Typography>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="出来事を思い出す"
+                  />
                 </Box>
                 <Box
                   display="flex"
@@ -46,8 +51,10 @@ const RetrospectiveListPresenter: React.FC = () => {
                   gap={1}
                   sx={{ width: '33%' }}
                 >
-                  <Checkbox />
-                  <Typography>アイデアを出し合う</Typography>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="アイデアを出し合う"
+                  />
                 </Box>
                 <Box
                   display="flex"
@@ -55,8 +62,10 @@ const RetrospectiveListPresenter: React.FC = () => {
                   gap={1}
                   sx={{ width: '33%' }}
                 >
-                  <Checkbox />
-                  <Typography>ふりかえりを改善する</Typography>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="ふりかえりを改善する"
+                  />
                 </Box>
                 <Box
                   display="flex"
@@ -64,8 +73,10 @@ const RetrospectiveListPresenter: React.FC = () => {
                   gap={1}
                   sx={{ width: '33%' }}
                 >
-                  <Checkbox />
-                  <Typography>アクションを決める</Typography>
+                  <FormControlLabel
+                    control={<Checkbox />}
+                    label="アクションを決める"
+                  />
                 </Box>
                 <Box
                   display="flex"
