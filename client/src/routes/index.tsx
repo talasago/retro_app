@@ -4,7 +4,6 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import ServiceTerm from 'components/container/ServiceTerm';
 import HomeContainer from '../components/container/HomeContainer';
 import RetrospectiveListContainer from '../features/RetrospectiveList/components/container/RetrospectiveListContainer';
-export const ROUTES_LISTS = {} as const;
 
 const IndexRoutes: FC = () => {
   const { hash, pathname } = useLocation();
