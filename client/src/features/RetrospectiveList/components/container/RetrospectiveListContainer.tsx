@@ -1,7 +1,12 @@
+import retrospectiveData from '../../../../assets/retrospective.json';
 import RetrospectiveListPresenter from '../presenter/RetrospectiveListPresenter';
 
 const RetrospectiveListContainer: React.FC = () => {
-  return <RetrospectiveListPresenter />;
+  return (
+    <RetrospectiveListPresenter
+      RetrospectiveMethods={retrospectiveData.retrospectives}
+    />
+  );
 };
 
 export default RetrospectiveListContainer;

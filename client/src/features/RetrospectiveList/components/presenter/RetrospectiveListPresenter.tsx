@@ -17,7 +17,20 @@ const checkboxLabels = [
   'アクションを決める',
 ];
 
-const RetrospectiveListPresenter: React.FC = () => {
+// TODO:受け取るデータは仮の型
+interface RetrospectiveListPresenterProps {
+  RetrospectiveMethods: Array<{
+    title: string;
+    easyToUseScenes: number[];
+    wayOfProceeding: string;
+    reference: string;
+    id: number;
+  }>;
+}
+
+const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
+  RetrospectiveMethods,
+}) => {
   return (
     <Box>
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 10 }}>
@@ -59,11 +72,15 @@ const RetrospectiveListPresenter: React.FC = () => {
           </Grid>
         </Container>
       </Box>
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
-          {Array.from({ length: 12 }).map((_, index) => (
+          {RetrospectiveMethods.map((method, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-              <RetrospectiveCard />
+              <RetrospectiveCard
+                title={method.title}
+                description={method.wayOfProceeding}
+              />
             </Grid>
           ))}
         </Grid>

@@ -1,7 +1,15 @@
 import type React from 'react';
 import { Typography, Paper } from '@mui/material';
 
-const RetrospectiveCard: React.FC = () => {
+interface RetrospectiveCardProps {
+  title: string;
+  description: string;
+}
+
+const RetrospectiveCard: React.FC<RetrospectiveCardProps> = ({
+  title,
+  description,
+}) => {
   return (
     <Paper
       sx={{
@@ -19,7 +27,7 @@ const RetrospectiveCard: React.FC = () => {
           letterSpacing: 1.4,
         }}
       >
-        手法名
+        {title}
       </Typography>
 
       <Typography
@@ -28,9 +36,14 @@ const RetrospectiveCard: React.FC = () => {
           fontSize: 16,
           lineHeight: 1.5,
           letterSpacing: 1.12,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
         }}
       >
-        ふりかえりの詳細テキストが入ります。3行以上は3点リーダ…
+        {description}
       </Typography>
     </Paper>
   );
