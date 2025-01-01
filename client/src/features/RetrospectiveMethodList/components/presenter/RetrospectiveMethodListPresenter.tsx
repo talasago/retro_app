@@ -13,7 +13,7 @@ import {
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
-import RetrospectiveCard from './RetrospectiveCard';
+import RetrospectiveMethodCard from './RetrospectiveMethodCard';
 
 // TODO:データ型は別のところで定義したい。ここで全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
 type RetrospectiveMethods = Array<{
@@ -25,17 +25,15 @@ type RetrospectiveMethods = Array<{
 }>;
 type RetrospectiveSceneNames = Record<string, string>;
 
-interface RetrospectiveListPresenterProps {
+interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethods;
   retrospectiveSceneName: RetrospectiveSceneNames;
   scrollY: number;
 }
 
-const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
-  retrospectiveMethods,
-  retrospectiveSceneName,
-  scrollY,
-}) => {
+const retrospectiveMethodListPresenter: React.FC<
+  retrospectiveMethodListPresenterProps
+> = ({ retrospectiveMethods, retrospectiveSceneName, scrollY }) => {
   return (
     <Box>
       <SearchArea retrospectiveSceneName={retrospectiveSceneName} />
@@ -47,7 +45,7 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   );
 };
 
-export default React.memo(RetrospectiveListPresenter);
+export default React.memo(retrospectiveMethodListPresenter);
 
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
@@ -131,7 +129,7 @@ const RetrospectiveMethodCardArea: React.FC<
       <Grid container spacing={3}>
         {retrospectiveMethods.map((method, index) => (
           <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-            <RetrospectiveCard
+            <RetrospectiveMethodCard
               title={method.title}
               description={method.wayOfProceeding}
             />

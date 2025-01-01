@@ -4,9 +4,9 @@ import { useState, useLayoutEffect } from 'react';
 import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
-import RetrospectiveListPresenter from '../presenter/RetrospectiveListPresenter';
+import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodListPresenter';
 
-const RetrospectiveListContainer: React.FC = () => {
+const RetrospectiveMethodListContainer: React.FC = () => {
   const [scrollY, setScrollY] = useState<number>(0);
 
   const updateScrollYPosition = (): void => {
@@ -24,7 +24,7 @@ const RetrospectiveListContainer: React.FC = () => {
   });
 
   return (
-    <RetrospectiveListPresenter
+    <RetrospectiveMethodListPresenter
       retrospectiveMethods={retrospectiveData.retrospectives}
       retrospectiveSceneName={retrospectiveSceneName}
       scrollY={scrollY}
@@ -32,4 +32,4 @@ const RetrospectiveListContainer: React.FC = () => {
   );
 };
 
-export default RetrospectiveListContainer;
+export default RetrospectiveMethodListContainer;

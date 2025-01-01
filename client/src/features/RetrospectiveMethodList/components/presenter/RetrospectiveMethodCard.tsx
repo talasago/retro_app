@@ -1,12 +1,12 @@
 import type React from 'react';
 import { Typography, Paper } from '@mui/material';
 
-interface RetrospectiveCardProps {
+interface RetrospectiveMethodCardProps {
   title: string;
   description: string;
 }
 
-const RetrospectiveCard: React.FC<RetrospectiveCardProps> = ({
+const RetrospectiveMethodCard: React.FC<RetrospectiveMethodCardProps> = ({
   title,
   description,
 }) => {
@@ -49,4 +49,4 @@ const RetrospectiveCard: React.FC<RetrospectiveCardProps> = ({
   );
 };
 
-export default RetrospectiveCard;
+export default RetrospectiveMethodCard;

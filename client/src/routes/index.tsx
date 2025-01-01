@@ -3,7 +3,7 @@ import type { FC } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 import ServiceTerm from 'components/container/ServiceTerm';
 import HomeContainer from '../components/container/HomeContainer';
-import RetrospectiveListContainer from '../features/RetrospectiveList/components/container/RetrospectiveListContainer';
+import RetrospectiveMethodListContainer from '../features/RetrospectiveMethodList/components/container/RetrospectiveMethodListContainer';
 
 const IndexRoutes: FC = () => {
   const { hash, pathname } = useLocation();
@@ -21,7 +21,7 @@ const IndexRoutes: FC = () => {
       <Route path="service_term" element={<ServiceTerm />} />
       <Route
         path="retrospective_list"
-        element={<RetrospectiveListContainer />}
+        element={<RetrospectiveMethodListContainer />}
       />
     </Routes>
   );
