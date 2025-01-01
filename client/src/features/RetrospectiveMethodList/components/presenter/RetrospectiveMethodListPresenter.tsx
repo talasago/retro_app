@@ -29,18 +29,24 @@ interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethods;
   retrospectiveSceneName: RetrospectiveSceneNames;
   scrollY: number;
+  onScrollToButtonClick: () => void;
 }
 
 const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethodListPresenterProps
-> = ({ retrospectiveMethods, retrospectiveSceneName, scrollY }) => {
+> = ({
+  retrospectiveMethods,
+  retrospectiveSceneName,
+  scrollY,
+  onScrollToButtonClick,
+}) => {
   return (
     <Box>
       <SearchArea retrospectiveSceneName={retrospectiveSceneName} />
       <RetrospectiveMethodCardArea
         retrospectiveMethods={retrospectiveMethods}
       />
-      <ScrollToTop scrollY={scrollY} />
+      <ScrollToTop scrollY={scrollY} onClick={onScrollToButtonClick} />
     </Box>
   );
 };
@@ -149,13 +155,10 @@ const RetrospectiveMethodCardArea: React.FC<RetrospectiveMethodCardAreaProps> =
 
 interface ScrollToTopProps {
   scrollY: number;
+  onClick: () => void;
 }
 
-const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY }) => {
-  const handleClick = (): void => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY, onClick }) => {
   return (
     <Box
       sx={{
@@ -166,7 +169,7 @@ const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY }) => {
     >
       <Fade in={scrollY > 0}>
         <IconButton
-          onClick={handleClick}
+          onClick={onClick}
           style={{
             width: 120,
             height: 120,

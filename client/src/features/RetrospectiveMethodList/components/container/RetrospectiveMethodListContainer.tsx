@@ -22,12 +22,17 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     };
   });
 
+  const handleScrollToButtonClick = (): void => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const memorizedPresenter = useMemo(
     () => (
       <RetrospectiveMethodListPresenter
         retrospectiveMethods={retrospectiveData.retrospectives}
         retrospectiveSceneName={retrospectiveSceneName}
         scrollY={scrollY}
+        onScrollToButtonClick={handleScrollToButtonClick}
       />
     ),
     [scrollY],
