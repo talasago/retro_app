@@ -84,7 +84,7 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 10 }}>
         <Container maxWidth="md">
           <Grid>
-            <Grid xs={12}>
+            <Grid item xs={12}>
               <Box
                 display="flex"
                 justifyContent="space-between"
