@@ -27,61 +27,6 @@ interface RetrospectiveListPresenterProps {
   retrospectiveSceneName: Record<string, string>;
 }
 
-interface ScrollToTopProps {
-  scrollY: number;
-}
-
-const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
-  const handleClick = (): void => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  return (
-    <Box
-      sx={{
-        position: 'fixed',
-        bottom: 80,
-        right: 80,
-      }}
-    >
-      <Fade in={scrollY > 0}>
-        <IconButton
-          onClick={handleClick}
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 100,
-            color: 'rgba(19, 171, 121, 1)',
-            backgroundColor: 'rgb(234, 255, 248)',
-          }}
-        >
-          <VerticalAlignTopIcon style={{ fontSize: 60 }} />
-        </IconButton>
-      </Fade>
-    </Box>
-  );
-};
-
-interface SearchButtonProps {
-  icon: React.ReactNode;
-  buttonName: string;
-}
-
-const SearchButton: React.FC<SearchButtonProps> = ({ icon, buttonName }) => {
-  const buttonStyle = {
-    mt: 3,
-    borderRadius: 100,
-    height: 50,
-    minWidth: 350,
-  };
-
-  return (
-    <Button variant="contained" startIcon={icon} sx={buttonStyle}>
-      {buttonName}
-    </Button>
-  );
-};
-
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   retrospectiveMethods,
   retrospectiveSceneName,
@@ -170,3 +115,58 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
 };
 
 export default React.memo(RetrospectiveListPresenter);
+
+interface ScrollToTopProps {
+  scrollY: number;
+}
+
+const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
+  const handleClick = (): void => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <Box
+      sx={{
+        position: 'fixed',
+        bottom: 80,
+        right: 80,
+      }}
+    >
+      <Fade in={scrollY > 0}>
+        <IconButton
+          onClick={handleClick}
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: 100,
+            color: 'rgba(19, 171, 121, 1)',
+            backgroundColor: 'rgb(234, 255, 248)',
+          }}
+        >
+          <VerticalAlignTopIcon style={{ fontSize: 60 }} />
+        </IconButton>
+      </Fade>
+    </Box>
+  );
+};
+
+interface SearchButtonProps {
+  icon: React.ReactNode;
+  buttonName: string;
+}
+
+const SearchButton: React.FC<SearchButtonProps> = ({ icon, buttonName }) => {
+  const buttonStyle = {
+    mt: 3,
+    borderRadius: 100,
+    height: 50,
+    minWidth: 350,
+  };
+
+  return (
+    <Button variant="contained" startIcon={icon} sx={buttonStyle}>
+      {buttonName}
+    </Button>
+  );
+};
