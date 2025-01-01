@@ -124,7 +124,7 @@ interface RetrospectiveMethodPaperAreaProps {
 const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> =
   memo(({ retrospectiveMethods, onRetrospectiveMethodPaperClick }) => {
     return (
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Container maxWidth="lg" sx={{ py: 10 }}>
         <Grid container spacing={3}>
           {retrospectiveMethods.map((method, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
