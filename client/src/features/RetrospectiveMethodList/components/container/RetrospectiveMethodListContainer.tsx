@@ -7,9 +7,15 @@ import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodLi
 
 const RetrospectiveMethodListContainer: React.FC = () => {
   const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false);
+  const [isShowRetrospectiveMethodList, setIsShowRetrospectiveMethodList] =
+    useState<boolean>(false);
 
   const updateisShowScrollToTop = (): void => {
     setIsShowScrollToTop(window.scrollY > 0);
+  };
+
+  const handleRetroMethodListShowButtonClick = (): void => {
+    setIsShowRetrospectiveMethodList(true);
   };
 
   useLayoutEffect(() => {
@@ -38,11 +44,17 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         retrospectiveMethods={retrospectiveData.retrospectives}
         retrospectiveSceneName={retrospectiveSceneName}
         isShowScrollToTop={isShowScrollToTop}
+        isShowRetrospectiveMethodList={isShowRetrospectiveMethodList}
         onScrollToButtonClick={handleScrollToButtonClick}
         onRetrospectiveMethodPaperClick={handleRetrospectiveMethodPaperClick}
+        onRetroMethodListShowButtonClick={handleRetroMethodListShowButtonClick}
       />
     ),
-    [isShowScrollToTop, handleRetrospectiveMethodPaperClick],
+    [
+      isShowScrollToTop,
+      isShowRetrospectiveMethodList,
+      handleRetrospectiveMethodPaperClick,
+    ],
   );
 
   return memorizedPresenter;

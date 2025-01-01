@@ -29,8 +29,10 @@ interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethods;
   retrospectiveSceneName: RetrospectiveSceneNames;
   isShowScrollToTop: boolean;
+  isShowRetrospectiveMethodList: boolean;
   onScrollToButtonClick: () => void;
   onRetrospectiveMethodPaperClick: () => void;
+  onRetroMethodListShowButtonClick: () => void;
 }
 
 const RetrospectiveMethodListPresenter: React.FC<
@@ -39,16 +41,23 @@ const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethods,
   retrospectiveSceneName,
   isShowScrollToTop,
+  isShowRetrospectiveMethodList,
   onScrollToButtonClick,
   onRetrospectiveMethodPaperClick,
+  onRetroMethodListShowButtonClick,
 }) => {
   return (
     <Box>
-      <SearchArea retrospectiveSceneName={retrospectiveSceneName} />
-      <RetrospectiveMethodPaperArea
-        retrospectiveMethods={retrospectiveMethods}
-        onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
+      <SearchArea
+        retrospectiveSceneName={retrospectiveSceneName}
+        onRetroMethodListShowButtonClick={onRetroMethodListShowButtonClick}
       />
+      {isShowRetrospectiveMethodList && (
+        <RetrospectiveMethodPaperArea
+          retrospectiveMethods={retrospectiveMethods}
+          onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
+        />
+      )}
       <ScrollToTop isShow={isShowScrollToTop} onClick={onScrollToButtonClick} />
     </Box>
   );
@@ -58,10 +67,11 @@ export default memo(RetrospectiveMethodListPresenter);
 
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
+  onRetroMethodListShowButtonClick: () => void;
 }
 
 const SearchArea: React.FC<SearchAreaProps> = memo(
-  ({ retrospectiveSceneName }) => {
+  ({ retrospectiveSceneName, onRetroMethodListShowButtonClick }) => {
     return (
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
         <Container maxWidth="md">
@@ -103,10 +113,14 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
               <RetrospectiveMethodSearchButton
                 icon={<ListAltIcon />}
                 buttonName="一覧表示"
+                onClick={onRetroMethodListShowButtonClick}
               />
               <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
                 buttonName="ランダムに1つ抽選"
+                onClick={() => {
+                  console.log('[tmp]random button clicked');
+                }}
               />
             </Box>
           </Grid>

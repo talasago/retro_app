@@ -4,10 +4,11 @@ import { Button } from '@mui/material';
 interface SearchButtonProps {
   icon: React.ReactNode;
   buttonName: string;
+  onClick: () => void;
 }
 
 const RetrospectiveMethodSearchButton: React.FC<SearchButtonProps> = memo(
-  ({ icon, buttonName }) => {
+  ({ icon, buttonName, onClick }) => {
     return (
       <Button
         variant="contained"
@@ -18,6 +19,7 @@ const RetrospectiveMethodSearchButton: React.FC<SearchButtonProps> = memo(
           height: 50,
           minWidth: 350,
         }}
+        onClick={onClick}
       >
         {buttonName}
       </Button>
