@@ -6,19 +6,19 @@ import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.js
 import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodListPresenter';
 
 const RetrospectiveMethodListContainer: React.FC = () => {
-  const [scrollY, setScrollY] = useState<number>(0);
+  const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false);
 
-  const updateScrollYPosition = (): void => {
-    setScrollY(window.scrollY);
+  const updateisShowScrollToTop = (): void => {
+    setIsShowScrollToTop(window.scrollY > 0);
   };
 
   useLayoutEffect(() => {
-    window.addEventListener('resize', updateScrollYPosition);
-    window.addEventListener('scroll', updateScrollYPosition);
+    window.addEventListener('resize', updateisShowScrollToTop);
+    window.addEventListener('scroll', updateisShowScrollToTop);
 
     return () => {
-      window.removeEventListener('resize', updateScrollYPosition);
-      window.removeEventListener('scroll', updateScrollYPosition);
+      window.removeEventListener('resize', updateisShowScrollToTop);
+      window.removeEventListener('scroll', updateisShowScrollToTop);
     };
   });
 
@@ -37,12 +37,12 @@ const RetrospectiveMethodListContainer: React.FC = () => {
       <RetrospectiveMethodListPresenter
         retrospectiveMethods={retrospectiveData.retrospectives}
         retrospectiveSceneName={retrospectiveSceneName}
-        scrollY={scrollY}
+        isShowScrollToTop={isShowScrollToTop}
         onScrollToButtonClick={handleScrollToButtonClick}
         onRetrospectiveMethodPaperClick={handleRetrospectiveMethodPaperClick}
       />
     ),
-    [scrollY, handleRetrospectiveMethodPaperClick],
+    [isShowScrollToTop, handleRetrospectiveMethodPaperClick],
   );
 
   return memorizedPresenter;

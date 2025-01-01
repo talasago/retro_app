@@ -28,7 +28,7 @@ type RetrospectiveSceneNames = Record<string, string>;
 interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethods;
   retrospectiveSceneName: RetrospectiveSceneNames;
-  scrollY: number;
+  isShowScrollToTop: boolean;
   onScrollToButtonClick: () => void;
   onRetrospectiveMethodPaperClick: () => void;
 }
@@ -38,7 +38,7 @@ const RetrospectiveMethodListPresenter: React.FC<
 > = ({
   retrospectiveMethods,
   retrospectiveSceneName,
-  scrollY,
+  isShowScrollToTop,
   onScrollToButtonClick,
   onRetrospectiveMethodPaperClick,
 }) => {
@@ -49,7 +49,7 @@ const RetrospectiveMethodListPresenter: React.FC<
         retrospectiveMethods={retrospectiveMethods}
         onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
       />
-      <ScrollToTop scrollY={scrollY} onClick={onScrollToButtonClick} />
+      <ScrollToTop isShow={isShowScrollToTop} onClick={onScrollToButtonClick} />
     </Box>
   );
 };
@@ -141,11 +141,11 @@ const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> 
   });
 
 interface ScrollToTopProps {
-  scrollY: number;
   onClick: () => void;
+  isShow: boolean;
 }
 
-const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY, onClick }) => {
+const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ onClick, isShow }) => {
   return (
     <Box
       sx={{
@@ -154,7 +154,7 @@ const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY, onClick }) => {
         right: 80,
       }}
     >
-      <Fade in={scrollY > 0}>
+      <Fade in={isShow}>
         <IconButton
           onClick={onClick}
           style={{
