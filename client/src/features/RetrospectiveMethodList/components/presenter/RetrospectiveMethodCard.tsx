@@ -1,4 +1,4 @@
-import type React from 'react';
+import { memo } from 'react';
 import { Typography, Paper } from '@mui/material';
 
 interface RetrospectiveMethodCardProps {
@@ -49,4 +49,4 @@ const RetrospectiveMethodCard: React.FC<RetrospectiveMethodCardProps> = ({
   );
 };
 
-export default RetrospectiveMethodCard;
+export default memo(RetrospectiveMethodCard);

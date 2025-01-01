@@ -1,5 +1,4 @@
-import type React from 'react';
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useMemo } from 'react';
 // eslint-disable-next-line import/extensions
 import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
@@ -23,13 +22,18 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     };
   });
 
-  return (
-    <RetrospectiveMethodListPresenter
-      retrospectiveMethods={retrospectiveData.retrospectives}
-      retrospectiveSceneName={retrospectiveSceneName}
-      scrollY={scrollY}
-    />
+  const memorizedPresenter = useMemo(
+    () => (
+      <RetrospectiveMethodListPresenter
+        retrospectiveMethods={retrospectiveData.retrospectives}
+        retrospectiveSceneName={retrospectiveSceneName}
+        scrollY={scrollY}
+      />
+    ),
+    [scrollY],
   );
+
+  return memorizedPresenter;
 };
 
 export default RetrospectiveMethodListContainer;

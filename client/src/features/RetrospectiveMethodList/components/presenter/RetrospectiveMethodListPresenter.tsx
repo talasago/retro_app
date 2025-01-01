@@ -1,4 +1,4 @@
-import React from 'react';
+import { memo } from 'react';
 import {
   Box,
   Container,
@@ -31,7 +31,7 @@ interface retrospectiveMethodListPresenterProps {
   scrollY: number;
 }
 
-const retrospectiveMethodListPresenter: React.FC<
+const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethodListPresenterProps
 > = ({ retrospectiveMethods, retrospectiveSceneName, scrollY }) => {
   return (
@@ -45,106 +45,113 @@ const retrospectiveMethodListPresenter: React.FC<
   );
 };
 
-export default React.memo(retrospectiveMethodListPresenter);
+export default memo(RetrospectiveMethodListPresenter);
 
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
 }
 
-const SearchArea: React.FC<SearchAreaProps> = ({ retrospectiveSceneName }) => {
-  return (
-    <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
-      <Container maxWidth="md">
-        <Typography
-          variant="h6"
-          sx={{
-            color: 'rgba(19, 171, 121, 1)',
-            letterSpacing: 1.4,
-            mb: 3,
-          }}
-        >
-          場面ごとで使いやすいふりかえり手法
-        </Typography>
-        <Grid>
-          <Grid item xs={12}>
-            <Box display="flex" justifyContent="space-between" flexWrap="wrap">
-              {Object.entries(retrospectiveSceneName).map((SceneNames, _) => (
-                <Box
-                  key={SceneNames[0]}
-                  display="flex"
-                  alignItems="center"
-                  sx={{ width: '33%' }}
-                >
-                  <FormControlLabel
-                    control={<Checkbox />}
-                    label={SceneNames[1]}
-                  />
-                </Box>
-              ))}
-              <Box sx={{ width: '33%' }}></Box>
+const SearchArea: React.FC<SearchAreaProps> = memo(
+  ({ retrospectiveSceneName }) => {
+    return (
+      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
+        <Container maxWidth="md">
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'rgba(19, 171, 121, 1)',
+              letterSpacing: 1.4,
+              mb: 3,
+            }}
+          >
+            場面ごとで使いやすいふりかえり手法
+          </Typography>
+          <Grid>
+            <Grid item xs={12}>
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                flexWrap="wrap"
+              >
+                {Object.entries(retrospectiveSceneName).map((SceneNames, _) => (
+                  <Box
+                    key={SceneNames[0]}
+                    display="flex"
+                    alignItems="center"
+                    sx={{ width: '33%' }}
+                  >
+                    <FormControlLabel
+                      control={<Checkbox />}
+                      label={SceneNames[1]}
+                    />
+                  </Box>
+                ))}
+                <Box sx={{ width: '33%' }}></Box>
+              </Box>
+            </Grid>
+
+            <Box display="flex" justifyContent="space-around">
+              <SearchButton icon={<ListAltIcon />} buttonName="一覧表示" />
+              <SearchButton
+                icon={<ShuffleIcon />}
+                buttonName="ランダムに1つ抽選"
+              />
             </Box>
           </Grid>
-
-          <Box display="flex" justifyContent="space-around">
-            <SearchButton icon={<ListAltIcon />} buttonName="一覧表示" />
-            <SearchButton
-              icon={<ShuffleIcon />}
-              buttonName="ランダムに1つ抽選"
-            />
-          </Box>
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
+        </Container>
+      </Box>
+    );
+  },
+);
 
 interface SearchButtonProps {
   icon: React.ReactNode;
   buttonName: string;
 }
 
-const SearchButton: React.FC<SearchButtonProps> = ({ icon, buttonName }) => {
-  const buttonStyle = {
-    mt: 3,
-    borderRadius: 100,
-    height: 50,
-    minWidth: 350,
-  };
+const SearchButton: React.FC<SearchButtonProps> = memo(
+  ({ icon, buttonName }) => {
+    const buttonStyle = {
+      mt: 3,
+      borderRadius: 100,
+      height: 50,
+      minWidth: 350,
+    };
 
-  return (
-    <Button variant="contained" startIcon={icon} sx={buttonStyle}>
-      {buttonName}
-    </Button>
-  );
-};
+    return (
+      <Button variant="contained" startIcon={icon} sx={buttonStyle}>
+        {buttonName}
+      </Button>
+    );
+  },
+);
 
 interface RetrospectiveMethodCardAreaProps {
   retrospectiveMethods: RetrospectiveMethods;
 }
-const RetrospectiveMethodCardArea: React.FC<
-  RetrospectiveMethodCardAreaProps
-> = ({ retrospectiveMethods }) => {
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Grid container spacing={3}>
-        {retrospectiveMethods.map((method, index) => (
-          <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-            <RetrospectiveMethodCard
-              title={method.title}
-              description={method.wayOfProceeding}
-            />
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
-  );
-};
+const RetrospectiveMethodCardArea: React.FC<RetrospectiveMethodCardAreaProps> =
+  memo(({ retrospectiveMethods }) => {
+    return (
+      <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Grid container spacing={3}>
+          {retrospectiveMethods.map((method, index) => (
+            <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
+              <RetrospectiveMethodCard
+                title={method.title}
+                description={method.wayOfProceeding}
+              />
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    );
+  });
 
 interface ScrollToTopProps {
   scrollY: number;
 }
 
-const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
+const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ scrollY }) => {
   const handleClick = (): void => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -173,4 +180,4 @@ const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
       </Fade>
     </Box>
   );
-};
+});
