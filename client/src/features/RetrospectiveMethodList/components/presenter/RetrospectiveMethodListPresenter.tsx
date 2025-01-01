@@ -16,17 +16,17 @@ import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
 
 // TODO:データ型は別のところで定義したい。ここで全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
-type RetrospectiveMethods = Array<{
+export type RetrospectiveMethod = {
   title: string;
   easyToUseScenes: number[];
   wayOfProceeding: string;
   reference: string;
   id: number;
-}>;
+};
 type RetrospectiveSceneNames = Record<string, string>;
 
 interface retrospectiveMethodListPresenterProps {
-  retrospectiveMethods: RetrospectiveMethods;
+  retrospectiveMethods: RetrospectiveMethod[];
   retrospectiveSceneName: RetrospectiveSceneNames;
   isShowScrollToTop: boolean;
   isShowRetrospectiveMethodList: boolean;
@@ -131,7 +131,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 );
 
 interface RetrospectiveMethodPaperAreaProps {
-  retrospectiveMethods: RetrospectiveMethods;
+  retrospectiveMethods: RetrospectiveMethod[];
   onRetrospectiveMethodPaperClick: () => void;
 }
 
@@ -143,8 +143,7 @@ const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> 
           {retrospectiveMethods.map((method, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveMethodPaper
-                title={method.title}
-                description={method.wayOfProceeding}
+                retrospectiveMethod={method}
                 onClick={onRetrospectiveMethodPaperClick}
               />
             </Grid>

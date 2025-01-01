@@ -1,15 +1,14 @@
 import { memo } from 'react';
 import { Typography, Paper, ButtonBase } from '@mui/material';
+import type { RetrospectiveMethod } from './RetrospectiveMethodListPresenter';
 
 interface RetrospectiveMethodPaperProps {
-  title: string;
-  description: string;
+  retrospectiveMethod: RetrospectiveMethod;
   onClick: () => void;
 }
 
 const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
-  title,
-  description,
+  retrospectiveMethod,
   onClick,
 }) => {
   return (
@@ -40,7 +39,7 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             letterSpacing: 1.4,
           }}
         >
-          {title}
+          {retrospectiveMethod.title}
         </Typography>
 
         <Typography
@@ -56,7 +55,7 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             WebkitBoxOrient: 'vertical',
           }}
         >
-          {description}
+          {retrospectiveMethod.wayOfProceeding}
         </Typography>
       </Paper>
     </ButtonBase>
