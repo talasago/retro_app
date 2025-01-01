@@ -26,6 +26,10 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleRetrospectiveMethodPaperClick = (): void => {
+    console.log('[tmp]Retro paper clicked.');
+  };
+
   const memorizedPresenter = useMemo(
     () => (
       <RetrospectiveMethodListPresenter
@@ -33,6 +37,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         retrospectiveSceneName={retrospectiveSceneName}
         scrollY={scrollY}
         onScrollToButtonClick={handleScrollToButtonClick}
+        onRetrospectiveMethodPaperClick={handleRetrospectiveMethodPaperClick}
       />
     ),
     [scrollY],

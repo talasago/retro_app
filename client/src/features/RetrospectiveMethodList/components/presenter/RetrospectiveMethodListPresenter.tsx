@@ -30,6 +30,7 @@ interface retrospectiveMethodListPresenterProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
   scrollY: number;
   onScrollToButtonClick: () => void;
+  onRetrospectiveMethodPaperClick: () => void;
 }
 
 const RetrospectiveMethodListPresenter: React.FC<
@@ -39,12 +40,14 @@ const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveSceneName,
   scrollY,
   onScrollToButtonClick,
+  onRetrospectiveMethodPaperClick,
 }) => {
   return (
     <Box>
       <SearchArea retrospectiveSceneName={retrospectiveSceneName} />
       <RetrospectiveMethodCardArea
         retrospectiveMethods={retrospectiveMethods}
+        onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
       />
       <ScrollToTop scrollY={scrollY} onClick={onScrollToButtonClick} />
     </Box>
@@ -115,9 +118,11 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 
 interface RetrospectiveMethodCardAreaProps {
   retrospectiveMethods: RetrospectiveMethods;
+  onRetrospectiveMethodPaperClick: () => void;
 }
+
 const RetrospectiveMethodCardArea: React.FC<RetrospectiveMethodCardAreaProps> =
-  memo(({ retrospectiveMethods }) => {
+  memo(({ retrospectiveMethods, onRetrospectiveMethodPaperClick }) => {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
@@ -126,6 +131,7 @@ const RetrospectiveMethodCardArea: React.FC<RetrospectiveMethodCardAreaProps> =
               <RetrospectiveMethodCard
                 title={method.title}
                 description={method.wayOfProceeding}
+                onClick={onRetrospectiveMethodPaperClick}
               />
             </Grid>
           ))}
