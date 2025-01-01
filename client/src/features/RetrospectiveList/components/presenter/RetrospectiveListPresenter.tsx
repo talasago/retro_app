@@ -62,6 +62,26 @@ const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
   );
 };
 
+interface SearchButtonProps {
+  icon: React.ReactNode;
+  buttonName: string;
+}
+
+const SearchButton: React.FC<SearchButtonProps> = ({ icon, buttonName }) => {
+  const buttonStyle = {
+    mt: 3,
+    borderRadius: 100,
+    height: 50,
+    minWidth: 350,
+  };
+
+  return (
+    <Button variant="contained" startIcon={icon} sx={buttonStyle}>
+      {buttonName}
+    </Button>
+  );
+};
+
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   retrospectiveMethods,
   retrospectiveSceneName,
@@ -120,31 +140,12 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
               </Box>
             </Grid>
 
-            <Box display="flex" justifyContent="space-evenly">
-              <Button
-                variant="contained"
-                startIcon={<ListAltIcon />}
-                sx={{
-                  mt: 3,
-                  borderRadius: 100,
-                  px: 14,
-                  height: 50,
-                }}
-              >
-                一覧表示
-              </Button>
-              <Button
-                variant="contained"
-                startIcon={<ShuffleIcon />}
-                sx={{
-                  mt: 3,
-                  borderRadius: 100,
-                  px: 10,
-                  height: 50,
-                }}
-              >
-                ランダムに1つ抽選
-              </Button>
+            <Box display="flex" justifyContent="space-around">
+              <SearchButton icon={<ListAltIcon />} buttonName="一覧表示" />
+              <SearchButton
+                icon={<ShuffleIcon />}
+                buttonName="ランダムに1つ抽選"
+              />
             </Box>
           </Grid>
         </Container>
