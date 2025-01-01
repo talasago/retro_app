@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React from 'react';
 import {
   Box,
   Container,
@@ -25,28 +25,14 @@ interface RetrospectiveListPresenterProps {
     id: number;
   }>;
   retrospectiveSceneName: Record<string, string>;
+  scrollY: number;
 }
 
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   retrospectiveMethods,
   retrospectiveSceneName,
+  scrollY,
 }) => {
-  const [scrollY, setScrollY] = useState<number>(0);
-
-  const determineButtonPosition = (): void => {
-    setScrollY(window.scrollY);
-  };
-
-  useLayoutEffect(() => {
-    window.addEventListener('resize', determineButtonPosition);
-    window.addEventListener('scroll', determineButtonPosition);
-
-    return () => {
-      window.removeEventListener('resize', determineButtonPosition);
-      window.removeEventListener('scroll', determineButtonPosition);
-    };
-  });
-
   return (
     <Box>
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
