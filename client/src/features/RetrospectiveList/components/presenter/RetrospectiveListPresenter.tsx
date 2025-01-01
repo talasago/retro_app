@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import {
   Box,
   Container,
@@ -6,7 +6,10 @@ import {
   Checkbox,
   Grid,
   FormControlLabel,
+  Fade,
+  IconButton,
 } from '@mui/material';
+import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import RetrospectiveCard from './RetrospectiveCard';
 
 // TODO:データ型は別のところで定義したい。全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
@@ -21,10 +24,61 @@ interface RetrospectiveListPresenterProps {
   retrospectiveSceneName: Record<string, string>;
 }
 
+interface ScrollToTopProps {
+  scrollY: number;
+}
+
+const ScrollToTop: React.FC<ScrollToTopProps> = ({ scrollY }) => {
+  const handleClick = (): void => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <Box
+      sx={{
+        position: 'fixed',
+        bottom: 80,
+        right: 80,
+      }}
+    >
+      <Fade in={scrollY > 0}>
+        <IconButton
+          onClick={handleClick}
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: 100,
+            color: 'rgba(19, 171, 121, 1)',
+            backgroundColor: 'rgb(234, 255, 248)',
+          }}
+        >
+          <VerticalAlignTopIcon style={{ fontSize: 60 }} />
+        </IconButton>
+      </Fade>
+    </Box>
+  );
+};
+
 const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
   retrospectiveMethods,
   retrospectiveSceneName,
 }) => {
+  const [scrollY, setScrollY] = useState<number>(0);
+
+  const determineButtonPosition = (): void => {
+    setScrollY(window.scrollY);
+  };
+
+  useLayoutEffect(() => {
+    window.addEventListener('resize', determineButtonPosition);
+    window.addEventListener('scroll', determineButtonPosition);
+
+    return () => {
+      window.removeEventListener('resize', determineButtonPosition);
+      window.removeEventListener('scroll', determineButtonPosition);
+    };
+  });
+
   return (
     <Box>
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 10 }}>
@@ -69,7 +123,6 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
           </Grid>
         </Container>
       </Box>
-
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
           {retrospectiveMethods.map((method, index) => (
@@ -83,20 +136,7 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
         </Grid>
       </Container>
 
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 4 }}>
-        <Button
-          style={{
-            width: 74,
-            height: 74,
-            borderRadius: 100,
-            fontSize: 40,
-            backgroundColor: 'rgb(234, 255, 248)',
-            color: 'rgba(19, 171, 121, 1)',
-          }}
-        >
-          ↑
-        </Button>
-      </Box>
+      <ScrollToTop scrollY={scrollY} />
     </Box>
   );
 };
