@@ -12,7 +12,7 @@ import {
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
-import RetrospectiveMethodCard from './RetrospectiveMethodCard';
+import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
 
 // TODO:データ型は別のところで定義したい。ここで全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
@@ -45,7 +45,7 @@ const RetrospectiveMethodListPresenter: React.FC<
   return (
     <Box>
       <SearchArea retrospectiveSceneName={retrospectiveSceneName} />
-      <RetrospectiveMethodCardArea
+      <RetrospectiveMethodPaperArea
         retrospectiveMethods={retrospectiveMethods}
         onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
       />
@@ -116,19 +116,19 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
   },
 );
 
-interface RetrospectiveMethodCardAreaProps {
+interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethods;
   onRetrospectiveMethodPaperClick: () => void;
 }
 
-const RetrospectiveMethodCardArea: React.FC<RetrospectiveMethodCardAreaProps> =
+const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> =
   memo(({ retrospectiveMethods, onRetrospectiveMethodPaperClick }) => {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
           {retrospectiveMethods.map((method, index) => (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-              <RetrospectiveMethodCard
+              <RetrospectiveMethodPaper
                 title={method.title}
                 description={method.wayOfProceeding}
                 onClick={onRetrospectiveMethodPaperClick}

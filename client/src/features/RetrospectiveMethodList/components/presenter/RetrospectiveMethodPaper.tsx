@@ -1,13 +1,13 @@
 import { memo } from 'react';
 import { Typography, Paper, ButtonBase } from '@mui/material';
 
-interface RetrospectiveMethodCardProps {
+interface RetrospectiveMethodPaperProps {
   title: string;
   description: string;
   onClick: () => void;
 }
 
-const RetrospectiveMethodCard: React.FC<RetrospectiveMethodCardProps> = ({
+const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
   title,
   description,
   onClick,
@@ -63,4 +63,4 @@ const RetrospectiveMethodCard: React.FC<RetrospectiveMethodCardProps> = ({
   );
 };
 
-export default memo(RetrospectiveMethodCard);
+export default memo(RetrospectiveMethodPaper);
