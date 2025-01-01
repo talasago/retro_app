@@ -2,7 +2,6 @@ import { memo } from 'react';
 import {
   Box,
   Container,
-  Button,
   Checkbox,
   Grid,
   FormControlLabel,
@@ -14,6 +13,7 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import RetrospectiveMethodCard from './RetrospectiveMethodCard';
+import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
 
 // TODO:データ型は別のところで定義したい。ここで全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
 type RetrospectiveMethods = Array<{
@@ -97,8 +97,11 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
             </Grid>
 
             <Box display="flex" justifyContent="space-around">
-              <SearchButton icon={<ListAltIcon />} buttonName="一覧表示" />
-              <SearchButton
+              <RetrospectiveMethodSearchButton
+                icon={<ListAltIcon />}
+                buttonName="一覧表示"
+              />
+              <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
                 buttonName="ランダムに1つ抽選"
               />
@@ -106,28 +109,6 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
           </Grid>
         </Container>
       </Box>
-    );
-  },
-);
-
-interface SearchButtonProps {
-  icon: React.ReactNode;
-  buttonName: string;
-}
-
-const SearchButton: React.FC<SearchButtonProps> = memo(
-  ({ icon, buttonName }) => {
-    const buttonStyle = {
-      mt: 3,
-      borderRadius: 100,
-      height: 50,
-      minWidth: 350,
-    };
-
-    return (
-      <Button variant="contained" startIcon={icon} sx={buttonStyle}>
-        {buttonName}
-      </Button>
     );
   },
 );
