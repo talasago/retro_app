@@ -10,7 +10,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const [isShowRetrospectiveMethodList, setIsShowRetrospectiveMethodList] =
     useState<boolean>(false);
 
-  const updateisShowScrollToTop = (): void => {
+  const updateIsShowScrollToTop = (): void => {
     setIsShowScrollToTop(window.scrollY > 0);
   };
 
@@ -19,12 +19,12 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   };
 
   useLayoutEffect(() => {
-    window.addEventListener('resize', updateisShowScrollToTop);
-    window.addEventListener('scroll', updateisShowScrollToTop);
+    window.addEventListener('resize', updateIsShowScrollToTop);
+    window.addEventListener('scroll', updateIsShowScrollToTop);
 
     return () => {
-      window.removeEventListener('resize', updateisShowScrollToTop);
-      window.removeEventListener('scroll', updateisShowScrollToTop);
+      window.removeEventListener('resize', updateIsShowScrollToTop);
+      window.removeEventListener('scroll', updateIsShowScrollToTop);
     };
   });
 
