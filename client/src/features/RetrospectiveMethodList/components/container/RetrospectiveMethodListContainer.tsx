@@ -11,7 +11,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     useState<boolean>(false);
 
   const updateIsShowScrollToTop = (): void => {
-    setIsShowScrollToTop(window.scrollY > 0);
+    setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
   };
 
   const handleRetroMethodListShowButtonClick = (): void => {
