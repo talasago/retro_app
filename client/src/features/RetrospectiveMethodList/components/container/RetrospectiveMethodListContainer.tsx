@@ -1,4 +1,4 @@
-import { useState, useLayoutEffect, useMemo } from 'react';
+import { useState, useLayoutEffect, useMemo, useCallback } from 'react';
 // eslint-disable-next-line import/extensions
 import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
@@ -26,9 +26,11 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleRetrospectiveMethodPaperClick = (): void => {
+  // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
+  // これが無いと、恐らく毎回新しい関数インスタンスがが生成されてるぽい
+  const handleRetrospectiveMethodPaperClick = useCallback(() => {
     console.log('[tmp]Retro paper clicked.');
-  };
+  }, []);
 
   const memorizedPresenter = useMemo(
     () => (
@@ -40,7 +42,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         onRetrospectiveMethodPaperClick={handleRetrospectiveMethodPaperClick}
       />
     ),
-    [scrollY],
+    [scrollY, handleRetrospectiveMethodPaperClick],
   );
 
   return memorizedPresenter;
