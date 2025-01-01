@@ -8,7 +8,10 @@ import {
   FormControlLabel,
   Fade,
   IconButton,
+  Typography,
 } from '@mui/material';
+import ListAltIcon from '@mui/icons-material/ListAlt';
+import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import RetrospectiveCard from './RetrospectiveCard';
 
@@ -81,8 +84,18 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
 
   return (
     <Box>
-      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 10 }}>
+      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
         <Container maxWidth="md">
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'rgba(19, 171, 121, 1)',
+              letterSpacing: 1.4,
+              mb: 3,
+            }}
+          >
+            場面ごとで使いやすいふりかえり手法
+          </Typography>
           <Grid>
             <Grid item xs={12}>
               <Box
@@ -107,9 +120,22 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
               </Box>
             </Grid>
 
-            <Box display="flex" flexDirection="column" alignItems="center">
+            <Box display="flex" justifyContent="space-evenly">
               <Button
                 variant="contained"
+                startIcon={<ListAltIcon />}
+                sx={{
+                  mt: 3,
+                  borderRadius: 100,
+                  px: 14,
+                  height: 50,
+                }}
+              >
+                一覧表示
+              </Button>
+              <Button
+                variant="contained"
+                startIcon={<ShuffleIcon />}
                 sx={{
                   mt: 3,
                   borderRadius: 100,
@@ -117,12 +143,13 @@ const RetrospectiveListPresenter: React.FC<RetrospectiveListPresenterProps> = ({
                   height: 50,
                 }}
               >
-                ランダム表示
+                ランダムに1つ抽選
               </Button>
             </Box>
           </Grid>
         </Container>
       </Box>
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Grid container spacing={3}>
           {retrospectiveMethods.map((method, index) => (
