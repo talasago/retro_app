@@ -1,15 +1,17 @@
 import { memo } from 'react';
-import { Typography, Paper, ButtonBase } from '@mui/material';
+import { Typography, Paper, ButtonBase, Box } from '@mui/material';
 import type { RetrospectiveMethod } from './RetrospectiveMethodListPresenter';
 
 interface RetrospectiveMethodPaperProps {
   retrospectiveMethod: RetrospectiveMethod;
   onClick: () => void;
+  categoryChips: React.ReactElement[];
 }
 
 const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
   retrospectiveMethod,
   onClick,
+  categoryChips,
 }) => {
   return (
     <ButtonBase
@@ -29,6 +31,9 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
           '&:hover': {
             backgroundColor: 'rgba(239, 249, 246, 1)',
           },
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
         }}
       >
         <Typography
@@ -37,14 +42,13 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             color: 'rgba(19, 171, 121, 1)',
             fontWeight: 700,
             letterSpacing: 1.4,
+            marginBottom: 0.5, // 間隔を詰めるために追加
           }}
         >
           {retrospectiveMethod.title}
         </Typography>
-
         <Typography
           sx={{
-            mt: 2,
             fontSize: 16,
             lineHeight: 1.5,
             letterSpacing: 1.12,
@@ -53,10 +57,24 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
+            marginTop: -3.5, // 間隔を詰めるために追加
           }}
         >
           {retrospectiveMethod.wayOfProceeding}
         </Typography>
+
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'flex-end',
+            gap: 0.5,
+          }}
+        >
+          {categoryChips.map((chip, index) => (
+            <Box key={index}>{chip}</Box>
+          ))}
+        </Box>
       </Paper>
     </ButtonBase>
   );

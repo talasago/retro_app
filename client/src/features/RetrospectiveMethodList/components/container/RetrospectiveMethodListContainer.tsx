@@ -42,7 +42,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     () => (
       <RetrospectiveMethodListPresenter
         retrospectiveMethods={retrospectiveData.retrospectives}
-        retrospectiveSceneName={retrospectiveSceneName}
+        retrospectiveSceneNames={retrospectiveSceneName}
         isShowScrollToTop={isShowScrollToTop}
         isShowRetrospectiveMethodList={isShowRetrospectiveMethodList}
         onScrollToButtonClick={handleScrollToButtonClick}

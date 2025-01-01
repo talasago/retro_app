@@ -12,6 +12,7 @@ import {
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
+import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
 
@@ -23,11 +24,11 @@ export type RetrospectiveMethod = {
   reference: string;
   id: number;
 };
-type RetrospectiveSceneNames = Record<string, string>;
+export type RetrospectiveSceneNames = Record<string, string>;
 
 interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethod[];
-  retrospectiveSceneName: RetrospectiveSceneNames;
+  retrospectiveSceneNames: RetrospectiveSceneNames;
   isShowScrollToTop: boolean;
   isShowRetrospectiveMethodList: boolean;
   onScrollToButtonClick: () => void;
@@ -39,7 +40,7 @@ const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethodListPresenterProps
 > = ({
   retrospectiveMethods,
-  retrospectiveSceneName,
+  retrospectiveSceneNames,
   isShowScrollToTop,
   isShowRetrospectiveMethodList,
   onScrollToButtonClick,
@@ -49,13 +50,14 @@ const RetrospectiveMethodListPresenter: React.FC<
   return (
     <Box>
       <SearchArea
-        retrospectiveSceneName={retrospectiveSceneName}
+        retrospectiveSceneName={retrospectiveSceneNames}
         onRetroMethodListShowButtonClick={onRetroMethodListShowButtonClick}
       />
       {isShowRetrospectiveMethodList && (
         <RetrospectiveMethodPaperArea
           retrospectiveMethods={retrospectiveMethods}
           onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
+          retrospectiveSceneNames={retrospectiveSceneNames}
         />
       )}
       <ScrollToTop isShow={isShowScrollToTop} onClick={onScrollToButtonClick} />
@@ -133,25 +135,50 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethod[];
   onRetrospectiveMethodPaperClick: () => void;
+  retrospectiveSceneNames: RetrospectiveSceneNames;
 }
 
 const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> =
-  memo(({ retrospectiveMethods, onRetrospectiveMethodPaperClick }) => {
-    return (
-      <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Grid container spacing={3}>
-          {retrospectiveMethods.map((method, index) => (
+  memo(
+    ({
+      retrospectiveMethods,
+      onRetrospectiveMethodPaperClick,
+      retrospectiveSceneNames,
+    }) => {
+      const displayRetrospectivePapers = retrospectiveMethods.map(
+        (method, index) => {
+          // IDを元に文言のtipに変換
+          const categoryChips = method.easyToUseScenes.map((sceneId) => {
+            return (
+              <RetrospectiveMethodCategoryChip
+                key={sceneId}
+                sceneId={sceneId}
+                retrospectiveSceneNames={retrospectiveSceneNames}
+              />
+            );
+          });
+
+          return (
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveMethodPaper
                 retrospectiveMethod={method}
                 onClick={onRetrospectiveMethodPaperClick}
+                categoryChips={categoryChips}
               />
             </Grid>
-          ))}
-        </Grid>
-      </Container>
-    );
-  });
+          );
+        },
+      );
+
+      return (
+        <Container maxWidth="lg" sx={{ py: 10 }}>
+          <Grid container spacing={3}>
+            {displayRetrospectivePapers}
+          </Grid>
+        </Container>
+      );
+    },
+  );
 
 interface ScrollToTopProps {
   onClick: () => void;
