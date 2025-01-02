@@ -17,7 +17,7 @@ const RetrospectiveMethodSearchButton: React.FC<SearchButtonProps> = memo(
           mt: 3,
           borderRadius: 100,
           height: 50,
-          minWidth: 350,
+          minWidth: 300,
         }}
         onClick={onClick}
       >

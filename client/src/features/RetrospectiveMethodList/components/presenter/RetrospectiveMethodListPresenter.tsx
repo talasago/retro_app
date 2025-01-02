@@ -8,6 +8,8 @@ import {
   Fade,
   IconButton,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import type {
   RetrospectiveMethod,
@@ -75,6 +77,9 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
     onClickRetroMethodListShowButton,
     onChangeScenesCheckbox,
   }) => {
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
     return (
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
         <Container maxWidth="md">
@@ -115,7 +120,11 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
               </Box>
             </Grid>
 
-            <Box display="flex" justifyContent="space-around">
+            <Box
+              display="flex"
+              justifyContent="space-around"
+              flexDirection={isSmallScreen ? 'column' : 'row'}
+            >
               <RetrospectiveMethodSearchButton
                 icon={<ListAltIcon />}
                 buttonName="検索して一覧表示"
