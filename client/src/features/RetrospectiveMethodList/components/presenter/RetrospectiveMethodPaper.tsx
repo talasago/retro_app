@@ -27,7 +27,7 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
           p: 3.5,
           borderRadius: 4,
           border: '2px solid rgba(117, 200, 172, 1)',
-          height: '100%',
+          height: '89%',
           '&:hover': {
             backgroundColor: 'rgba(239, 249, 246, 1)',
           },
@@ -53,11 +53,9 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             lineHeight: 1.5,
             letterSpacing: 1.12,
             overflow: 'hidden',
-            textOverflow: 'ellipsis',
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
-            marginTop: -3.5, // 間隔を詰めるために追加
           }}
         >
           {retrospectiveMethod.wayOfProceeding}
@@ -69,6 +67,7 @@ const RetrospectiveMethodPaper: React.FC<RetrospectiveMethodPaperProps> = ({
             flexWrap: 'wrap',
             justifyContent: 'flex-end',
             gap: 0.5,
+            marginTop: 'auto', // 下に配置するために追加
           }}
         >
           {categoryChips.map((chip, index) => (
