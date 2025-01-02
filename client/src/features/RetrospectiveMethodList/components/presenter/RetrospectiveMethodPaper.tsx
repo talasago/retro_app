@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { Typography, Paper, ButtonBase, Box } from '@mui/material';
-import type { RetrospectiveMethod } from './RetrospectiveMethodListPresenter';
-
+import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 interface RetrospectiveMethodPaperProps {
   retrospectiveMethod: RetrospectiveMethod;
   onClick: () => void;

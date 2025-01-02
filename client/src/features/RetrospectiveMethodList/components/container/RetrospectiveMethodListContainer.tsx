@@ -1,11 +1,11 @@
 import { useState, useLayoutEffect, useMemo, useCallback } from 'react';
+
+import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 // eslint-disable-next-line import/extensions
 import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodListPresenter';
-import type { RetrospectiveMethod } from '../presenter/RetrospectiveMethodListPresenter';
-
 // HACK: どのコンポーネント向けのロジックかわかるようにリファクタしたい
 const RetrospectiveMethodListContainer: React.FC = () => {
   const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false);

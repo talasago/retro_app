@@ -9,22 +9,16 @@ import {
   IconButton,
   Typography,
 } from '@mui/material';
+import type {
+  RetrospectiveMethod,
+  RetrospectiveSceneNames,
+} from 'domains/internal/retrospectiveJsonType';
 import ListAltIcon from '@mui/icons-material/ListAlt';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
 import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
-
-// TODO:データ型は別のところで定義したい。ここで全てのデータが必要ないこと、jsonデータの定義は別でした方が良いため
-export type RetrospectiveMethod = {
-  title: string;
-  easyToUseScenes: number[];
-  wayOfProceeding: string;
-  reference: string;
-  id: number;
-};
-export type RetrospectiveSceneNames = Record<string, string>;
 
 interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethod[];

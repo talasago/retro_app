@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import { Chip } from '@mui/material';
-import type { RetrospectiveSceneNames } from './RetrospectiveMethodListPresenter';
-
+import type { RetrospectiveSceneNames } from 'domains/internal/retrospectiveJsonType';
 const sceneIdTocolors: Record<number, string> = {
   1: 'rgba(254, 101, 128, 1)',
   2: 'rgba(255, 163, 55, 1)',
