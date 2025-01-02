@@ -30,6 +30,7 @@ interface retrospectiveMethodListPresenterProps {
   onClickScrollToButton: () => void;
   onClickRetrospectiveMethodPaper: () => void;
   onClickRetroMethodListShowButton: () => void;
+  onClickRandomButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 const RetrospectiveMethodListPresenter: React.FC<
@@ -42,6 +43,7 @@ const RetrospectiveMethodListPresenter: React.FC<
   onClickScrollToButton,
   onClickRetrospectiveMethodPaper,
   onClickRetroMethodListShowButton,
+  onClickRandomButton,
   onChangeScenesCheckbox,
 }) => {
   return (
@@ -49,6 +51,7 @@ const RetrospectiveMethodListPresenter: React.FC<
       <SearchArea
         retrospectiveSceneName={retrospectiveSceneNames}
         onClickRetroMethodListShowButton={onClickRetroMethodListShowButton}
+        onClickRandomButton={onClickRandomButton}
         onChangeScenesCheckbox={onChangeScenesCheckbox}
       />
       {isShowRetrospectiveMethodList && (
@@ -68,6 +71,7 @@ export default memo(RetrospectiveMethodListPresenter);
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
   onClickRetroMethodListShowButton: () => void;
+  onClickRandomButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -75,6 +79,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
   ({
     retrospectiveSceneName,
     onClickRetroMethodListShowButton,
+    onClickRandomButton,
     onChangeScenesCheckbox,
   }) => {
     const theme = useTheme();
@@ -133,9 +138,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
               <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
                 buttonName="検索してランダムに1つ抽選"
-                onClick={() => {
-                  console.log('[tmp]random button clicked');
-                }}
+                onClick={onClickRandomButton}
               />
             </Box>
           </Grid>

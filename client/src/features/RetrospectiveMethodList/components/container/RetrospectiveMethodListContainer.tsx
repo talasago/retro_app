@@ -54,6 +54,11 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     setIsModalOpen(true);
   }, []);
 
+  // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
+  const handleClickRandomButton = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
   const updateIsShowScrollToTop = (): void => {
     setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
   };
@@ -82,6 +87,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         onClickScrollToButton={handleClickScrollToButton}
         onClickRetrospectiveMethodPaper={handleClickRetrospectiveMethodPaper}
         onClickRetroMethodListShowButton={handleClickRetroMethodListShowButton}
+        onClickRandomButton={handleClickRandomButton}
         onChangeScenesCheckbox={handleChangeScenesCheckbox}
       />
     ),
@@ -92,6 +98,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
       handleClickRetrospectiveMethodPaper,
       handleClickRetroMethodListShowButton,
       handleChangeScenesCheckbox,
+      handleClickRandomButton,
     ],
   );
 
@@ -103,7 +110,9 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         retrospectiveMethod={
           retrospectiveData.retrospectives[0] as RetrospectiveMethod
         }
-        onCloseModal={() => { setIsModalOpen(false); }}
+        onCloseModal={() => {
+          setIsModalOpen(false);
+        }}
       />
     </>
   );
