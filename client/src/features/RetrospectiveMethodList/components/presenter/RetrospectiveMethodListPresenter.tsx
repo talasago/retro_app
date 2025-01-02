@@ -34,8 +34,8 @@ interface retrospectiveMethodListPresenterProps {
   onScrollToButtonClick: () => void;
   onRetrospectiveMethodPaperClick: () => void;
   onRetroMethodListShowButtonClick: () => void;
+  onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
-
 const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethodListPresenterProps
 > = ({
@@ -46,12 +46,14 @@ const RetrospectiveMethodListPresenter: React.FC<
   onScrollToButtonClick,
   onRetrospectiveMethodPaperClick,
   onRetroMethodListShowButtonClick,
+  onChangeScenesCheckbox,
 }) => {
   return (
     <Box>
       <SearchArea
         retrospectiveSceneName={retrospectiveSceneNames}
         onRetroMethodListShowButtonClick={onRetroMethodListShowButtonClick}
+        onChangeScenesCheckbox={onChangeScenesCheckbox}
       />
       {isShowRetrospectiveMethodList && (
         <RetrospectiveMethodPaperArea
@@ -70,10 +72,15 @@ export default memo(RetrospectiveMethodListPresenter);
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
   onRetroMethodListShowButtonClick: () => void;
+  onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SearchArea: React.FC<SearchAreaProps> = memo(
-  ({ retrospectiveSceneName, onRetroMethodListShowButtonClick }) => {
+  ({
+    retrospectiveSceneName,
+    onRetroMethodListShowButtonClick,
+    onChangeScenesCheckbox,
+  }) => {
     return (
       <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
         <Container maxWidth="md">
@@ -94,19 +101,22 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
                 justifyContent="space-between"
                 flexWrap="wrap"
               >
-                {Object.entries(retrospectiveSceneName).map((SceneNames, _) => (
-                  <Box
-                    key={SceneNames[0]}
-                    display="flex"
-                    alignItems="center"
-                    sx={{ width: '33%' }}
-                  >
-                    <FormControlLabel
-                      control={<Checkbox />}
-                      label={SceneNames[1]}
-                    />
-                  </Box>
-                ))}
+                {Object.entries(retrospectiveSceneName).map(
+                  ([id, sceneNames]) => (
+                    <Box
+                      key={id}
+                      display="flex"
+                      alignItems="center"
+                      sx={{ width: '33%' }}
+                    >
+                      <FormControlLabel
+                        control={<Checkbox onChange={onChangeScenesCheckbox} />}
+                        label={sceneNames}
+                        value={id}
+                      />
+                    </Box>
+                  ),
+                )}
                 <Box sx={{ width: '33%' }}></Box>
               </Box>
             </Grid>
