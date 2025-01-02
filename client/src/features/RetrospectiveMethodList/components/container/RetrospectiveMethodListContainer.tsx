@@ -5,20 +5,26 @@ import retrospectiveData from '../../../../assets/retrospective.json';
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodListPresenter';
 
+// HACK: どのコンポーネント向けのロジックかわかるようにリファクタしたい
 const RetrospectiveMethodListContainer: React.FC = () => {
   const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false);
   const [isShowRetrospectiveMethodList, setIsShowRetrospectiveMethodList] =
     useState<boolean>(false);
-
-  const updateIsShowScrollToTop = (): void => {
-    setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
-  };
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   // これが無いと、恐らく毎回新しい関数インスタンスがが生成されてるぽい
   const handleRetroMethodListShowButtonClick = useCallback(() => {
     setIsShowRetrospectiveMethodList(true);
   }, []);
+
+  // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
+  const handleRetrospectiveMethodPaperClick = useCallback(() => {
+    console.log('[tmp]Retro paper clicked.');
+  }, []);
+
+  const updateIsShowScrollToTop = (): void => {
+    setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
+  };
 
   useLayoutEffect(() => {
     window.addEventListener('resize', updateIsShowScrollToTop);
@@ -33,12 +39,6 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const handleScrollToButtonClick = (): void => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
-  // これが無いと、恐らく毎回新しい関数インスタンスがが生成されてるぽい
-  const handleRetrospectiveMethodPaperClick = useCallback(() => {
-    console.log('[tmp]Retro paper clicked.');
-  }, []);
 
   const memorizedPresenter = useMemo(
     () => (
