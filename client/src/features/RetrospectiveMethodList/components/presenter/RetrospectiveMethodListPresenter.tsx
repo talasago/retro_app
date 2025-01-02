@@ -199,12 +199,15 @@ interface ScrollToTopProps {
 }
 
 const ScrollToTop: React.FC<ScrollToTopProps> = memo(({ onClick, isShow }) => {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
     <Box
       sx={{
         position: 'fixed',
         bottom: 80,
-        right: 80,
+        right: isSmallScreen ? 20 : 80,
       }}
     >
       <Fade in={isShow}>
