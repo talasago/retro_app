@@ -53,22 +53,21 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
       />
     );
   });
+  const displayWayOfProceedings = retrospectiveMethod.wayOfProceeding
+    .split('\n')
+    .map((val, idx) => {
+      return <li key={idx}>{val}</li>;
+    });
 
   return (
     <Box
       sx={{
         maxWidth: 730,
-        fontFamily: 'Noto Sans, sans-serif',
-        borderRadius: 20,
-        backgroundColor: 'white',
-        boxShadow: '0px 4px 4px rgba(0, 0, 0, 0.25)',
         padding: '3.75, 0, 8.75',
         width: '100%',
       }}
     >
       <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
         open={isOpen}
         onClose={onCloseModal}
         slotProps={{
@@ -83,7 +82,6 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
         }}
       >
         <Container
-          maxWidth="xl"
           sx={{
             display: 'flex',
             justifyContent: 'center',
@@ -91,8 +89,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
           }}
         >
           <Paper
-            elevation={3}
-            sx={{ width: 400, padding: 4, borderRadius: 2 }}
+            sx={{ height: 700, width: 700, padding: 4, borderRadius: 5 }}
             onClick={(e) => {
               // ContainerでonClick={onClose}を入れている。
               // モーダルの横をクリックしたらクローズするようにしているため
@@ -107,40 +104,39 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               </IconButton>
             </Box>
 
-            <Box
+            {categoryChips}
+            <Typography
+              variant="h1"
               sx={{
-                px: { xs: 2.5, md: 7.5 },
-                mt: 3.25,
-                display: 'inline-block',
+                color: 'rgba(19, 171, 121, 1)',
+                fontSize: 24,
+                fontWeight: 700,
+                mt: 2.5,
               }}
             >
-              {categoryChips}
-              <Typography
-                variant="h1"
-                sx={{
-                  color: 'rgba(19, 171, 121, 1)',
-                  fontSize: 24,
-                  fontWeight: 700,
-                  mt: 2.5,
-                }}
-              >
-                {retrospectiveMethod.title}
-              </Typography>
-            </Box>
+              {retrospectiveMethod.title}
+            </Typography>
             <Typography
+              variant="h6"
               sx={{
-                mt: 3.75,
-                fontSize: 16,
-                fontWeight: 500,
-                lineHeight: '30px',
+                mt: 3,
+                fontWeight: 600,
                 letterSpacing: '1.12px',
               }}
             >
-              {retrospectiveMethod.wayOfProceeding}
+              進め方
             </Typography>
-            <Box
-              sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 5.375 }}
+            <Typography
+              sx={{
+                fontSize: 16,
+                fontWeight: 500,
+                letterSpacing: '1.12px',
+              }}
             >
+              <ul>{displayWayOfProceedings}</ul>
+            </Typography>
+
+            <Box sx={{ alignItems: 'center', gap: 1 }}>
               <LinkIcon sx={{ width: 14, height: 14 }} />
               <Typography
                 component="a"
@@ -150,15 +146,14 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
                   fontSize: 14,
                   fontWeight: 500,
                   textDecoration: 'none',
-                  letterSpacing: '0.98px',
-                  lineHeight: '25px',
                 }}
               >
-                {retrospectiveMethod.reference}
+                参照元リンク
               </Typography>
             </Box>
 
-            <Divider sx={{ my: 6 }} />
+            <Divider sx={{ my: 2 }} />
+
             <Typography
               variant="h2"
               sx={{
