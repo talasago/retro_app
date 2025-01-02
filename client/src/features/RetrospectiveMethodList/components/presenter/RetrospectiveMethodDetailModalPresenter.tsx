@@ -8,6 +8,7 @@ import {
   Typography,
   Divider,
   TextField,
+  Link,
 } from '@mui/material';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 import CloseIcon from '@mui/icons-material/Close';
@@ -120,7 +121,6 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               variant="h6"
               sx={{
                 mt: 3,
-                fontWeight: 600,
                 letterSpacing: '1.12px',
               }}
             >
@@ -138,9 +138,10 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
 
             <Box sx={{ alignItems: 'center', gap: 1 }}>
               <LinkIcon sx={{ width: 14, height: 14 }} />
-              <Typography
-                component="a"
+              <Link
                 href={retrospectiveMethod.reference}
+                rel="noopener"
+                target="_blank"
                 sx={{
                   color: 'rgba(19, 171, 121, 1)',
                   fontSize: 14,
@@ -148,8 +149,9 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
                   textDecoration: 'none',
                 }}
               >
+                {' '}
                 参照元リンク
-              </Typography>
+              </Link>
             </Box>
 
             <Divider sx={{ my: 2 }} />
