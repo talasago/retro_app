@@ -31,9 +31,9 @@ interface retrospectiveMethodListPresenterProps {
   retrospectiveSceneNames: RetrospectiveSceneNames;
   isShowScrollToTop: boolean;
   isShowRetrospectiveMethodList: boolean;
-  onScrollToButtonClick: () => void;
-  onRetrospectiveMethodPaperClick: () => void;
-  onRetroMethodListShowButtonClick: () => void;
+  onClickScrollToButton: () => void;
+  onClickRetrospectiveMethodPaper: () => void;
+  onClickRetroMethodListShowButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 const RetrospectiveMethodListPresenter: React.FC<
@@ -43,26 +43,26 @@ const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveSceneNames,
   isShowScrollToTop,
   isShowRetrospectiveMethodList,
-  onScrollToButtonClick,
-  onRetrospectiveMethodPaperClick,
-  onRetroMethodListShowButtonClick,
+  onClickScrollToButton,
+  onClickRetrospectiveMethodPaper,
+  onClickRetroMethodListShowButton,
   onChangeScenesCheckbox,
 }) => {
   return (
     <Box>
       <SearchArea
         retrospectiveSceneName={retrospectiveSceneNames}
-        onRetroMethodListShowButtonClick={onRetroMethodListShowButtonClick}
+        onClickRetroMethodListShowButton={onClickRetroMethodListShowButton}
         onChangeScenesCheckbox={onChangeScenesCheckbox}
       />
       {isShowRetrospectiveMethodList && (
         <RetrospectiveMethodPaperArea
           retrospectiveMethods={retrospectiveMethods}
-          onRetrospectiveMethodPaperClick={onRetrospectiveMethodPaperClick}
+          onClickRetrospectiveMethodPaper={onClickRetrospectiveMethodPaper}
           retrospectiveSceneNames={retrospectiveSceneNames}
         />
       )}
-      <ScrollToTop isShow={isShowScrollToTop} onClick={onScrollToButtonClick} />
+      <ScrollToTop isShow={isShowScrollToTop} onClick={onClickScrollToButton} />
     </Box>
   );
 };
@@ -71,14 +71,14 @@ export default memo(RetrospectiveMethodListPresenter);
 
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
-  onRetroMethodListShowButtonClick: () => void;
+  onClickRetroMethodListShowButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SearchArea: React.FC<SearchAreaProps> = memo(
   ({
     retrospectiveSceneName,
-    onRetroMethodListShowButtonClick,
+    onClickRetroMethodListShowButton,
     onChangeScenesCheckbox,
   }) => {
     return (
@@ -125,7 +125,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
               <RetrospectiveMethodSearchButton
                 icon={<ListAltIcon />}
                 buttonName="一覧表示"
-                onClick={onRetroMethodListShowButtonClick}
+                onClick={onClickRetroMethodListShowButton}
               />
               <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
@@ -144,7 +144,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 
 interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethod[];
-  onRetrospectiveMethodPaperClick: () => void;
+  onClickRetrospectiveMethodPaper: () => void;
   retrospectiveSceneNames: RetrospectiveSceneNames;
 }
 
@@ -152,7 +152,7 @@ const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> 
   memo(
     ({
       retrospectiveMethods,
-      onRetrospectiveMethodPaperClick,
+      onClickRetrospectiveMethodPaper,
       retrospectiveSceneNames,
     }) => {
       const displayRetrospectivePapers = retrospectiveMethods.map(
@@ -172,7 +172,7 @@ const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> 
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveMethodPaper
                 retrospectiveMethod={method}
-                onClick={onRetrospectiveMethodPaperClick}
+                onClick={onClickRetrospectiveMethodPaper}
                 categoryChips={categoryChips}
               />
             </Grid>

@@ -13,6 +13,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const [checkedScenes, setCheckedScenes] = useState<number[]>([]);
 
   // MEMO: checkしてもstateが更新されなくなるため、useCallbackを使用
+  // MEMO: checkしただけでRetrospectiveMethodPaperAreaが再度レンダリングされてしまうが、許容する。対処方法がわからない。
   const handleChangeScenesCheckbox = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>): void => {
       const checkedTargetValue = parseInt(event.target.value, 10); // 10進数でパース
@@ -31,12 +32,12 @@ const RetrospectiveMethodListContainer: React.FC = () => {
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   // これが無いと、恐らく毎回新しい関数インスタンスがが生成されてるぽい
-  const handleRetroMethodListShowButtonClick = useCallback(() => {
+  const handleClickRetroMethodListShowButton = useCallback(() => {
     setIsShowRetrospectiveMethodList(true);
   }, []);
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
-  const handleRetrospectiveMethodPaperClick = useCallback(() => {
+  const handleClickRetrospectiveMethodPaper = useCallback(() => {
     console.log('[tmp]Retro paper clicked.');
   }, []);
 
@@ -54,7 +55,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     };
   });
 
-  const handleScrollToButtonClick = (): void => {
+  const handleClickScrollToButton = (): void => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -65,17 +66,17 @@ const RetrospectiveMethodListContainer: React.FC = () => {
         retrospectiveSceneNames={retrospectiveSceneName}
         isShowScrollToTop={isShowScrollToTop}
         isShowRetrospectiveMethodList={isShowRetrospectiveMethodList}
-        onScrollToButtonClick={handleScrollToButtonClick}
-        onRetrospectiveMethodPaperClick={handleRetrospectiveMethodPaperClick}
-        onRetroMethodListShowButtonClick={handleRetroMethodListShowButtonClick}
+        onClickScrollToButton={handleClickScrollToButton}
+        onClickRetrospectiveMethodPaper={handleClickRetrospectiveMethodPaper}
+        onClickRetroMethodListShowButton={handleClickRetroMethodListShowButton}
         onChangeScenesCheckbox={handleChangeScenesCheckbox}
       />
     ),
     [
       isShowScrollToTop,
       isShowRetrospectiveMethodList,
-      handleRetrospectiveMethodPaperClick,
-      handleRetroMethodListShowButtonClick,
+      handleClickRetrospectiveMethodPaper,
+      handleClickRetroMethodListShowButton,
       handleChangeScenesCheckbox,
     ],
   );
