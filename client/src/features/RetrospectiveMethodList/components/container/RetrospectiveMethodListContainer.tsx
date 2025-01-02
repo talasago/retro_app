@@ -14,9 +14,11 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
   };
 
-  const handleRetroMethodListShowButtonClick = (): void => {
+  // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
+  // これが無いと、恐らく毎回新しい関数インスタンスがが生成されてるぽい
+  const handleRetroMethodListShowButtonClick = useCallback(() => {
     setIsShowRetrospectiveMethodList(true);
-  };
+  }, []);
 
   useLayoutEffect(() => {
     window.addEventListener('resize', updateIsShowScrollToTop);
@@ -54,6 +56,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
       isShowScrollToTop,
       isShowRetrospectiveMethodList,
       handleRetrospectiveMethodPaperClick,
+      handleRetroMethodListShowButtonClick,
     ],
   );
 
