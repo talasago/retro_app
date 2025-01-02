@@ -124,12 +124,12 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
             <Box display="flex" justifyContent="space-around">
               <RetrospectiveMethodSearchButton
                 icon={<ListAltIcon />}
-                buttonName="一覧表示"
+                buttonName="検索して一覧表示"
                 onClick={onClickRetroMethodListShowButton}
               />
               <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
-                buttonName="ランダムに1つ抽選"
+                buttonName="検索してランダムに1つ抽選"
                 onClick={() => {
                   console.log('[tmp]random button clicked');
                 }}
