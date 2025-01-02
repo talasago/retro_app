@@ -40,6 +40,8 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
             variant="contained"
             sx={{ mt: 4, bgcolor: '#454545', borderRadius: '100px', px: 10 }}
             size="large"
+            component={Link}
+            to="/retrospective_list"
           >
             試してみる
           </Button>
