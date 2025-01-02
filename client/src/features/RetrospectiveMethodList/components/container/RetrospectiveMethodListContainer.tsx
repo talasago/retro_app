@@ -6,6 +6,8 @@ import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodListPresenter from '../presenter/RetrospectiveMethodListPresenter';
+import RetroMethodDetailModalContainer from './RetrospectiveMethodDetailModalContainer';
+
 // HACK: どのコンポーネント向けのロジックかわかるようにリファクタしたい
 const RetrospectiveMethodListContainer: React.FC = () => {
   const [isShowScrollToTop, setIsShowScrollToTop] = useState<boolean>(false);
@@ -15,6 +17,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const [retrospectiveMethods, setRetrospectiveMethods] = useState<
     RetrospectiveMethod[]
   >(retrospectiveData.retrospectives);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   // MEMO: checkしてもstateが更新されなくなるため、useCallbackを使用
   // MEMO: checkしただけでRetrospectiveMethodPaperAreaが再度レンダリングされてしまうが、許容する。対処方法がわからない。
@@ -48,7 +51,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   const handleClickRetrospectiveMethodPaper = useCallback(() => {
-    console.log('[tmp]Retro paper clicked.');
+    setIsModalOpen(true);
   }, []);
 
   const updateIsShowScrollToTop = (): void => {
@@ -92,7 +95,18 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     ],
   );
 
-  return memorizedPresenter;
+  return (
+    <>
+      {memorizedPresenter}
+      <RetroMethodDetailModalContainer
+        isOpen={isModalOpen}
+        retrospectiveMethod={
+          retrospectiveData.retrospectives[0] as RetrospectiveMethod
+        }
+        onCloseModal={() => { setIsModalOpen(false); }}
+      />
+    </>
+  );
 };
 
 export default RetrospectiveMethodListContainer;
