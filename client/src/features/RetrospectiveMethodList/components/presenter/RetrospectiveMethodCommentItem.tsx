@@ -1,6 +1,7 @@
-import { memo } from 'react';
-import { Avatar, Box, Typography } from '@mui/material';
-
+import { memo, Fragment } from 'react';
+import { Box, Typography, IconButton } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PersonIcon from '@mui/icons-material/Person';
 interface RetrospectiveMethodCommentProps {
   comment: {
     id: number;
@@ -13,29 +14,51 @@ interface RetrospectiveMethodCommentProps {
 const RetrospectiveMethodCommentItem: React.FC<
   RetrospectiveMethodCommentProps
 > = ({ comment }) => {
+  const formatDate = (dateString: string): string => {
+    return new Date(dateString)
+      .toLocaleDateString('ja-JP', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      })
+      .replace(/\//g, '/');
+  };
+
+  const formatText = (text: string): JSX.Element[] => {
+    return text.split('\n').map((line, idx) => (
+      <Fragment key={idx}>
+        {line}
+        <br />
+      </Fragment>
+    ));
+  };
+
   return (
     <Box
       sx={{
         display: 'flex',
         flexDirection: 'column',
         width: '100%',
-        mt: 3,
+        mt: 2,
+        mb: 2,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <Avatar sx={{ width: 14, height: 14 }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <PersonIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
         <Typography variant="body2" fontWeight={500}>
           {comment.userName}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {comment.date}
+          {formatDate(comment.date)}
         </Typography>
+        <IconButton>
+          <DeleteIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
+        </IconButton>
       </Box>
       <Box
         sx={{
-          borderRadius: 14,
+          borderRadius: 4,
           backgroundColor: 'rgba(233, 250, 245, 1)',
-          mt: 2,
           p: 3,
         }}
       >
@@ -45,7 +68,7 @@ const RetrospectiveMethodCommentItem: React.FC<
           letterSpacing="0.98px"
           lineHeight="27px"
         >
-          {comment.comment}
+          {formatText(comment.comment)}
         </Typography>
       </Box>
     </Box>

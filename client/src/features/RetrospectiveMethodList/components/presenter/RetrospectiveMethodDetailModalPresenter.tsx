@@ -14,6 +14,7 @@ import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType
 import CloseIcon from '@mui/icons-material/Close';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
+
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
@@ -23,14 +24,14 @@ const dummyComments = {
     {
       id: 1,
       userName: 'User1',
-      date: '2021-10-01',
+      date: '2025-01-03 04:29:00.560283',
       comment: 'This is a comment',
     },
     {
       id: 2,
       userName: 'User2',
-      date: '2021-10-02',
-      comment: '2222',
+      date: '2025-01-03 04:29:00.560283',
+      comment: 'これはコメントです\n22',
     },
   ],
 };
@@ -161,7 +162,6 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               sx={{
                 fontSize: 18,
                 fontWeight: 700,
-                color: 'rgba(19, 171, 121, 1)',
               }}
             >
               コメント一覧
