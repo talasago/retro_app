@@ -33,6 +33,13 @@ const dummyComments = {
       date: '2025-01-03 04:29:00.560283',
       comment: 'これはコメントです\n22',
     },
+    {
+      id: 3,
+      userName: 'User3',
+      date: '2025-01-03 04:29:00.560283',
+      comment:
+        '最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数',
+    },
   ],
 };
 
@@ -91,7 +98,13 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
           }}
         >
           <Paper
-            sx={{ height: 700, width: 700, padding: 4, borderRadius: 5 }}
+            sx={{
+              height: 700,
+              width: 700,
+              padding: 4,
+              borderRadius: 5,
+              overflowY: 'auto',
+            }}
             onClick={(e) => {
               // ContainerでonClick={onClose}を入れている。
               // モーダルの横をクリックしたらクローズするようにしているため
@@ -166,32 +179,58 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             >
               コメント一覧
             </Typography>
+            <Box
+              sx={{
+                maxHeight: '300px',
+                overflowY: 'auto',
+                paddingRight: '16px',
+              }}
+            >
+              {dummyComments.comment.map((comment) => (
+                <RetrospectiveMethodCommentItem
+                  key={comment.id}
+                  comment={comment}
+                />
+              ))}
+            </Box>
 
-            {dummyComments.comment.map((comment) => (
-              <RetrospectiveMethodCommentItem
-                key={comment.id}
-                comment={comment}
-              />
-            ))}
-
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <TextField
                 fullWidth
-                variant="filled"
+                variant="outlined"
                 label="コメントする"
                 sx={{
-                  bgcolor: 'grey.200',
-                  borderRadius: 1,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'rgb(216, 216, 216)',
+                    borderRadius: '100px',
+                    '&.Mui-focused fieldset': {
+                      borderColor: 'gray',
+                    },
+                  },
                 }}
               />
-              <IconButton>
+              <IconButton
+                sx={{
+                  width: '48px',
+                  height: '48px',
+                  backgroundColor: 'rgb(234, 255, 248)',
+                  ml: 1,
+                  '&:hover': {
+                    backgroundColor: 'rgb(234, 255, 248)',
+                  },
+                }}
+              >
                 <SendIcon
+                  fontSize="medium"
                   style={{
-                    width: 35,
-                    height: 35,
                     borderRadius: 100,
                     color: 'rgba(19, 171, 121, 1)',
-                    backgroundColor: 'rgb(234, 255, 248)',
                   }}
                 />
               </IconButton>
