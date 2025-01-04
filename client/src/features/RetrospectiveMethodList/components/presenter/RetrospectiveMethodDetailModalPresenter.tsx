@@ -101,9 +101,10 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             sx={{
               height: 700,
               width: 700,
-              padding: 4,
+              padding: 3,
               borderRadius: 5,
               overflowY: 'auto',
+              maxHeight: { xs: '600px', sm: '900px' },
             }}
             onClick={(e) => {
               // ContainerでonClick={onClose}を入れている。
@@ -114,12 +115,37 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             }}
           >
             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <IconButton onClick={onCloseModal} aria-label="Close modal">
+              <IconButton
+                onClick={onCloseModal}
+                sx={{
+                  p: 0.5,
+                  // 見た目のサイズはそのまま
+                  // 当たり判定だけ広げる
+                  position: 'relative',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: '-10px',
+                    left: '-10px',
+                    right: '-10px',
+                    bottom: '-10px',
+                  },
+                }}
+              >
                 <CloseIcon />
               </IconButton>
             </Box>
 
-            {categoryChips}
+            <Box
+              sx={{
+                display: 'flex',
+                gap: 0.5,
+                flexWrap: 'wrap',
+              }}
+            >
+              {categoryChips}
+            </Box>
+
             <Typography
               variant="h1"
               sx={{
@@ -199,6 +225,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
+                mt: 2,
               }}
             >
               <TextField

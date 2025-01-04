@@ -59,7 +59,7 @@ const RetrospectiveMethodCommentItem: React.FC<
         sx={{
           borderRadius: 4,
           backgroundColor: 'rgba(233, 250, 245, 1)',
-          p: 3,
+          p: 2,
         }}
       >
         <Typography
