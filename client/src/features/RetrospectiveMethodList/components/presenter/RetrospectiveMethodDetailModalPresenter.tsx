@@ -140,7 +140,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             >
               進め方
             </Typography>
-            <Typography
+            <Box
               sx={{
                 fontSize: 16,
                 fontWeight: 500,
@@ -148,7 +148,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               }}
             >
               <ul>{displayWayOfProceedings}</ul>
-            </Typography>
+            </Box>
 
             <Box sx={{ alignItems: 'center', gap: 1 }}>
               <LinkIcon sx={{ width: 14, height: 14 }} />
