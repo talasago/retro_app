@@ -66,11 +66,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
       }}
     >
       <Container
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
+        sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}
         onClick={onCloseModal}
       >
         <Paper
@@ -213,13 +209,7 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
 
     return (
       <>
-        <Box
-          sx={{
-            display: 'flex',
-            gap: 0.5,
-            flexWrap: 'wrap',
-          }}
-        >
+        <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
           {categoryChips}
         </Box>
 
@@ -234,26 +224,23 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
         >
           {retrospectiveMethod.title}
         </Typography>
-        <Typography
-          variant="h6"
-          sx={{
-            mt: 3,
-            letterSpacing: '1.12px',
-          }}
-        >
+
+        <Typography variant="h6" sx={{ mt: 1, letterSpacing: '1.12px' }}>
           進め方
         </Typography>
+
         <Box
           sx={{
             fontSize: 16,
             fontWeight: 500,
             letterSpacing: '1.12px',
+            mt: -2,
           }}
         >
           <ul>{displayWayOfProceedings}</ul>
         </Box>
 
-        <Box sx={{ alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <LinkIcon sx={{ width: 14, height: 14 }} />
           <Link
             href={retrospectiveMethod.reference}
@@ -264,9 +251,9 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
               fontSize: 14,
               fontWeight: 500,
               textDecoration: 'none',
+              ml: 0.5,
             }}
           >
-            {' '}
             参照元リンク
           </Link>
         </Box>
