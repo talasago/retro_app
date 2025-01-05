@@ -110,7 +110,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
 
           <RetrospectiveMethodArea retrospectiveMethod={retrospectiveMethod} />
           <Divider sx={{ my: 2 }} />
-          <CommentListArea comments={dummyComments} />
+          <CommentListArea />
           <EnteringCommentArea />
         </Paper>
       </Container>
@@ -198,15 +198,7 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
   },
 );
 
-interface ComentListAreaProps {
-  // TODO: 詳しいinterfaceは後で考える
-  // ほんとはlist型だけ受け取りたい
-  comments: {
-    comment: [];
-  };
-}
-
-const CommentListArea: React.FC<ComentListAreaProps> = memo(({ comments }) => {
+const CommentListArea: React.FC = memo(() => {
   return (
     <>
       <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
@@ -214,7 +206,7 @@ const CommentListArea: React.FC<ComentListAreaProps> = memo(({ comments }) => {
       </Typography>
 
       <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-        {comments.comment.map((comment) => (
+        {dummyComments.comment.map((comment) => (
           // TODO: 後でやる
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           <RetrospectiveMethodCommentItem key={comment.id} comment={comment} />
