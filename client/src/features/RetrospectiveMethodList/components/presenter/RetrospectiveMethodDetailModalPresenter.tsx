@@ -96,6 +96,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             justifyContent: 'center',
             alignItems: 'center',
           }}
+          onClick={onCloseModal}
         >
           <Paper
             sx={{
@@ -107,10 +108,8 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               maxHeight: { xs: '600px', sm: '900px' },
             }}
             onClick={(e) => {
-              // ContainerでonClick={onClose}を入れている。
-              // モーダルの横をクリックしたらクローズするようにしているため
-              // そのクリックイベントが伝播すると、モーダル内でもクローズしてしまうため
-              // この処理を追加した
+              // モーダルの横をクリックしたらクローズするようにしているため、ContainerでonClick={onClose}を入れている。
+              // ここでe.stopPropagation()を入れないと、そのクリックイベントが伝播すると、モーダル内でもクローズしてしまう。
               e.stopPropagation();
             }}
           >
