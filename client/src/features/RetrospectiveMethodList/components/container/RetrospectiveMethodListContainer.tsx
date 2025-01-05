@@ -18,6 +18,8 @@ const RetrospectiveMethodListContainer: React.FC = () => {
     RetrospectiveMethod[]
   >(retrospectiveData.retrospectives);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedRetrospectiveMethod, setSelectedRetrospectiveMethod] =
+    useState<RetrospectiveMethod>();
 
   // MEMO: checkしてもstateが更新されなくなるため、useCallbackを使用
   // MEMO: checkしただけでRetrospectiveMethodPaperAreaが再度レンダリングされてしまうが、許容する。対処方法がわからない。
@@ -50,9 +52,13 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   }, [checkedScenes]);
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
-  const handleClickRetrospectiveMethodPaper = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
+  const handleClickRetrospectiveMethodPaper = useCallback(
+    (method: RetrospectiveMethod) => {
+      setIsModalOpen(true);
+      setSelectedRetrospectiveMethod(method);
+    },
+    [],
+  );
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   const handleClickRandomButton = useCallback(() => {
@@ -105,15 +111,15 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   return (
     <>
       {memorizedPresenter}
-      <RetroMethodDetailModalContainer
-        isOpen={isModalOpen}
-        retrospectiveMethod={
-          retrospectiveData.retrospectives[0] as RetrospectiveMethod
-        }
-        onCloseModal={() => {
-          setIsModalOpen(false);
-        }}
-      />
+      {selectedRetrospectiveMethod && (
+        <RetroMethodDetailModalContainer
+          isOpen={isModalOpen}
+          retrospectiveMethod={selectedRetrospectiveMethod}
+          onCloseModal={() => {
+            setIsModalOpen(false);
+          }}
+        />
+      )}
     </>
   );
 };

@@ -28,7 +28,7 @@ interface retrospectiveMethodListPresenterProps {
   isShowScrollToTop: boolean;
   isShowRetrospectiveMethodList: boolean;
   onClickScrollToButton: () => void;
-  onClickRetrospectiveMethodPaper: () => void;
+  onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
   onClickRetroMethodListShowButton: () => void;
   onClickRandomButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -150,7 +150,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 
 interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethod[];
-  onClickRetrospectiveMethodPaper: () => void;
+  onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
   retrospectiveSceneNames: RetrospectiveSceneNames;
 }
 
@@ -178,7 +178,9 @@ const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> 
             <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
               <RetrospectiveMethodPaper
                 retrospectiveMethod={method}
-                onClick={onClickRetrospectiveMethodPaper}
+                onClick={() => {
+                  onClickRetrospectiveMethodPaper(method);
+                }}
                 categoryChips={categoryChips}
               />
             </Grid>
