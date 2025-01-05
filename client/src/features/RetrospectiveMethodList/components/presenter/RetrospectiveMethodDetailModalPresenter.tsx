@@ -1,3 +1,4 @@
+import type React from 'react';
 import { memo } from 'react';
 import {
   Box,
@@ -19,6 +20,7 @@ import SendIcon from '@mui/icons-material/Send';
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
+
 const dummyComments = {
   comment: [
     {
@@ -110,29 +112,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
 
           <Divider sx={{ my: 2 }} />
 
-          <Typography
-            variant="h2"
-            sx={{
-              fontSize: 18,
-              fontWeight: 700,
-            }}
-          >
-            コメント一覧
-          </Typography>
-          <Box
-            sx={{
-              maxHeight: '300px',
-              overflowY: 'auto',
-              paddingRight: '16px',
-            }}
-          >
-            {dummyComments.comment.map((comment) => (
-              <RetrospectiveMethodCommentItem
-                key={comment.id}
-                comment={comment}
-              />
-            ))}
-          </Box>
+          <CommentListArea comments={dummyComments} />
 
           <Box
             sx={{
@@ -261,3 +241,29 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
     );
   },
 );
+
+interface ComentListAreaProps {
+  // TODO: 詳しいinterfaceは後で考える
+  // ほんとはlist型だけ受け取りたい
+  comments: {
+    comment: [];
+  };
+}
+
+const CommentListArea: React.FC<ComentListAreaProps> = memo(({ comments }) => {
+  return (
+    <>
+      <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
+        コメント一覧
+      </Typography>
+
+      <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+        {comments.comment.map((comment) => (
+          // TODO: 後でやる
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+          <RetrospectiveMethodCommentItem key={comment.id} comment={comment} />
+        ))}
+      </Box>
+    </>
+  );
+});
