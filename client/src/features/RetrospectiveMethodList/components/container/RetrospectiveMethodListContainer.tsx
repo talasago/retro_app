@@ -63,7 +63,12 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   const handleClickRandomButton = useCallback(() => {
     setIsModalOpen(true);
-  }, []);
+    setSelectedRetrospectiveMethod(
+      retrospectiveMethods[
+        Math.floor(Math.random() * retrospectiveMethods.length)
+      ],
+    );
+  }, [retrospectiveMethods]);
 
   const updateIsShowScrollToTop = (): void => {
     setIsShowScrollToTop(window.scrollY > 0 && isShowRetrospectiveMethodList);
