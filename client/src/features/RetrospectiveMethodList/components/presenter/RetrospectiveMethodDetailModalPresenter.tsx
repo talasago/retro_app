@@ -109,53 +109,9 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
           </Box>
 
           <RetrospectiveMethodArea retrospectiveMethod={retrospectiveMethod} />
-
           <Divider sx={{ my: 2 }} />
-
           <CommentListArea comments={dummyComments} />
-
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              mt: 2,
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="コメントする"
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'rgb(216, 216, 216)',
-                  borderRadius: '100px',
-                  '&.Mui-focused fieldset': {
-                    borderColor: 'gray',
-                  },
-                },
-              }}
-            />
-            <IconButton
-              sx={{
-                width: '48px',
-                height: '48px',
-                backgroundColor: 'rgb(234, 255, 248)',
-                ml: 1,
-                '&:hover': {
-                  backgroundColor: 'rgb(234, 255, 248)',
-                },
-              }}
-            >
-              <SendIcon
-                fontSize="medium"
-                style={{
-                  borderRadius: 100,
-                  color: 'rgba(19, 171, 121, 1)',
-                }}
-              />
-            </IconButton>
-          </Box>
+          <EnteringCommentArea />
         </Paper>
       </Container>
     </Modal>
@@ -265,5 +221,49 @@ const CommentListArea: React.FC<ComentListAreaProps> = memo(({ comments }) => {
         ))}
       </Box>
     </>
+  );
+});
+
+const EnteringCommentArea: React.FC = memo(() => {
+  return (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        mt: 2,
+      }}
+    >
+      <TextField
+        fullWidth
+        variant="outlined"
+        label="コメントする"
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: 'rgb(216, 216, 216)',
+            borderRadius: '100px',
+            '&.Mui-focused fieldset': {
+              borderColor: 'gray',
+            },
+          },
+        }}
+      />
+      <IconButton
+        sx={{
+          width: '48px',
+          height: '48px',
+          backgroundColor: 'rgb(234, 255, 248)',
+          ml: 1,
+          '&:hover': {
+            backgroundColor: 'rgb(234, 255, 248)',
+          },
+        }}
+      >
+        <SendIcon
+          fontSize="medium"
+          style={{ color: 'rgba(19, 171, 121, 1)' }}
+        />
+      </IconButton>
+    </Box>
   );
 });
