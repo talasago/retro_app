@@ -206,18 +206,21 @@ const CommentListArea: React.FC = memo(() => {
     if (!data || error)
       return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
 
+    const displayComments =
+      data.data.comments.length > 0 ? (
+        data.data.comments.map((comment) => (
+          <RetrospectiveMethodCommentItem
+            key={comment.comment_id}
+            commentData={comment}
+          />
+        ))
+      ) : (
+        <div>コメントはまだ登録されていません。</div>
+      );
+
     return (
       <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-        {data.data.comments.length > 0 ? (
-          data.data.comments.map((comment) => (
-            <RetrospectiveMethodCommentItem
-              key={comment.comment_id}
-              commentData={comment}
-            />
-          ))
-        ) : (
-          <div>コメントはまだ登録されていません。</div>
-        )}
+        {isLoading ? '読み込み中...' : displayComments}
       </Box>
     );
   };
