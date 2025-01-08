@@ -1,19 +1,16 @@
 import { memo, Fragment } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
+import { type apiSchemas } from 'domains/internal/apiSchema';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
+
 interface RetrospectiveMethodCommentProps {
-  comment: {
-    id: number;
-    userName: string;
-    date: string;
-    comment: string;
-  };
+  commentData: apiSchemas['schemas']['GetCommentApiResponseBody']['comments'][0];
 }
 
 const RetrospectiveMethodCommentItem: React.FC<
   RetrospectiveMethodCommentProps
-> = ({ comment }) => {
+> = ({ commentData }) => {
   const formatDate = (dateString: string): string => {
     return new Date(dateString)
       .toLocaleDateString('ja-JP', {
@@ -46,10 +43,10 @@ const RetrospectiveMethodCommentItem: React.FC<
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <PersonIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
         <Typography variant="body2" fontWeight={500}>
-          {comment.userName}
+          {commentData.user_id}
         </Typography>
         <Typography variant="caption" color="text.secondary">
-          {formatDate(comment.date)}
+          {formatDate(commentData.created_at)}
         </Typography>
         <IconButton>
           <DeleteIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
@@ -68,7 +65,7 @@ const RetrospectiveMethodCommentItem: React.FC<
           letterSpacing="0.98px"
           lineHeight="27px"
         >
-          {formatText(comment.comment)}
+          {formatText(commentData.comment)}
         </Typography>
       </Box>
     </Box>

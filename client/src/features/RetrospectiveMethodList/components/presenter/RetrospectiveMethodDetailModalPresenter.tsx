@@ -11,7 +11,13 @@ import {
   TextField,
   Link,
 } from '@mui/material';
+import axios, { type AxiosError, type AxiosResponse } from 'axios';
+
+import { type apiSchemas } from 'domains/internal/apiSchema';
+import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
+import useSWR from 'swr';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
@@ -20,30 +26,6 @@ import SendIcon from '@mui/icons-material/Send';
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
-
-const dummyComments = {
-  comment: [
-    {
-      id: 1,
-      userName: 'User1',
-      date: '2025-01-03 04:29:00.560283',
-      comment: 'This is a comment',
-    },
-    {
-      id: 2,
-      userName: 'User2',
-      date: '2025-01-03 04:29:00.560283',
-      comment: 'これはコメントです\n22',
-    },
-    {
-      id: 3,
-      userName: 'User3',
-      date: '2025-01-03 04:29:00.560283',
-      comment:
-        '最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数最大文字数',
-    },
-  ],
-};
 
 interface RetrospectiveMethodDetailModalPresenterProps {
   isOpen: boolean;
@@ -199,19 +181,53 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
 );
 
 const CommentListArea: React.FC = memo(() => {
+  const fetchComments = async (
+    retrospectiveMethodId: number,
+  ): Promise<
+    AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>
+  > => {
+    return await axios.get(COMMENT_URL(retrospectiveMethodId));
+  };
+
+  const CommentItems: React.FC<{ retrospectiveMethodId: number }> = ({
+    retrospectiveMethodId,
+  }) => {
+    const { data, error, isLoading, isValidating } = useSWR<
+      AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
+      AxiosError
+    >(
+      `retrospectiveMethodId/${retrospectiveMethodId}`,
+      async () => await fetchComments(retrospectiveMethodId),
+      // { suspense: true },
+    );
+
+    console.log(data, error, isLoading, isValidating);
+
+    if (!data || error)
+      return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
+
+    return (
+      <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
+        {data.data.comments.length > 0 ? (
+          data.data.comments.map((comment) => (
+            <RetrospectiveMethodCommentItem
+              key={comment.comment_id}
+              commentData={comment}
+            />
+          ))
+        ) : (
+          <div>コメントはまだ登録されていません。</div>
+        )}
+      </Box>
+    );
+  };
+
   return (
     <>
       <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
         コメント一覧
       </Typography>
-
-      <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-        {dummyComments.comment.map((comment) => (
-          // TODO: 後でやる
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          <RetrospectiveMethodCommentItem key={comment.id} comment={comment} />
-        ))}
-      </Box>
+      <CommentItems retrospectiveMethodId={1} />
     </>
   );
 });
