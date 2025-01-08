@@ -46,7 +46,8 @@ class CommentModel(Base):
         return {
             "id": self.id,
             "retrospective_method_id": self.retrospective_method_id,
-            "user_id": self.user_id,
+            "user_uuid": str(self.user.uuid),
+            "user_name": self.user.name,
             "comment": self.comment,
             "created_at": str(self.created_at),
             "updated_at": str(self.updated_at),

@@ -121,6 +121,9 @@ class TestCommentFunction:
 
                 for comment in comments:
                     assert "user" not in comment
+                    assert "user_id" not in comment
+                    assert "user_uuid" in comment
+                    assert "user_name" in comment
                     assert comment["retrospective_method_id"] == 5
 
         class TestWhenNotLogin:

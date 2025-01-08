@@ -65,7 +65,8 @@ class GetCommentApiResponseBody(BaseModel):
             {
                 "comment_id": 1,
                 "retrospective_method_id": 1,
-                "user_id": 1,
+                "user_uuid": "123e4567-e89b-12d3-a456-426614174000",
+                "user_name": "test_user",
                 "comment": "comment",
                 "created_at": "2021-01-01T00:00:00",
                 "updated_at": "2021-01-01T00:00:00",
