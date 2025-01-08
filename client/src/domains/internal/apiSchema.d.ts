@@ -170,7 +170,16 @@ export interface apiSchemas {
        * Comments
        * @description コメントデータ
        */
-      comments: unknown[];
+      comments: [
+        {
+          comment: string;
+          comment_id: number;
+          created_at: string;
+          retrospective_method_id: number;
+          updated_at: string;
+          user_id: number;
+        },
+      ];
     };
     /** HTTPValidationError */
     HTTPValidationError: {
