@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo } from 'react';
+import { memo, Suspense } from 'react';
 import {
   Box,
   Modal,
@@ -92,7 +92,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
 
           <RetrospectiveMethodArea retrospectiveMethod={retrospectiveMethod} />
           <Divider sx={{ my: 2 }} />
-          <CommentListArea />
+          <CommentListArea retrospectiveMethodId={retrospectiveMethod.id} />
           <EnteringCommentArea />
         </Paper>
       </Container>
@@ -180,60 +180,67 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
   },
 );
 
-const CommentListArea: React.FC = memo(() => {
-  const fetchComments = async (
-    retrospectiveMethodId: number,
-  ): Promise<
-    AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>
-  > => {
-    return await axios.get(COMMENT_URL(retrospectiveMethodId));
-  };
+interface CommentListAreaProps {
+  retrospectiveMethodId: number;
+}
 
-  const CommentItems: React.FC<{ retrospectiveMethodId: number }> = ({
-    retrospectiveMethodId,
-  }) => {
-    const { data, error, isLoading, isValidating } = useSWR<
-      AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
-      AxiosError
-    >(
-      `retrospectiveMethodId/${retrospectiveMethodId}`,
-      async () => await fetchComments(retrospectiveMethodId),
-      // { suspense: true },
-    );
+const CommentListArea: React.FC<CommentListAreaProps> = memo(
+  ({ retrospectiveMethodId }) => {
+    const fetchComments = async (
+      retrospectiveMethodId: number,
+    ): Promise<
+      AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>
+    > => {
+      return await axios.get(COMMENT_URL(retrospectiveMethodId));
+    };
 
-    console.log(data, error, isLoading, isValidating);
-
-    if (!data || error)
-      return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
-
-    const displayComments =
-      data.data.comments.length > 0 ? (
-        data.data.comments.map((comment) => (
-          <RetrospectiveMethodCommentItem
-            key={comment.comment_id}
-            commentData={comment}
-          />
-        ))
-      ) : (
-        <div>コメントはまだ登録されていません。</div>
+    const CommentItems: React.FC<{ retrospectiveMethodId: number }> = ({
+      retrospectiveMethodId,
+    }) => {
+      const { data, error, isLoading } = useSWR<
+        AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
+        AxiosError
+      >(
+        `retrospectiveMethodId/${retrospectiveMethodId}`,
+        async () => await fetchComments(retrospectiveMethodId),
       );
 
-    return (
-      <Box sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}>
-        {isLoading ? '読み込み中...' : displayComments}
-      </Box>
-    );
-  };
+      console.log(data, error);
 
-  return (
-    <>
-      <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
-        コメント一覧
-      </Typography>
-      <CommentItems retrospectiveMethodId={1} />
-    </>
-  );
-});
+      if (!data || error)
+        return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
+
+      const displayComments =
+        data.data.comments.length > 0 ? (
+          data.data.comments.map((comment) => (
+            <RetrospectiveMethodCommentItem
+              key={comment.comment_id}
+              commentData={comment}
+            />
+          ))
+        ) : (
+          <div>コメントはまだ登録されていません。</div>
+        );
+
+      return (
+        <Box
+          sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}
+        >
+          {isLoading ? '読み込み中...' : displayComments}
+        </Box>
+      );
+    };
+
+    return (
+      <>
+        <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
+          コメント一覧
+        </Typography>
+        <CommentItems retrospectiveMethodId={retrospectiveMethodId} />
+      </>
+    );
+  },
+);
 
 const EnteringCommentArea: React.FC = memo(() => {
   return (
