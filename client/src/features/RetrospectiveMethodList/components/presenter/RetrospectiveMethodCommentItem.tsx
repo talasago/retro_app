@@ -43,7 +43,7 @@ const RetrospectiveMethodCommentItem: React.FC<
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <PersonIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
         <Typography variant="body2" fontWeight={500}>
-          {commentData.user_id}
+          {commentData.user_name}
         </Typography>
         <Typography variant="caption" color="text.secondary">
           {formatDate(commentData.created_at)}

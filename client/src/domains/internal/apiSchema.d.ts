@@ -177,7 +177,8 @@ export interface apiSchemas {
           created_at: string;
           retrospective_method_id: number;
           updated_at: string;
-          user_id: number;
+          user_uuid: string;
+          user_name: string;
         },
       ];
     };
