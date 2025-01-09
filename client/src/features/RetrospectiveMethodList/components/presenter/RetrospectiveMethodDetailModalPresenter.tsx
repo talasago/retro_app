@@ -10,20 +10,28 @@ import {
   Divider,
   TextField,
   Link,
+  FormControl,
+  FormHelperText,
 } from '@mui/material';
 import { type AxiosError, type AxiosResponse } from 'axios';
 
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
+import {
+  type FieldErrors,
+  type UseFormRegister,
+  type UseFormHandleSubmit,
+  type SubmitHandler,
+} from 'react-hook-form';
 import useSWR from 'swr';
-import CircleIcon from '@mui/icons-material/Circle';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
-
+import CircularProgress from '@mui/material/CircularProgress';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
+import { type CommentFormSchema } from '../Schema/commentFormSchema';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
 
@@ -32,11 +40,26 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   onCloseModal: () => void;
   retrospectiveMethod: RetrospectiveMethod;
   fetchComments: (retrospectiveMethodId: number) => Promise<AxiosResponse>;
+  register: UseFormRegister<CommentFormSchema>;
+  handleSubmit: UseFormHandleSubmit<CommentFormSchema>;
+  onSubmit: SubmitHandler<CommentFormSchema>;
+  errors: FieldErrors<CommentFormSchema>;
+  isSubmitting: boolean;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
   RetrospectiveMethodDetailModalPresenterProps
-> = ({ isOpen, onCloseModal, retrospectiveMethod, fetchComments }) => {
+> = ({
+  isOpen,
+  onCloseModal,
+  retrospectiveMethod,
+  fetchComments,
+  register,
+  handleSubmit,
+  onSubmit,
+  errors,
+  isSubmitting,
+}) => {
   return (
     <Modal
       open={isOpen}
@@ -97,7 +120,13 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             retrospectiveMethodId={retrospectiveMethod.id}
             fetchComments={fetchComments}
           />
-          <EnteringCommentArea />
+          <EnteringCommentArea
+            register={register}
+            handleSubmit={handleSubmit}
+            onSubmit={onSubmit}
+            errors={errors}
+            isSubmitting={isSubmitting}
+          />
         </Paper>
       </Container>
     </Modal>
@@ -220,53 +249,76 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
         <Box
           sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}
         >
-          {isLoading ? <CircleIcon /> : displayComments}
+          {isLoading ? <CircularProgress /> : displayComments}
         </Box>
       </>
     );
   },
 );
 
-const EnteringCommentArea: React.FC = memo(() => {
-  return (
-    <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        mt: 2,
-      }}
-    >
-      <TextField
-        fullWidth
-        variant="outlined"
-        label="コメントする"
+interface EnteringCommentAreaProps {
+  register: UseFormRegister<CommentFormSchema>;
+  handleSubmit: UseFormHandleSubmit<CommentFormSchema>;
+  onSubmit: SubmitHandler<CommentFormSchema>;
+  errors: FieldErrors<CommentFormSchema>;
+  isSubmitting: boolean;
+}
+
+const EnteringCommentArea: React.FC<EnteringCommentAreaProps> = memo(
+  ({ register, handleSubmit, onSubmit, errors, isSubmitting }) => {
+    return (
+      <Box
+        component="form"
         sx={{
-          '& .MuiOutlinedInput-root': {
-            backgroundColor: 'rgb(216, 216, 216)',
-            borderRadius: '100px',
-            '&.Mui-focused fieldset': {
-              borderColor: 'gray',
-            },
-          },
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          mt: 2,
         }}
-      />
-      <IconButton
-        sx={{
-          width: '48px',
-          height: '48px',
-          backgroundColor: 'rgb(234, 255, 248)',
-          ml: 1,
-          '&:hover': {
-            backgroundColor: 'rgb(234, 255, 248)',
-          },
-        }}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <SendIcon
-          fontSize="medium"
-          style={{ color: 'rgba(19, 171, 121, 1)' }}
-        />
-      </IconButton>
-    </Box>
-  );
-});
+        <FormControl fullWidth error={errors.comment !== undefined}>
+          <TextField
+            {...register('comment')}
+            fullWidth
+            variant="outlined"
+            label="コメントする"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'rgb(216, 216, 216)',
+                borderRadius: '100px',
+                '&.Mui-focused fieldset': {
+                  borderColor: 'gray',
+                },
+              },
+            }}
+          />
+          <FormHelperText>{errors.comment?.message}</FormHelperText>
+        </FormControl>
+        <IconButton
+          type="submit"
+          sx={{
+            width: '48px',
+            height: '48px',
+            backgroundColor: 'rgb(234, 255, 248)',
+            ml: 1,
+            '&:hover': {
+              backgroundColor: 'rgb(234, 255, 248)',
+            },
+            mb: errors.comment ? 2.5 : 0,
+          }}
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <CircularProgress />
+          ) : (
+            <SendIcon
+              fontSize="medium"
+              style={{ color: 'rgba(19, 171, 121, 1)' }}
+            />
+          )}
+        </IconButton>
+      </Box>
+    );
+  },
+);
