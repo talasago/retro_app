@@ -11,10 +11,9 @@ import {
   TextField,
   Link,
 } from '@mui/material';
-import axios, { type AxiosError, type AxiosResponse } from 'axios';
+import { type AxiosError, type AxiosResponse } from 'axios';
 
 import { type apiSchemas } from 'domains/internal/apiSchema';
-import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 import useSWR from 'swr';
@@ -32,11 +31,12 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   isOpen: boolean;
   onCloseModal: () => void;
   retrospectiveMethod: RetrospectiveMethod;
+  fetchComments: (retrospectiveMethodId: number) => Promise<AxiosResponse>;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
   RetrospectiveMethodDetailModalPresenterProps
-> = ({ isOpen, onCloseModal, retrospectiveMethod }) => {
+> = ({ isOpen, onCloseModal, retrospectiveMethod, fetchComments }) => {
   return (
     <Modal
       open={isOpen}
@@ -93,7 +93,10 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
 
           <RetrospectiveMethodArea retrospectiveMethod={retrospectiveMethod} />
           <Divider sx={{ my: 2 }} />
-          <CommentListArea retrospectiveMethodId={retrospectiveMethod.id} />
+          <CommentListArea
+            retrospectiveMethodId={retrospectiveMethod.id}
+            fetchComments={fetchComments}
+          />
           <EnteringCommentArea />
         </Paper>
       </Container>
@@ -183,57 +186,42 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
 
 interface CommentListAreaProps {
   retrospectiveMethodId: number;
+  fetchComments: (retrospectiveMethodId: number) => Promise<AxiosResponse>;
 }
 
 const CommentListArea: React.FC<CommentListAreaProps> = memo(
-  ({ retrospectiveMethodId }) => {
-    const fetchComments = async (
-      retrospectiveMethodId: number,
-    ): Promise<
-      AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>
-    > => {
-      return await axios.get(COMMENT_URL(retrospectiveMethodId));
-    };
+  ({ retrospectiveMethodId, fetchComments }) => {
+    const { data, error, isLoading } = useSWR<
+      AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
+      AxiosError
+    >(
+      `retrospectiveMethodId/${retrospectiveMethodId}`,
+      async () => await fetchComments(retrospectiveMethodId),
+      { revalidateIfStale: false }, // TODO: コメント登録後は再取得するようにしたいが、これで良いかは未確認
+    );
 
-    const CommentItems: React.FC<{ retrospectiveMethodId: number }> = ({
-      retrospectiveMethodId,
-    }) => {
-      const { data, error, isLoading } = useSWR<
-        AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
-        AxiosError
-      >(
-        `retrospectiveMethodId/${retrospectiveMethodId}`,
-        async () => await fetchComments(retrospectiveMethodId),
-        { revalidateIfStale: false }, // TODO: コメント登録後は再取得するようにしたいが、これで良いかは未確認
+    if (!data || error)
+      return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
+
+    const displayComments =
+      data.data.comments.length > 0 ? (
+        data.data.comments.map((comment, idx) => (
+          <RetrospectiveMethodCommentItem key={idx} commentData={comment} />
+        ))
+      ) : (
+        <div>コメントはまだ登録されていません。</div>
       );
-
-      if (!data || error)
-        return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
-
-      const displayComments =
-        data.data.comments.length > 0 ? (
-          data.data.comments.map((comment, idx) => (
-            <RetrospectiveMethodCommentItem key={idx} commentData={comment} />
-          ))
-        ) : (
-          <div>コメントはまだ登録されていません。</div>
-        );
-
-      return (
-        <Box
-          sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}
-        >
-          {isLoading ? <CircleIcon /> : displayComments}
-        </Box>
-      );
-    };
 
     return (
       <>
         <Typography variant="h2" sx={{ fontSize: 18, fontWeight: 700 }}>
           コメント一覧
         </Typography>
-        <CommentItems retrospectiveMethodId={retrospectiveMethodId} />
+        <Box
+          sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}
+        >
+          {isLoading ? <CircleIcon /> : displayComments}
+        </Box>
       </>
     );
   },
