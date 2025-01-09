@@ -212,11 +212,8 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
 
       const displayComments =
         data.data.comments.length > 0 ? (
-          data.data.comments.map((comment) => (
-            <RetrospectiveMethodCommentItem
-              key={comment.comment_id}
-              commentData={comment}
-            />
+          data.data.comments.map((comment, idx) => (
+            <RetrospectiveMethodCommentItem key={idx} commentData={comment} />
           ))
         ) : (
           <div>コメントはまだ登録されていません。</div>
