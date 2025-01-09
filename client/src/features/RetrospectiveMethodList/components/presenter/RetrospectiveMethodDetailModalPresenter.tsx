@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo, Suspense } from 'react';
+import { memo } from 'react';
 import {
   Box,
   Modal,
@@ -18,6 +18,7 @@ import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 import useSWR from 'swr';
+import CircleIcon from '@mui/icons-material/Circle';
 import CloseIcon from '@mui/icons-material/Close';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
@@ -203,9 +204,8 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
       >(
         `retrospectiveMethodId/${retrospectiveMethodId}`,
         async () => await fetchComments(retrospectiveMethodId),
+        { revalidateIfStale: false }, // TODO: コメント登録後は再取得するようにしたいが、これで良いかは未確認
       );
-
-      console.log(data, error);
 
       if (!data || error)
         return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
@@ -223,7 +223,7 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
         <Box
           sx={{ maxHeight: '300px', overflowY: 'auto', paddingRight: '5px' }}
         >
-          {isLoading ? '読み込み中...' : displayComments}
+          {isLoading ? <CircleIcon /> : displayComments}
         </Box>
       );
     };
