@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useState, useEffect, useCallback } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { PermDeviceInformation } from '@mui/icons-material';
 import axios, { type AxiosResponse } from 'axios';
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
@@ -18,9 +19,23 @@ interface RetrospectiveMethodDetailModalContainerProps {
   onCloseModal: () => void;
 }
 
+export type commentsType = {
+  comments: Array<{
+    comment: string;
+    comment_id: number | null;
+    created_at: string;
+    retrospective_method_id: number;
+    updated_at: string | null;
+    user_uuid: string;
+    user_name: string;
+  }>;
+};
+
 const RetroMethodDetailModalContainer: React.FC<
   RetrospectiveMethodDetailModalContainerProps
 > = ({ isOpen, retrospectiveMethod, onCloseModal }) => {
+  const [comments, setComments] = useState<commentsType['comments']>([]);
+
   const {
     register,
     handleSubmit,
@@ -38,6 +53,32 @@ const RetroMethodDetailModalContainer: React.FC<
     reset();
   };
 
+  //  const handleDeleteComment = useCallback((commentId: number) => {
+  //    setComments((prevComments) =>
+  //      prevComments.filter((comment) => comment.comment_id !== commentId),
+  //    );
+  //  }, []);
+  //
+
+  // まだ未使用
+  const handleAddComment = useCallback(
+    (comment: string) => {
+      setComments((prevComments) => [
+        ...prevComments,
+        {
+          comment,
+          retrospective_method_id: retrospectiveMethod.id,
+          created_at: new Date().toISOString(),
+          updated_at: null,
+          user_uuid: 'user_uuid',
+          user_name: 'user_name',
+          comment_id: null,
+        },
+      ]);
+    },
+    [retrospectiveMethod],
+  );
+
   return (
     <RetrospectiveMethodDetailModalPresenter
       isOpen={isOpen}
@@ -49,6 +90,8 @@ const RetroMethodDetailModalContainer: React.FC<
       onSubmit={onSubmit}
       errors={errors}
       isSubmitting={isSubmitting}
+      comments={comments}
+      setComments={setComments}
     />
   );
 };

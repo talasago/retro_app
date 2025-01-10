@@ -1,5 +1,5 @@
 import type React from 'react';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import {
   Box,
   Modal,
@@ -32,6 +32,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import { type CommentFormSchema } from '../Schema/commentFormSchema';
+import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
 
@@ -45,6 +46,8 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   onSubmit: SubmitHandler<CommentFormSchema>;
   errors: FieldErrors<CommentFormSchema>;
   isSubmitting: boolean;
+  comments: commentsType['comments'];
+  setComments: React.Dispatch<React.SetStateAction<commentsType['comments']>>;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
@@ -59,6 +62,8 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
   onSubmit,
   errors,
   isSubmitting,
+  comments,
+  setComments,
 }) => {
   return (
     <Modal
@@ -119,6 +124,8 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
           <CommentListArea
             retrospectiveMethodId={retrospectiveMethod.id}
             fetchComments={fetchComments}
+            comments={comments}
+            setComments={setComments}
           />
           <EnteringCommentArea
             register={register}
@@ -216,10 +223,12 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
 interface CommentListAreaProps {
   retrospectiveMethodId: number;
   fetchComments: (retrospectiveMethodId: number) => Promise<AxiosResponse>;
+  comments: RetrospectiveMethodDetailModalPresenterProps['comments'];
+  setComments: RetrospectiveMethodDetailModalPresenterProps['setComments'];
 }
 
 const CommentListArea: React.FC<CommentListAreaProps> = memo(
-  ({ retrospectiveMethodId, fetchComments }) => {
+  ({ retrospectiveMethodId, fetchComments, comments, setComments }) => {
     const { data, error, isLoading } = useSWR<
       AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
       AxiosError
@@ -229,12 +238,16 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
       { revalidateIfStale: false }, // TODO: コメント登録後は再取得するようにしたいが、これで良いかは未確認
     );
 
+    useEffect(() => {
+      setComments(data ? data.data.comments : []);
+    }, [data, setComments]);
+
     if (!data || error)
       return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
 
     const displayComments =
-      data.data.comments.length > 0 ? (
-        data.data.comments.map((comment, idx) => (
+      comments.length > 0 ? (
+        comments.map((comment, idx) => (
           <RetrospectiveMethodCommentItem key={idx} commentData={comment} />
         ))
       ) : (

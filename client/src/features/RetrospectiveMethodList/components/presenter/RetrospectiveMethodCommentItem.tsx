@@ -1,11 +1,11 @@
 import { memo, Fragment } from 'react';
 import { Box, Typography, IconButton } from '@mui/material';
-import { type apiSchemas } from 'domains/internal/apiSchema';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
+import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
 
 interface RetrospectiveMethodCommentProps {
-  commentData: apiSchemas['schemas']['GetCommentApiResponseBody']['comments'][0];
+  commentData: commentsType['comments'][0];
 }
 
 const RetrospectiveMethodCommentItem: React.FC<
