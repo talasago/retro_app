@@ -257,6 +257,11 @@ export interface apiSchemas {
        * @description リフレッシュトークン
        */
       refresh_token: string;
+      /**
+       * uid
+       * @description uid
+       */
+      uuid: string;
     };
     /** UserCreate */
     UserCreate: {

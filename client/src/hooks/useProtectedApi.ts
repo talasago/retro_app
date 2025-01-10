@@ -2,6 +2,7 @@ import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
+import { UserInfo } from 'domains/UserInfo';
 
 const ERROR_MESSAGES = {
   GENERIC: 'エラーが発生しました。時間をおいて再実行してください。',
@@ -131,6 +132,7 @@ const updateTokenUseRefreshToken = async (
     }
 
     AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
+    UserInfo.resetUserInfo();
     navigate('/login');
 
     throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);

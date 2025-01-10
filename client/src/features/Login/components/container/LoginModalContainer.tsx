@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken } from 'domains/AuthToken';
+import { UserInfo } from 'domains/UserInfo';
 import LoginModalPresenter from '../presenter/LoginModalPresenter';
 import { loginFormSchema } from '../schemas/loginFormSchema';
 import type { LoginFormSchema } from '../schemas/loginFormSchema';
@@ -74,6 +75,7 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       response.data.access_token,
       response.data.refresh_token,
     );
+    UserInfo.setUserInfo(response.data.name, response.data.uuid);
 
     dispatch(
       setAlert({

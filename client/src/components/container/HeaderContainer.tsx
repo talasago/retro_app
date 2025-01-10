@@ -11,6 +11,7 @@ import { alertSlice } from 'stores/alert';
 import { signUpModalSlice } from 'stores/signUpModal';
 import type { AppDispatch } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
+import { UserInfo } from 'domains/UserInfo';
 import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
 import SignUpModalContainer from 'features/SignUp/components/container/SignUpModalContainer';
 import HeaderPresenter from '../presenter/HeaderPresenter';
@@ -70,6 +71,8 @@ const HeaderContainer: FC = () => {
     }
 
     AuthToken.resetTokens();
+    UserInfo.resetUserInfo();
+
     dispatch(
       setAlert({
         open: true,
