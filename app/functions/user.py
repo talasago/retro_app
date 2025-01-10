@@ -100,7 +100,7 @@ def sign_in(
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
             content=ClientErrorResponseBody(
-                message="メールアドレスまたはパスワードが間違っています。"
+                message="ユーザー名またはパスワードが間違っています。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
