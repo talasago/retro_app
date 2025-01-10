@@ -26,8 +26,8 @@ class TokenApiResponseBody(BaseModel):
         examples=["ログインしました"],
     )
     name: str = Field(description="ユーザー名", examples=["test_user"])
-    uid: str = Field(
-        description="UID", examples=["123e4567-e89b-12d3-a456-426614174000"]
+    uuid: str = Field(
+        description="uuid", examples=["123e4567-e89b-12d3-a456-426614174000"]
     )
     token_type: str = Field(description="トークンタイプ", examples=["bearer"])
     access_token: str = Field(description="アクセストークン")

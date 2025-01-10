@@ -107,7 +107,7 @@ def sign_in(
 
     tokens = auth_service.create_tokens(user=user)
 
-    res_body = TokenApiResponseBody(name=user.name, uid=str(user.uuid), **tokens)
+    res_body = TokenApiResponseBody(name=user.name, uuid=str(user.uuid), **tokens)
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
