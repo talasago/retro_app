@@ -1,5 +1,4 @@
-import type React from 'react';
-import { memo, useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import {
   Box,
   Modal,
@@ -66,6 +65,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
   setComments,
 }) => {
   const isLogined: boolean = useAuthTokenObserver() as boolean;
+  const [isGetApiError, setIsGetApiError] = React.useState<boolean>(false);
 
   return (
     <Modal
@@ -128,8 +128,9 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             fetchComments={fetchComments}
             comments={comments}
             setComments={setComments}
+            setIsGetApiError={setIsGetApiError}
           />
-          {isLogined && (
+          {isLogined && !isGetApiError && (
             <EnteringCommentArea
               register={register}
               handleSubmit={handleSubmit}
@@ -229,10 +230,17 @@ interface CommentListAreaProps {
   fetchComments: (retrospectiveMethodId: number) => Promise<AxiosResponse>;
   comments: RetrospectiveMethodDetailModalPresenterProps['comments'];
   setComments: RetrospectiveMethodDetailModalPresenterProps['setComments'];
+  setIsGetApiError: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const CommentListArea: React.FC<CommentListAreaProps> = memo(
-  ({ retrospectiveMethodId, fetchComments, comments, setComments }) => {
+  ({
+    retrospectiveMethodId,
+    fetchComments,
+    comments,
+    setComments,
+    setIsGetApiError,
+  }) => {
     const { data, error, isLoading } = useSWR<
       AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
       AxiosError
@@ -246,8 +254,11 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
       setComments(data ? data.data.comments : []);
     }, [data, setComments]);
 
-    if (!data || error)
+    if (!data || error) {
+      setIsGetApiError(true);
+
       return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
+    }
 
     const displayComments =
       comments.length > 0 ? (
