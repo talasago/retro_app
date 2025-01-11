@@ -1,12 +1,12 @@
-import { memo, useState, useEffect, useCallback } from 'react';
+import { memo, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { PermDeviceInformation } from '@mui/icons-material';
 import axios, { type AxiosResponse } from 'axios';
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
+import { UserInfo } from 'domains/UserInfo';
 import {
   type CommentFormSchema,
   commentFormSchema,
@@ -49,7 +49,21 @@ const RetroMethodDetailModalContainer: React.FC<
   });
 
   const onSubmit: SubmitHandler<CommentFormSchema> = (commentFormSchema) => {
-    console.log('commentFormSchema', commentFormSchema);
+    const { userName, userUuid } = UserInfo.getUserInfo();
+
+    setComments((prevComments) => [
+      ...prevComments,
+      {
+        comment: commentFormSchema.comment,
+        retrospective_method_id: retrospectiveMethod.id,
+        created_at: new Date().toISOString(),
+        updated_at: null,
+        user_uuid: userUuid,
+        user_name: userName,
+        comment_id: null,
+      },
+    ]);
+
     reset();
   };
 
@@ -59,25 +73,6 @@ const RetroMethodDetailModalContainer: React.FC<
   //    );
   //  }, []);
   //
-
-  // まだ未使用
-  const handleAddComment = useCallback(
-    (comment: string) => {
-      setComments((prevComments) => [
-        ...prevComments,
-        {
-          comment,
-          retrospective_method_id: retrospectiveMethod.id,
-          created_at: new Date().toISOString(),
-          updated_at: null,
-          user_uuid: 'user_uuid',
-          user_name: 'user_name',
-          comment_id: null,
-        },
-      ]);
-    },
-    [retrospectiveMethod],
-  );
 
   return (
     <RetrospectiveMethodDetailModalPresenter
