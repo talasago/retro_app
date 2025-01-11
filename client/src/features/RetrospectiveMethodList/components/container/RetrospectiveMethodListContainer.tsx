@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect, useMemo, useCallback } from 'react';
-
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
+import { mutate } from 'swr';
 // eslint-disable-next-line import/extensions
 import retrospectiveData from '../../../../assets/retrospective.json';
 // eslint-disable-next-line import/extensions
@@ -20,6 +20,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRetrospectiveMethod, setSelectedRetrospectiveMethod] =
     useState<RetrospectiveMethod>();
+  const [isNextMutate, setIsNextMutate] = useState<boolean>(false); // TODO:後で名前変える
 
   // MEMO: checkしてもstateが更新されなくなるため、useCallbackを使用
   // MEMO: checkしただけでRetrospectiveMethodPaperAreaが再度レンダリングされてしまうが、許容する。対処方法がわからない。
@@ -53,15 +54,24 @@ const RetrospectiveMethodListContainer: React.FC = () => {
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   const handleClickRetrospectiveMethodPaper = useCallback(
-    (method: RetrospectiveMethod) => {
+    async (method: RetrospectiveMethod) => {
+      if (isNextMutate) {
+        // キャッシュが無効化され、APIをコールするようになる
+        await mutate(`retrospectiveMethodId/${method.id}`, undefined, {
+          revalidate: true,
+        });
+        setIsNextMutate(false);
+      }
       setIsModalOpen(true);
       setSelectedRetrospectiveMethod(method);
     },
-    [],
+    [isNextMutate],
   );
 
   // MEMO: スクロールするたびにレンダリングされる問題を回避するため、useCallbackを使用
   const handleClickRandomButton = useCallback(() => {
+    // MEMO: コメント登録削除後にこのボタンを押しても、再フェッチ出来ない仕様。
+    // そのユースケースが考えにくいのと、1/72の確率でしか発生しないため、このままにしておく。
     setIsModalOpen(true);
     setSelectedRetrospectiveMethod(
       retrospectiveMethods[
@@ -123,6 +133,7 @@ const RetrospectiveMethodListContainer: React.FC = () => {
           onCloseModal={() => {
             setIsModalOpen(false);
           }}
+          setIsNextMutate={setIsNextMutate}
         />
       )}
     </>

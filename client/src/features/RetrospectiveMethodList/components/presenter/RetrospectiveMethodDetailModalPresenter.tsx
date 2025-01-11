@@ -235,7 +235,7 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
     >(
       `retrospectiveMethodId/${retrospectiveMethodId}`,
       async () => await fetchComments(retrospectiveMethodId),
-      { revalidateIfStale: false }, // TODO: コメント登録後は再取得するようにしたいが、これで良いかは未確認
+      { revalidateIfStale: false },
     );
 
     useEffect(() => {

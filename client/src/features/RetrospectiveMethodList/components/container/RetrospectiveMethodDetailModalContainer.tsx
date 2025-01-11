@@ -12,11 +12,11 @@ import {
   commentFormSchema,
 } from '../Schema/commentFormSchema';
 import RetrospectiveMethodDetailModalPresenter from '../presenter/RetrospectiveMethodDetailModalPresenter';
-
 interface RetrospectiveMethodDetailModalContainerProps {
   isOpen: boolean;
   retrospectiveMethod: RetrospectiveMethod;
   onCloseModal: () => void;
+  setIsNextMutate: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export type commentsType = {
@@ -33,7 +33,7 @@ export type commentsType = {
 
 const RetroMethodDetailModalContainer: React.FC<
   RetrospectiveMethodDetailModalContainerProps
-> = ({ isOpen, retrospectiveMethod, onCloseModal }) => {
+> = ({ isOpen, retrospectiveMethod, onCloseModal, setIsNextMutate }) => {
   const [comments, setComments] = useState<commentsType['comments']>([]);
 
   const {
@@ -64,6 +64,7 @@ const RetroMethodDetailModalContainer: React.FC<
       },
     ]);
 
+    setIsNextMutate(true);
     reset();
   };
 
