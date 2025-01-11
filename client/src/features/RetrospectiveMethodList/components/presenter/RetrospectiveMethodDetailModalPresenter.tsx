@@ -29,13 +29,13 @@ import CloseIcon from '@mui/icons-material/Close';
 import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useAuthTokenObserver } from 'domains/AuthToken';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import { type CommentFormSchema } from '../Schema/commentFormSchema';
 import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
-
 interface RetrospectiveMethodDetailModalPresenterProps {
   isOpen: boolean;
   onCloseModal: () => void;
@@ -65,6 +65,8 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
   comments,
   setComments,
 }) => {
+  const isLogined: boolean = useAuthTokenObserver() as boolean;
+
   return (
     <Modal
       open={isOpen}
@@ -127,13 +129,15 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             comments={comments}
             setComments={setComments}
           />
-          <EnteringCommentArea
-            register={register}
-            handleSubmit={handleSubmit}
-            onSubmit={onSubmit}
-            errors={errors}
-            isSubmitting={isSubmitting}
-          />
+          {isLogined && (
+            <EnteringCommentArea
+              register={register}
+              handleSubmit={handleSubmit}
+              onSubmit={onSubmit}
+              errors={errors}
+              isSubmitting={isSubmitting}
+            />
+          )}
         </Paper>
       </Container>
     </Modal>
