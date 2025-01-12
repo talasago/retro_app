@@ -164,7 +164,9 @@ def refresh_token(
         )
 
     tokens = auth_service.create_tokens(user=current_user)
-    res_body = RefreshTokenApiResponseBody(**tokens)
+    res_body = RefreshTokenApiResponseBody(
+        name=current_user.name, uuid=str(current_user.uuid), **tokens
+    )
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 

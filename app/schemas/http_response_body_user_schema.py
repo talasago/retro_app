@@ -40,6 +40,10 @@ class RefreshTokenApiResponseBody(BaseModel):
         description="処理メッセージ",
         examples=["トークンを再発行しました。"],
     )
+    name: str = Field(description="ユーザー名", examples=["test_user"])
+    uuid: str = Field(
+        description="uuid", examples=["123e4567-e89b-12d3-a456-426614174000"]
+    )
     token_type: str = Field(description="トークンタイプ", examples=["test_user"])
     access_token: str = Field(description="アクセストークン")
     refresh_token: str = Field(description="リフレッシュトークン")
