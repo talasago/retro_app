@@ -1,4 +1,4 @@
-import { memo, useState } from 'react';
+import { memo, useState, useCallback } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios, { type AxiosResponse } from 'axios';
 import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
@@ -29,7 +29,7 @@ interface RetrospectiveMethodDetailModalContainerProps {
 export type commentsType = {
   comments: Array<{
     comment: string;
-    comment_id: number | null;
+    id: number | null;
     created_at: string;
     retrospective_method_id: number;
     updated_at: string | null;
@@ -121,7 +121,7 @@ const RetroMethodDetailModalContainer: React.FC<
         updated_at: null,
         user_uuid: userUuid,
         user_name: userName,
-        comment_id: null,
+        id: null,
       },
     ]);
 
@@ -129,12 +129,15 @@ const RetroMethodDetailModalContainer: React.FC<
     reset();
   };
 
-  //  const handleDeleteComment = useCallback((commentId: number) => {
-  //    setComments((prevComments) =>
-  //      prevComments.filter((comment) => comment.comment_id !== commentId),
-  //    );
-  //  }, []);
-  //
+  const handleDeleteCommentButtonClick = useCallback(
+    (commentId: commentsType['comments'][0]['id']) => {
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment.id !== commentId),
+      );
+      setIsNextMutate(true);
+    },
+    [setIsNextMutate],
+  );
 
   return (
     <RetrospectiveMethodDetailModalPresenter
@@ -149,6 +152,7 @@ const RetroMethodDetailModalContainer: React.FC<
       isSubmitting={isSubmitting}
       comments={comments}
       setComments={setComments}
+      onDeleteCommentButtonClick={handleDeleteCommentButtonClick}
     />
   );
 };

@@ -49,6 +49,7 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   isSubmitting: boolean;
   comments: commentsType['comments'];
   setComments: React.Dispatch<React.SetStateAction<commentsType['comments']>>;
+  onDeleteCommentButtonClick: (commentId: number | null) => void;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
@@ -65,6 +66,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
   isSubmitting,
   comments,
   setComments,
+  onDeleteCommentButtonClick,
 }) => {
   const isLogined: boolean = useAuthTokenObserver() as boolean;
   const [isGetApiError, setIsGetApiError] = React.useState<boolean>(false);
@@ -131,6 +133,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             comments={comments}
             setComments={setComments}
             setIsGetApiError={setIsGetApiError}
+            onDeleteCommentButtonClick={onDeleteCommentButtonClick}
           />
           {isLogined && (
             <EnteringCommentArea
@@ -234,6 +237,7 @@ interface CommentListAreaProps {
   comments: RetrospectiveMethodDetailModalPresenterProps['comments'];
   setComments: RetrospectiveMethodDetailModalPresenterProps['setComments'];
   setIsGetApiError: React.Dispatch<React.SetStateAction<boolean>>;
+  onDeleteCommentButtonClick: (commentId: number | null) => void;
 }
 
 const CommentListArea: React.FC<CommentListAreaProps> = memo(
@@ -243,6 +247,7 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
     comments,
     setComments,
     setIsGetApiError,
+    onDeleteCommentButtonClick,
   }) => {
     const { data, error, isLoading } = useSWR<
       AxiosResponse<apiSchemas['schemas']['GetCommentApiResponseBody']>,
@@ -273,6 +278,7 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
             isDisplayDeleteButton={
               comment.user_uuid === UserInfo.getUserInfo().userUuid
             }
+            onDeleteCommentButtonClick={onDeleteCommentButtonClick}
           />
         ))
       ) : (

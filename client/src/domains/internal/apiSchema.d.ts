@@ -173,7 +173,7 @@ export interface apiSchemas {
       comments: [
         {
           comment: string;
-          comment_id: number;
+          id: number;
           created_at: string;
           retrospective_method_id: number;
           updated_at: string;
