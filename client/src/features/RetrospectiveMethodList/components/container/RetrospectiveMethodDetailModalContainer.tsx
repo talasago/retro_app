@@ -75,8 +75,6 @@ const RetroMethodDetailModalContainer: React.FC<
   const onSubmit: SubmitHandler<CommentFormSchema> = async (
     commentFormSchema,
   ) => {
-    const { userName, userUuid } = UserInfo.getUserInfo();
-
     let message: string = '';
     try {
       const response = await callCommentAddApi(
@@ -113,6 +111,7 @@ const RetroMethodDetailModalContainer: React.FC<
       }),
     );
 
+    const { userName, userUuid } = UserInfo.getUserInfo();
     setComments((prevComments) => [
       ...prevComments,
       {

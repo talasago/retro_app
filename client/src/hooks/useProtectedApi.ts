@@ -117,14 +117,16 @@ const updateTokenUseRefreshToken = async (
       headers: apiHeaders(refreshToken),
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const updatedAccessToken: string = responseRefToken.data.access_token;
-    AuthToken.setTokens(
-      updatedAccessToken,
-      responseRefToken.data.refresh_token,
-    );
+    const responseData = responseRefToken.data as {
+      access_token: string;
+      name: string;
+      uuid: string;
+      refresh_token: string;
+    };
+    AuthToken.setTokens(responseData.access_token, responseData.refresh_token);
+    UserInfo.setUserInfo(responseData.name, responseData.uuid);
 
-    return updatedAccessToken;
+    return responseData.access_token;
   } catch (error) {
     if (!isTokenExpired(error)) {
       // MEMO:
