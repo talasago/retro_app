@@ -130,13 +130,14 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             setComments={setComments}
             setIsGetApiError={setIsGetApiError}
           />
-          {isLogined && !isGetApiError && (
+          {isLogined && (
             <EnteringCommentArea
               register={register}
               handleSubmit={handleSubmit}
               onSubmit={onSubmit}
               errors={errors}
               isSubmitting={isSubmitting}
+              isGetApiError={isGetApiError}
             />
           )}
         </Paper>
@@ -255,9 +256,7 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
     }, [data, setComments]);
 
     useEffect(() => {
-      if (error) {
-        setIsGetApiError(true);
-      }
+      error ? setIsGetApiError(true) : setIsGetApiError(false);
     }, [error, setIsGetApiError]);
 
     if (!data || error)
@@ -293,11 +292,21 @@ interface EnteringCommentAreaProps {
   onSubmit: SubmitHandler<CommentFormSchema>;
   errors: FieldErrors<CommentFormSchema>;
   isSubmitting: boolean;
+  isGetApiError: boolean;
 }
 
 const EnteringCommentArea: React.FC<EnteringCommentAreaProps> = memo(
-  ({ register, handleSubmit, onSubmit, errors, isSubmitting }) => {
-    return (
+  ({
+    register,
+    handleSubmit,
+    onSubmit,
+    errors,
+    isSubmitting,
+    isGetApiError,
+  }) => {
+    return isGetApiError ? (
+      <></>
+    ) : (
       <Box
         component="form"
         sx={{
