@@ -119,7 +119,10 @@ const updateTokenUseRefreshToken = async (
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const updatedAccessToken: string = responseRefToken.data.access_token;
-    AuthToken.setTokens(updatedAccessToken, refreshToken);
+    AuthToken.setTokens(
+      updatedAccessToken,
+      responseRefToken.data.refresh_token,
+    );
 
     return updatedAccessToken;
   } catch (error) {
