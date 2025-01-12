@@ -254,11 +254,14 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
       setComments(data ? data.data.comments : []);
     }, [data, setComments]);
 
-    if (!data || error) {
-      setIsGetApiError(true);
+    useEffect(() => {
+      if (error) {
+        setIsGetApiError(true);
+      }
+    }, [error, setIsGetApiError]);
 
+    if (!data || error)
       return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
-    }
 
     const displayComments =
       comments.length > 0 ? (
