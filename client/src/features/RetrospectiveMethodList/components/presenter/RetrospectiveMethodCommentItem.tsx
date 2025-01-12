@@ -6,11 +6,12 @@ import { type commentsType } from '../container/RetrospectiveMethodDetailModalCo
 
 interface RetrospectiveMethodCommentProps {
   commentData: commentsType['comments'][0];
+  isDisplayDeleteButton: boolean;
 }
 
 const RetrospectiveMethodCommentItem: React.FC<
   RetrospectiveMethodCommentProps
-> = ({ commentData }) => {
+> = ({ commentData, isDisplayDeleteButton }) => {
   const formatDate = (dateString: string): string => {
     return new Date(dateString)
       .toLocaleDateString('ja-JP', {
@@ -48,9 +49,11 @@ const RetrospectiveMethodCommentItem: React.FC<
         <Typography variant="caption" color="text.secondary">
           {formatDate(commentData.created_at)}
         </Typography>
-        <IconButton>
-          <DeleteIcon sx={{ color: 'rgb(162, 162, 162)}}' }} fontSize="small" />
-        </IconButton>
+        {isDisplayDeleteButton && (
+          <IconButton>
+            <DeleteIcon sx={{ color: 'rgb(162, 162, 162)' }} fontSize="small" />
+          </IconButton>
+        )}
       </Box>
       <Box
         sx={{

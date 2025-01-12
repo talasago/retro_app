@@ -29,12 +29,14 @@ import LinkIcon from '@mui/icons-material/Link';
 import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthTokenObserver } from 'domains/AuthToken';
+import { UserInfo } from 'domains/UserInfo';
 // eslint-disable-next-line import/extensions
 import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import { type CommentFormSchema } from '../Schema/commentFormSchema';
 import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodCommentItem from './RetrospectiveMethodCommentItem';
+
 interface RetrospectiveMethodDetailModalPresenterProps {
   isOpen: boolean;
   onCloseModal: () => void;
@@ -265,7 +267,13 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
     const displayComments =
       comments.length > 0 ? (
         comments.map((comment, idx) => (
-          <RetrospectiveMethodCommentItem key={idx} commentData={comment} />
+          <RetrospectiveMethodCommentItem
+            key={idx}
+            commentData={comment}
+            isDisplayDeleteButton={
+              comment.user_uuid === UserInfo.getUserInfo().userUuid
+            }
+          />
         ))
       ) : (
         <div>コメントはまだ登録されていません。</div>
