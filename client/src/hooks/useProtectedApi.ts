@@ -13,7 +13,7 @@ const ERROR_MESSAGES = {
 export interface ApiRequest {
   url: string;
   method: Method;
-  data?: string;
+  data?: Record<string, unknown>;
 }
 
 export const useProtectedApi = (): ((
