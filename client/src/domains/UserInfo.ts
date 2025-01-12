@@ -8,8 +8,7 @@ export type UserInfoType = {
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class UserInfo {
-  static readonly EXPIRE_DATE =
-    AuthToken.ACCESS_TOKEN_EXPIRE_DATE_AFTER9_MINUTES;
+  static readonly EXPIRE_DATE = AuthToken.REFRESH_TOKEN_EXPIRE_DAYS;
 
   static readonly USER_NAME_KEY = 'userName';
   static readonly USER_UUID_KEY = 'userUuid';
