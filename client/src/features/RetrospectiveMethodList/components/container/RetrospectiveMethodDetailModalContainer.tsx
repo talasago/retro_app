@@ -1,17 +1,24 @@
 import { memo, useState } from 'react';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios, { type AxiosResponse } from 'axios';
+import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import { type apiSchemas } from 'domains/internal/apiSchema';
 import { COMMENT_URL } from 'domains/internal/constants/apiUrls';
+import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
+import { useProtectedApi } from 'hooks/useProtectedApi';
 import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { alertSlice } from 'stores/alert';
+import type { AppDispatch } from 'stores/store';
 import { UserInfo } from 'domains/UserInfo';
 import {
   type CommentFormSchema,
   commentFormSchema,
 } from '../Schema/commentFormSchema';
 import RetrospectiveMethodDetailModalPresenter from '../presenter/RetrospectiveMethodDetailModalPresenter';
+
 interface RetrospectiveMethodDetailModalContainerProps {
   isOpen: boolean;
   retrospectiveMethod: RetrospectiveMethod;
@@ -34,7 +41,24 @@ export type commentsType = {
 const RetroMethodDetailModalContainer: React.FC<
   RetrospectiveMethodDetailModalContainerProps
 > = ({ isOpen, retrospectiveMethod, onCloseModal, setIsNextMutate }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { setAlert } = alertSlice.actions;
+  const callProtectedApi = useProtectedApi();
+
   const [comments, setComments] = useState<commentsType['comments']>([]);
+
+  const callCommentAddApi = async (
+    retrospectiveMethodId: number,
+    comment: string,
+  ): Promise<
+    AxiosResponse<apiSchemas['schemas']['AddCommentApiResponseBody']>
+  > => {
+    return await callProtectedApi({
+      url: COMMENT_URL(retrospectiveMethodId),
+      method: 'POST',
+      data: { comment },
+    });
+  };
 
   const {
     register,
@@ -48,8 +72,46 @@ const RetroMethodDetailModalContainer: React.FC<
     resolver: yupResolver(commentFormSchema),
   });
 
-  const onSubmit: SubmitHandler<CommentFormSchema> = (commentFormSchema) => {
+  const onSubmit: SubmitHandler<CommentFormSchema> = async (
+    commentFormSchema,
+  ) => {
     const { userName, userUuid } = UserInfo.getUserInfo();
+
+    let message: string = '';
+    try {
+      const response = await callCommentAddApi(
+        retrospectiveMethod.id,
+        commentFormSchema.comment,
+      );
+      message = response.data.message;
+    } catch (error) {
+      let errorMessage: string = DEFAULT_ERROR_MESSAGE;
+      if (isClientErrorResponseBody(error)) {
+        // refreshTokenapiでエラーの場合にこのエラーレスポンスが返ってくる
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        errorMessage = error.response!.data.message;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
+      dispatch(
+        setAlert({
+          open: true,
+          message: errorMessage,
+          severity: 'error',
+        }),
+      );
+
+      return;
+    }
+
+    dispatch(
+      setAlert({
+        open: true,
+        message,
+        severity: 'success',
+      }),
+    );
 
     setComments((prevComments) => [
       ...prevComments,
