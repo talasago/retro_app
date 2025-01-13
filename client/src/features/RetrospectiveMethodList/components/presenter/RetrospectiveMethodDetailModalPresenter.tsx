@@ -49,7 +49,7 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   isSubmitting: boolean;
   comments: commentsType['comments'];
   setComments: React.Dispatch<React.SetStateAction<commentsType['comments']>>;
-  onDeleteCommentButtonClick: (commentId: number | null) => void;
+  onDeleteCommentButtonClick: (commentId: number) => void;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
@@ -237,7 +237,7 @@ interface CommentListAreaProps {
   comments: RetrospectiveMethodDetailModalPresenterProps['comments'];
   setComments: RetrospectiveMethodDetailModalPresenterProps['setComments'];
   setIsGetApiError: React.Dispatch<React.SetStateAction<boolean>>;
-  onDeleteCommentButtonClick: (commentId: number | null) => void;
+  onDeleteCommentButtonClick: (commentId: number) => void;
 }
 
 const CommentListArea: React.FC<CommentListAreaProps> = memo(

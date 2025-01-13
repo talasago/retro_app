@@ -142,8 +142,7 @@ const RetroMethodDetailModalContainer: React.FC<
   };
 
   const handleDeleteCommentButtonClick = useCallback(
-    async (commentId: commentsType['comments'][0]['id']) => {
-      if (commentId === null) return; // FIXME:本来はありえないが、一応チェック
+    async (commentId: number) => {
       if (!window.confirm('コメントを削除しますか？')) return;
 
       let message: string = '';

@@ -7,7 +7,7 @@ import { type commentsType } from '../container/RetrospectiveMethodDetailModalCo
 interface RetrospectiveMethodCommentProps {
   commentData: commentsType['comments'][0];
   isDisplayDeleteButton: boolean;
-  onDeleteCommentButtonClick: (commentId: number | null) => void;
+  onDeleteCommentButtonClick: (commentId: number) => void;
 }
 
 const RetrospectiveMethodCommentItem: React.FC<
@@ -53,7 +53,8 @@ const RetrospectiveMethodCommentItem: React.FC<
         {isDisplayDeleteButton && (
           <IconButton
             onClick={() => {
-              onDeleteCommentButtonClick(commentData.id);
+              commentData.id !== null &&
+                onDeleteCommentButtonClick(commentData.id);
             }}
           >
             <DeleteIcon sx={{ color: 'rgb(162, 162, 162)' }} fontSize="small" />
