@@ -60,6 +60,18 @@ const RetroMethodDetailModalContainer: React.FC<
     });
   };
 
+  const callCommentDeleteApi = async (
+    retrospectiveMethodId: number,
+    commentId: number,
+  ): Promise<
+    AxiosResponse<apiSchemas['schemas']['DeleteCommentApiResponseBody']>
+  > => {
+    return await callProtectedApi({
+      url: `${COMMENT_URL(retrospectiveMethodId)}/${commentId}`,
+      method: 'DELETE',
+    });
+  };
+
   const {
     register,
     handleSubmit,
@@ -130,13 +142,52 @@ const RetroMethodDetailModalContainer: React.FC<
   };
 
   const handleDeleteCommentButtonClick = useCallback(
-    (commentId: commentsType['comments'][0]['id']) => {
+    async (commentId: commentsType['comments'][0]['id']) => {
+      if (commentId === null) return; // FIXME:本来はありえないが、一応チェック
+      if (!window.confirm('コメントを削除しますか？')) return;
+
+      let message: string = '';
+      try {
+        const response = await callCommentDeleteApi(
+          retrospectiveMethod.id,
+          commentId,
+        );
+        message = response.data.message;
+      } catch (error) {
+        let errorMessage: string = DEFAULT_ERROR_MESSAGE;
+        if (isClientErrorResponseBody(error)) {
+          // refreshTokenapiでエラーの場合にこのエラーレスポンスが返ってくる
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          errorMessage = error.response!.data.message;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
+        dispatch(
+          setAlert({
+            open: true,
+            message: errorMessage,
+            severity: 'error',
+          }),
+        );
+
+        return;
+      }
+
+      dispatch(
+        setAlert({
+          open: true,
+          message,
+          severity: 'success',
+        }),
+      );
+
       setComments((prevComments) =>
         prevComments.filter((comment) => comment.id !== commentId),
       );
       setIsNextMutate(true);
     },
-    [setIsNextMutate],
+    [retrospectiveMethod],
   );
 
   return (

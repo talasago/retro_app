@@ -118,6 +118,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface apiSchemas {
   schemas: {
+    DeleteCommentApiResponseBody: {
+      /**
+       * Message
+       * @description 処理メッセージ
+       * @default コメントを削除しました。
+       */
+      message: string;
+    };
     /** AddCommentApiResponseBody */
     AddCommentApiResponseBody: {
       /**
