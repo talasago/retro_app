@@ -90,11 +90,11 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
       >
         <Paper
           sx={{
-            height: 700,
             width: 700,
             padding: 3,
             borderRadius: 5,
             overflowY: 'auto',
+            minHeight: '400px',
             maxHeight: { xs: '600px', sm: '900px' },
           }}
           onClick={(e) => {
