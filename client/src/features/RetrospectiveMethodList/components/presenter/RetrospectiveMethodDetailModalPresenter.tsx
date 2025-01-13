@@ -11,6 +11,7 @@ import {
   Link,
   FormControl,
   FormHelperText,
+  Button,
 } from '@mui/material';
 import { type AxiosError, type AxiosResponse } from 'axios';
 
@@ -135,7 +136,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             setIsGetApiError={setIsGetApiError}
             onDeleteCommentButtonClick={onDeleteCommentButtonClick}
           />
-          {isLogined && (
+          {isLogined ? (
             <EnteringCommentArea
               register={register}
               handleSubmit={handleSubmit}
@@ -144,6 +145,8 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
               isSubmitting={isSubmitting}
               isGetApiError={isGetApiError}
             />
+          ) : (
+            <NavigateLoginArea />
           )}
         </Paper>
       </Container>
@@ -267,6 +270,8 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
     }, [error, setIsGetApiError]);
 
     if (!data || error)
+      // FIXME:コメント一覧というもじれつは出すべき。そして下の余白を調整したい。
+      // エラー発生時にログインしてコメントするも出したくないかも。
       return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
 
     const displayComments =
@@ -380,3 +385,22 @@ const EnteringCommentArea: React.FC<EnteringCommentAreaProps> = memo(
     );
   },
 );
+
+const NavigateLoginArea: React.FC = memo(() => {
+  return (
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <Button
+        variant="contained"
+        sx={{
+          bgcolor: '#FE6D36',
+          '&:hover': {
+            bgcolor: '#FF5733',
+          },
+          height: 50,
+        }}
+      >
+        ログインしてコメントする
+      </Button>
+    </Box>
+  );
+});
