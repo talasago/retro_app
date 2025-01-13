@@ -276,7 +276,11 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
             key={idx}
             commentData={comment}
             isDisplayDeleteButton={
-              comment.user_uuid === UserInfo.getUserInfo().userUuid
+              comment.user_uuid === UserInfo.getUserInfo().userUuid &&
+              comment.id !== null // 登録後に再レンダリングされていないもの
+              // MEMO: idが特定できないので削除APIを呼び出せないため、削除ボタンを非表示にする
+              // 本来なら、「登録した後にすぐに削除したいユースケース」を優先すべきだが、
+              // それを満たせるような処理が浮かばなかったためこのような実装になっている
             }
             onDeleteCommentButtonClick={onDeleteCommentButtonClick}
           />
