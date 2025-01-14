@@ -95,7 +95,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             padding: 3,
             borderRadius: 5,
             overflowY: 'auto',
-            minHeight: '400px',
+            minHeight: '350px',
             maxHeight: { xs: '600px', sm: '900px' },
           }}
           onClick={(e) => {
@@ -269,30 +269,27 @@ const CommentListArea: React.FC<CommentListAreaProps> = memo(
       error ? setIsGetApiError(true) : setIsGetApiError(false);
     }, [error, setIsGetApiError]);
 
-    if (!data || error)
-      // FIXME:コメント一覧というもじれつは出すべき。そして下の余白を調整したい。
-      // エラー発生時にログインしてコメントするも出したくないかも。
-      return <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
-
-    const displayComments =
-      comments.length > 0 ? (
-        comments.map((comment, idx) => (
-          <RetrospectiveMethodCommentItem
-            key={idx}
-            commentData={comment}
-            isDisplayDeleteButton={
-              comment.user_uuid === UserInfo.getUserInfo().userUuid &&
-              comment.id !== null // 登録後に再レンダリングされていないもの
-              // MEMO: idが特定できないので削除APIを呼び出せないため、削除ボタンを非表示にする
-              // 本来なら、「登録した後にすぐに削除したいユースケース」を優先すべきだが、
-              // それを満たせるような処理が浮かばなかったためこのような実装になっている
-            }
-            onDeleteCommentButtonClick={onDeleteCommentButtonClick}
-          />
-        ))
-      ) : (
-        <div>コメントはまだ登録されていません。</div>
-      );
+    let displayComments;
+    if (!data || error) {
+      displayComments = <>{'コメント取得時に' + DEFAULT_ERROR_MESSAGE}</>;
+    } else if (comments.length > 0) {
+      displayComments = comments.map((comment, idx) => (
+        <RetrospectiveMethodCommentItem
+          key={idx}
+          commentData={comment}
+          isDisplayDeleteButton={
+            comment.user_uuid === UserInfo.getUserInfo().userUuid &&
+            comment.id !== null // 登録後に再レンダリングされていないもの
+            // MEMO: idが特定できないので削除APIを呼び出せないため、削除ボタンを非表示にする
+            // 本来なら、「登録した後にすぐに削除したいユースケース」を優先すべきだが、
+            // それを満たせるような処理が浮かばなかったためこのような実装になっている
+          }
+          onDeleteCommentButtonClick={onDeleteCommentButtonClick}
+        />
+      ));
+    } else {
+      displayComments = <div>コメントはまだ登録されていません。</div>;
+    }
 
     return (
       <>
