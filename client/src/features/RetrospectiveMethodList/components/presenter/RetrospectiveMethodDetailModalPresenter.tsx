@@ -136,18 +136,20 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
             setIsGetApiError={setIsGetApiError}
             onDeleteCommentButtonClick={onDeleteCommentButtonClick}
           />
-          {isLogined ? (
-            <EnteringCommentArea
-              register={register}
-              handleSubmit={handleSubmit}
-              onSubmit={onSubmit}
-              errors={errors}
-              isSubmitting={isSubmitting}
-              isGetApiError={isGetApiError}
-            />
-          ) : (
-            <NavigateLoginArea />
-          )}
+          {!isGetApiError ? (
+            isLogined ? (
+              <EnteringCommentArea
+                register={register}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                errors={errors}
+                isSubmitting={isSubmitting}
+                isGetApiError={isGetApiError}
+              />
+            ) : (
+              <NavigateLoginArea />
+            )
+          ) : null}
         </Paper>
       </Container>
     </Modal>
