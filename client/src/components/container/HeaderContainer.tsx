@@ -1,15 +1,16 @@
 import type { FC } from 'react';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import type { AxiosResponse } from 'axios';
 import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import type { apiSchemas } from 'domains/internal/apiSchema';
 import { LOGOUT_URL } from 'domains/internal/constants/apiUrls';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import { useProtectedApi } from 'hooks/useProtectedApi';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { alertSlice } from 'stores/alert';
+import { loginModalSlice } from 'stores/loginModal';
 import { signUpModalSlice } from 'stores/signUpModal';
-import type { AppDispatch } from 'stores/store';
+import type { AppDispatch, RootState } from 'stores/store';
 import { AuthToken, useAuthTokenObserver } from 'domains/AuthToken';
 import { UserInfo } from 'domains/UserInfo';
 import LoginModalContainer from 'features/Login/components/container/LoginModalContainer';
@@ -24,12 +25,17 @@ const HeaderContainer: FC = () => {
 
   // MEMO: HeaderPresenterのprops、ボタンをクリックするためにも必要なため、
   //      ここで管理している
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const { closeLoginModal, openLoginModal } = loginModalSlice.actions;
+  const isLoginModalOpen = useSelector(
+    (state: RootState) => state.loginModal.isOpen,
+  );
+
   const handleOpenLoginModal = (): void => {
-    setIsLoginModalOpen(true);
+    dispatch(openLoginModal());
   };
+
   const handleCloseLoginModal = (): void => {
-    setIsLoginModalOpen(false);
+    dispatch(closeLoginModal());
   };
 
   const { openSignUpModal } = signUpModalSlice.actions;
