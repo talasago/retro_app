@@ -11,6 +11,7 @@ import { useForm } from 'react-hook-form';
 import type { SubmitHandler } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { alertSlice } from 'stores/alert';
+import { loginModalSlice } from 'stores/loginModal';
 import type { AppDispatch } from 'stores/store';
 import { UserInfo } from 'domains/UserInfo';
 import {
@@ -46,6 +47,7 @@ const RetroMethodDetailModalContainer: React.FC<
   const callProtectedApi = useProtectedApi();
 
   const [comments, setComments] = useState<commentsType['comments']>([]);
+  const { openLoginModal } = loginModalSlice.actions;
 
   const callCommentAddApi = async (
     retrospectiveMethodId: number,
@@ -189,6 +191,11 @@ const RetroMethodDetailModalContainer: React.FC<
     [retrospectiveMethod],
   );
 
+  const handleNavigateLoginButtonClick = useCallback(() => {
+    onCloseModal();
+    dispatch(openLoginModal());
+  }, []);
+
   return (
     <RetrospectiveMethodDetailModalPresenter
       isOpen={isOpen}
@@ -203,6 +210,7 @@ const RetroMethodDetailModalContainer: React.FC<
       comments={comments}
       setComments={setComments}
       onDeleteCommentButtonClick={handleDeleteCommentButtonClick}
+      onNavigateLoginButtonClick={handleNavigateLoginButtonClick}
     />
   );
 };

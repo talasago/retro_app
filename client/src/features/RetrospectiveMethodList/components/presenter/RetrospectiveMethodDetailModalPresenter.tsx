@@ -51,6 +51,7 @@ interface RetrospectiveMethodDetailModalPresenterProps {
   comments: commentsType['comments'];
   setComments: React.Dispatch<React.SetStateAction<commentsType['comments']>>;
   onDeleteCommentButtonClick: (commentId: number) => void;
+  onNavigateLoginButtonClick: () => void;
 }
 
 const RetrospectiveMethodDetailModalPresenter: React.FC<
@@ -68,6 +69,7 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
   comments,
   setComments,
   onDeleteCommentButtonClick,
+  onNavigateLoginButtonClick,
 }) => {
   const isLogined: boolean = useAuthTokenObserver() as boolean;
   const [isGetApiError, setIsGetApiError] = React.useState<boolean>(false);
@@ -147,7 +149,9 @@ const RetrospectiveMethodDetailModalPresenter: React.FC<
                 isGetApiError={isGetApiError}
               />
             ) : (
-              <NavigateLoginArea />
+              <NavigateLoginArea
+                onNavigateLoginButtonClick={onNavigateLoginButtonClick}
+              />
             )
           ) : null}
         </Paper>
@@ -385,21 +389,28 @@ const EnteringCommentArea: React.FC<EnteringCommentAreaProps> = memo(
   },
 );
 
-const NavigateLoginArea: React.FC = memo(() => {
-  return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <Button
-        variant="contained"
-        sx={{
-          bgcolor: '#FE6D36',
-          '&:hover': {
-            bgcolor: '#FF5733',
-          },
-          height: 50,
-        }}
-      >
-        ログインしてコメントする
-      </Button>
-    </Box>
-  );
-});
+interface NavigateLoginAreaProps {
+  onNavigateLoginButtonClick: () => void;
+}
+
+const NavigateLoginArea: React.FC<NavigateLoginAreaProps> = memo(
+  ({ onNavigateLoginButtonClick }) => {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          sx={{
+            bgcolor: '#FE6D36',
+            '&:hover': {
+              bgcolor: '#FF5733',
+            },
+            height: 50,
+          }}
+          onClick={onNavigateLoginButtonClick}
+        >
+          ログインしてコメントする
+        </Button>
+      </Box>
+    );
+  },
+);
