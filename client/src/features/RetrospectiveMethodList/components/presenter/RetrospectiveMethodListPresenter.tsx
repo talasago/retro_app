@@ -58,7 +58,6 @@ const RetrospectiveMethodListPresenter: React.FC<
         <RetrospectiveMethodPaperArea
           retrospectiveMethods={retrospectiveMethods}
           onClickRetrospectiveMethodPaper={onClickRetrospectiveMethodPaper}
-          retrospectiveSceneNames={retrospectiveSceneNames}
         />
       )}
       <ScrollToTop isShow={isShowScrollToTop} onClick={onClickScrollToButton} />
@@ -151,52 +150,41 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethod[];
   onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
-  retrospectiveSceneNames: RetrospectiveSceneNames;
 }
 
 const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> =
-  memo(
-    ({
-      retrospectiveMethods,
-      onClickRetrospectiveMethodPaper,
-      retrospectiveSceneNames,
-    }) => {
-      const displayRetrospectivePapers = retrospectiveMethods.map(
-        (method, index) => {
-          // IDを元に文言のtipに変換
-          const categoryChips = method.easyToUseScenes.map((sceneId) => {
-            return (
-              <RetrospectiveMethodCategoryChip
-                key={sceneId}
-                sceneId={sceneId}
-                retrospectiveSceneNames={retrospectiveSceneNames}
-              />
-            );
-          });
-
+  memo(({ retrospectiveMethods, onClickRetrospectiveMethodPaper }) => {
+    const displayRetrospectivePapers = retrospectiveMethods.map(
+      (method, index) => {
+        // IDを元に文言のtipに変換
+        const categoryChips = method.easyToUseScenes.map((sceneId) => {
           return (
-            <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-              <RetrospectiveMethodPaper
-                retrospectiveMethod={method}
-                onClick={() => {
-                  onClickRetrospectiveMethodPaper(method);
-                }}
-                categoryChips={categoryChips}
-              />
-            </Grid>
+            <RetrospectiveMethodCategoryChip key={sceneId} sceneId={sceneId} />
           );
-        },
-      );
+        });
 
-      return (
-        <Container maxWidth="lg" sx={{ py: 10 }}>
-          <Grid container spacing={3}>
-            {displayRetrospectivePapers}
+        return (
+          <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
+            <RetrospectiveMethodPaper
+              retrospectiveMethod={method}
+              onClick={() => {
+                onClickRetrospectiveMethodPaper(method);
+              }}
+              categoryChips={categoryChips}
+            />
           </Grid>
-        </Container>
-      );
-    },
-  );
+        );
+      },
+    );
+
+    return (
+      <Container maxWidth="lg" sx={{ py: 10 }}>
+        <Grid container spacing={3}>
+          {displayRetrospectivePapers}
+        </Grid>
+      </Container>
+    );
+  });
 
 interface ScrollToTopProps {
   onClick: () => void;

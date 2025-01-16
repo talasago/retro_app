@@ -31,8 +31,6 @@ import SendIcon from '@mui/icons-material/Send';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAuthTokenObserver } from 'domains/AuthToken';
 import { UserInfo } from 'domains/UserInfo';
-// eslint-disable-next-line import/extensions
-import retrospectiveSceneName from '../../../../assets/retrospectiveSceneName.json';
 import { type CommentFormSchema } from '../Schema/commentFormSchema';
 import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
@@ -171,11 +169,7 @@ const RetrospectiveMethodArea: React.FC<RetrospectiveMethodAreaProps> = memo(
     // IDを元に文言のtipに変換
     const categoryChips = retrospectiveMethod.easyToUseScenes.map((sceneId) => {
       return (
-        <RetrospectiveMethodCategoryChip
-          key={sceneId}
-          sceneId={sceneId}
-          retrospectiveSceneNames={retrospectiveSceneName}
-        />
+        <RetrospectiveMethodCategoryChip key={sceneId} sceneId={sceneId} />
       );
     });
 
