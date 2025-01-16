@@ -4,6 +4,10 @@ import Cookies from 'js-cookie';
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class AuthToken {
   static readonly REFRESH_TOKEN_EXPIRE_DAYS = 10;
+  static readonly ACCESS_TOKEN_EXPIRE_DATE_AFTER9_MINUTES = new Date(
+    new Date().getTime() + 9 * 60 * 1000,
+  );
+
   static readonly ACCESS_TOKEN_KEY = 'accessToken';
   static readonly REFRESH_TOKEN_KEY = 'refreshToken';
   // TODO: tokenたちはプロパティに保存してもいいかも。そうなると、シングルトンにしないとだ。
@@ -55,13 +59,8 @@ export class AuthToken {
   }
 
   static setTokens(accessToken: string, refreshToken: string): void {
-    const accessTokenExpireDateAfter9Minutes = new Date(
-      new Date().getTime() + 9 * 60 * 1000,
-    );
-    const REFRESH_TOKEN_EXPIRE_DAYS = 10;
-
     Cookies.set(this.ACCESS_TOKEN_KEY, accessToken, {
-      expires: accessTokenExpireDateAfter9Minutes,
+      expires: this.ACCESS_TOKEN_EXPIRE_DATE_AFTER9_MINUTES,
       path: '/',
       // domain: // サーバーにcookieを送信しないので指定しない
       secure: true,
@@ -69,7 +68,7 @@ export class AuthToken {
     });
 
     Cookies.set(this.REFRESH_TOKEN_KEY, refreshToken, {
-      expires: REFRESH_TOKEN_EXPIRE_DAYS,
+      expires: this.REFRESH_TOKEN_EXPIRE_DAYS,
       path: '/',
       // domain: '*', // サーバーにcookieを送信しないので指定しない
       secure: true,

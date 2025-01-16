@@ -2,6 +2,7 @@ import axios, { type Method, type AxiosResponse } from 'axios';
 import { REFRESH_TOKEN_URL } from 'domains/internal/constants/apiUrls';
 import { useNavigate, type NavigateFunction } from 'react-router-dom';
 import { AuthToken } from 'domains/AuthToken';
+import { UserInfo } from 'domains/UserInfo';
 
 const ERROR_MESSAGES = {
   GENERIC: 'エラーが発生しました。時間をおいて再実行してください。',
@@ -12,7 +13,7 @@ const ERROR_MESSAGES = {
 export interface ApiRequest {
   url: string;
   method: Method;
-  data?: string;
+  data?: Record<string, unknown>;
 }
 
 export const useProtectedApi = (): ((
@@ -116,11 +117,16 @@ const updateTokenUseRefreshToken = async (
       headers: apiHeaders(refreshToken),
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-    const updatedAccessToken: string = responseRefToken.data.access_token;
-    AuthToken.setTokens(updatedAccessToken, refreshToken);
+    const responseData = responseRefToken.data as {
+      access_token: string;
+      name: string;
+      uuid: string;
+      refresh_token: string;
+    };
+    AuthToken.setTokens(responseData.access_token, responseData.refresh_token);
+    UserInfo.setUserInfo(responseData.name, responseData.uuid);
 
-    return updatedAccessToken;
+    return responseData.access_token;
   } catch (error) {
     if (!isTokenExpired(error)) {
       // MEMO:
@@ -131,6 +137,7 @@ const updateTokenUseRefreshToken = async (
     }
 
     AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
+    UserInfo.resetUserInfo();
     navigate('/login');
 
     throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);

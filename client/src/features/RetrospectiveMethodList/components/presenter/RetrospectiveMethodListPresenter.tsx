@@ -28,8 +28,9 @@ interface retrospectiveMethodListPresenterProps {
   isShowScrollToTop: boolean;
   isShowRetrospectiveMethodList: boolean;
   onClickScrollToButton: () => void;
-  onClickRetrospectiveMethodPaper: () => void;
+  onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
   onClickRetroMethodListShowButton: () => void;
+  onClickRandomButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 const RetrospectiveMethodListPresenter: React.FC<
@@ -42,6 +43,7 @@ const RetrospectiveMethodListPresenter: React.FC<
   onClickScrollToButton,
   onClickRetrospectiveMethodPaper,
   onClickRetroMethodListShowButton,
+  onClickRandomButton,
   onChangeScenesCheckbox,
 }) => {
   return (
@@ -49,13 +51,13 @@ const RetrospectiveMethodListPresenter: React.FC<
       <SearchArea
         retrospectiveSceneName={retrospectiveSceneNames}
         onClickRetroMethodListShowButton={onClickRetroMethodListShowButton}
+        onClickRandomButton={onClickRandomButton}
         onChangeScenesCheckbox={onChangeScenesCheckbox}
       />
       {isShowRetrospectiveMethodList && (
         <RetrospectiveMethodPaperArea
           retrospectiveMethods={retrospectiveMethods}
           onClickRetrospectiveMethodPaper={onClickRetrospectiveMethodPaper}
-          retrospectiveSceneNames={retrospectiveSceneNames}
         />
       )}
       <ScrollToTop isShow={isShowScrollToTop} onClick={onClickScrollToButton} />
@@ -68,6 +70,7 @@ export default memo(RetrospectiveMethodListPresenter);
 interface SearchAreaProps {
   retrospectiveSceneName: RetrospectiveSceneNames;
   onClickRetroMethodListShowButton: () => void;
+  onClickRandomButton: () => void;
   onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -75,6 +78,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
   ({
     retrospectiveSceneName,
     onClickRetroMethodListShowButton,
+    onClickRandomButton,
     onChangeScenesCheckbox,
   }) => {
     const theme = useTheme();
@@ -133,9 +137,7 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
               <RetrospectiveMethodSearchButton
                 icon={<ShuffleIcon />}
                 buttonName="検索してランダムに1つ抽選"
-                onClick={() => {
-                  console.log('[tmp]random button clicked');
-                }}
+                onClick={onClickRandomButton}
               />
             </Box>
           </Grid>
@@ -147,51 +149,42 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
 
 interface RetrospectiveMethodPaperAreaProps {
   retrospectiveMethods: RetrospectiveMethod[];
-  onClickRetrospectiveMethodPaper: () => void;
-  retrospectiveSceneNames: RetrospectiveSceneNames;
+  onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
 }
 
 const RetrospectiveMethodPaperArea: React.FC<RetrospectiveMethodPaperAreaProps> =
-  memo(
-    ({
-      retrospectiveMethods,
-      onClickRetrospectiveMethodPaper,
-      retrospectiveSceneNames,
-    }) => {
-      const displayRetrospectivePapers = retrospectiveMethods.map(
-        (method, index) => {
-          // IDを元に文言のtipに変換
-          const categoryChips = method.easyToUseScenes.map((sceneId) => {
-            return (
-              <RetrospectiveMethodCategoryChip
-                key={sceneId}
-                sceneId={sceneId}
-                retrospectiveSceneNames={retrospectiveSceneNames}
-              />
-            );
-          });
-
+  memo(({ retrospectiveMethods, onClickRetrospectiveMethodPaper }) => {
+    const displayRetrospectivePapers = retrospectiveMethods.map(
+      (method, index) => {
+        // IDを元に文言のtipに変換
+        const categoryChips = method.easyToUseScenes.map((sceneId) => {
           return (
-            <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
-              <RetrospectiveMethodPaper
-                retrospectiveMethod={method}
-                onClick={onClickRetrospectiveMethodPaper}
-                categoryChips={categoryChips}
-              />
-            </Grid>
+            <RetrospectiveMethodCategoryChip key={sceneId} sceneId={sceneId} />
           );
-        },
-      );
+        });
 
-      return (
-        <Container maxWidth="lg" sx={{ py: 10 }}>
-          <Grid container spacing={3}>
-            {displayRetrospectivePapers}
+        return (
+          <Grid item xs={12} sm={6} md={3} key={index} sx={{ mb: 8 }}>
+            <RetrospectiveMethodPaper
+              retrospectiveMethod={method}
+              onClick={() => {
+                onClickRetrospectiveMethodPaper(method);
+              }}
+              categoryChips={categoryChips}
+            />
           </Grid>
-        </Container>
-      );
-    },
-  );
+        );
+      },
+    );
+
+    return (
+      <Container maxWidth="lg" sx={{ py: 10 }}>
+        <Grid container spacing={3}>
+          {displayRetrospectivePapers}
+        </Grid>
+      </Container>
+    );
+  });
 
 interface ScrollToTopProps {
   onClick: () => void;

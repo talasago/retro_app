@@ -109,7 +109,7 @@ class TestUserFunction:
                 assert response.status_code == 401
                 assert (
                     res_body["message"]
-                    == "メールアドレスまたはパスワードが間違っています。"
+                    == "ユーザー名またはパスワードが間違っています。"
                 )
                 assert response.headers["WWW-Authenticate"] == "Bearer"
 
