@@ -32,6 +32,7 @@ const RetrospectiveMethodCommentItem: React.FC<
     ));
   };
 
+  // ユーザー名の文字数が長い場合のレイアウト崩れは考慮してない
   return (
     <Box
       sx={{
