@@ -1,8 +1,10 @@
 import type { FC } from 'react';
 import { Typography, Button, Container, Box, Grid } from '@mui/material';
-import { styled } from '@mui/system';
+// eslint-disable-next-line import/extensions
+import home_icon from 'assets/home_icon.svg';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
+
 interface FeatureSectionProps {
   title: string;
   description: string;
@@ -31,24 +33,43 @@ interface HomePresenterProps {
 const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'white' }}>
-      <Box sx={{ bgcolor: '#aaaaaa', py: 11 }}>
-        <Container>
-          <Typography variant="h4" gutterBottom>
-            自分に似合うふりかえり手法を、見つけよう
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mt: 4, bgcolor: '#454545', borderRadius: '100px', px: 10 }}
-            size="large"
-            component={Link}
-            to="/retrospective_list"
-          >
-            試してみる
-          </Button>
-        </Container>
-      </Box>
+      <Container>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Box>
+            <Typography sx={{ fontSize: '33px' }}>
+              今のチームにふさわしい
+              <br />
+              ふりかえり手法を
+              <br />
+              見つけよう
+            </Typography>
+            <Button
+              variant="contained"
+              sx={{
+                mt: 4,
+                bgcolor: '#454545',
+                borderRadius: '100px',
+                px: 10,
+              }}
+              size="large"
+              component={Link}
+              to="/retrospective_list"
+            >
+              試してみる
+            </Button>
+          </Box>
+          <Box>
+            <img src={home_icon} alt="Home" />
+          </Box>
+        </Box>
+      </Container>
 
-      <Container sx={{ pt: 8 }}>
+      <Container sx={{ pt: 4 }}>
         <Typography variant="h4" align="center" gutterBottom>
           グリーンレンズ
           <Typography variant="h6" component="span">
