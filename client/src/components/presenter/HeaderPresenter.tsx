@@ -1,7 +1,9 @@
 import type { FC } from 'react';
 import React from 'react';
-import { Box, Typography, Toolbar, AppBar, Button } from '@mui/material';
+import { Box, Toolbar, AppBar, Button } from '@mui/material';
+// eslint-disable-next-line import/extensions
 import logo from 'assets/logo.png';
+import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface HeaderPresenterProps {
@@ -22,7 +24,9 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
       <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: 'flex-end' }}>
           <Box sx={{ flexGrow: 1 }}>
-            <img src={logo} alt="Logo" />
+            <Link to="/">
+              <img src={logo} alt="Logo" />
+            </Link>
           </Box>
           <Button
             color="inherit"
