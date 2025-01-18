@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import React from 'react';
 import { Box, Toolbar, AppBar, Button } from '@mui/material';
 // eslint-disable-next-line import/extensions
-import logo from 'assets/logo.png';
+import logo from 'assets/logo.svg';
 import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 
