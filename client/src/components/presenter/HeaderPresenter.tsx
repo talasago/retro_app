@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import React from 'react';
 import { Box, Typography, Toolbar, AppBar, Button } from '@mui/material';
+import logo from 'assets/logo.png';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface HeaderPresenterProps {
@@ -20,9 +21,9 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: 'flex-end' }}>
-          <Typography variant="h4" sx={{ flexGrow: 1, ml: 3 }}>
-            LOGO
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <img src={logo} alt="Logo" />
+          </Box>
           <Button
             color="inherit"
             startIcon={<PersonIcon />}
