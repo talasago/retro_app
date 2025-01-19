@@ -1,5 +1,7 @@
 import type { FC } from 'react';
 import { Typography, Button, Container, Box, Grid } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
 import { Link } from 'react-router-dom';
@@ -31,41 +33,38 @@ interface HomePresenterProps {
 }
 
 const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   return (
-    <Box sx={{ width: '100%', bgcolor: 'white' }}>
+    <Box sx={{ width: '100%' }}>
       <Container>
         <Box
           sx={{
             display: 'flex',
-            alignItems: 'center',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            justifyContent: 'center',
           }}
         >
-          <Box>
-            <Typography sx={{ fontSize: '33px' }}>
+          <Box sx={{ mx: isMobile ? 'auto' : 0 }}>
+            <Typography sx={{ fontSize: isMobile ? '28px' : '33px' }}>
               今のチームにふさわしい
               <br />
               ふりかえり手法を
               <br />
               見つけよう
             </Typography>
-            <Button
-              variant="contained"
-              sx={{
-                mt: 4,
-                bgcolor: '#454545',
-                borderRadius: '100px',
-                px: 10,
-              }}
-              size="large"
-              component={Link}
-              to="/retrospective_list"
-            >
-              試してみる
-            </Button>
+            {!isMobile && <LetsTryButton />}
           </Box>
           <Box>
-            <img src={home_icon} alt="Home" />
+            <img
+              src={home_icon}
+              alt="Home"
+              style={{ width: '100%', maxWidth: '100%', height: 'auto' }}
+            />
           </Box>
+          {isMobile && <LetsTryButton />}
         </Box>
       </Container>
 
@@ -106,3 +105,21 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
 };
 
 export default HomePresenter;
+
+const LetsTryButton: React.FC = () => (
+  <Button
+    variant="contained"
+    sx={{
+      mt: 2,
+      bgcolor: '#454545',
+      borderRadius: '100px',
+      px: 10,
+      mx: 'auto',
+    }}
+    size="large"
+    component={Link}
+    to="/retrospective_list"
+  >
+    試してみる
+  </Button>
+);
