@@ -15,6 +15,7 @@ import {
 import {
   BUTTON_ACCENT_COLOR,
   BUTTON_ACCENT_HOVER_COLOR,
+  BASE_COLOR,
 } from 'domains/internal/constants/colors';
 import {
   type FieldErrors,
@@ -96,7 +97,7 @@ const SignUpModalPresenter: FC<SignUpModalPresenterProps> = ({
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-                <Avatar sx={{ bgcolor: 'grey.800', width: 90, height: 90 }}>
+                <Avatar sx={{ bgcolor: BASE_COLOR, width: 90, height: 90 }}>
                   <AssignmentIndIcon sx={{ fontSize: 50 }} />
                 </Avatar>
               </Box>
