@@ -3,6 +3,10 @@ import React from 'react';
 import { Box, Toolbar, AppBar, Button } from '@mui/material';
 // eslint-disable-next-line import/extensions
 import logo from 'assets/logo.svg';
+import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 
@@ -40,7 +44,10 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
             variant="contained"
             sx={{
               ml: 2,
-              bgcolor: '#d9d9d9', // この色でいいのか？
+              bgcolor: BUTTON_ACCENT_COLOR,
+              '&:hover': {
+                bgcolor: BUTTON_ACCENT_HOVER_COLOR,
+              },
               display: isLogined ? 'none' : 'inherit',
             }}
             onClick={onOpenSignUpModal}

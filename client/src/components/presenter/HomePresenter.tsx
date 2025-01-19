@@ -6,6 +6,10 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import backgroundImage from 'assets/home_background_image.svg';
 // eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
+import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
 
@@ -105,7 +109,14 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
       </Container>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Button variant="contained" onClick={onOpenSignUpModal}>
+        <Button
+          variant="contained"
+          onClick={onOpenSignUpModal}
+          sx={{
+            bgcolor: BUTTON_ACCENT_COLOR,
+            '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
+          }}
+        >
           ユーザー登録してはじめる
         </Button>
       </Box>

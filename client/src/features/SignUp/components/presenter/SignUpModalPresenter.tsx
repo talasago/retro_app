@@ -13,6 +13,10 @@ import {
   IconButton,
 } from '@mui/material';
 import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
+import {
   type FieldErrors,
   type UseFormRegister,
   type UseFormHandleSubmit,
@@ -135,8 +139,12 @@ const SignUpModalPresenter: FC<SignUpModalPresenterProps> = ({
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
-                sx={{ mb: 2, bgcolor: 'grey.800', height: 50 }}
+                sx={{
+                  mb: 2,
+                  height: 50,
+                  bgcolor: BUTTON_ACCENT_COLOR,
+                  '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
+                }}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? <CircularProgress size={24} /> : '登録する'}

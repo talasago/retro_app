@@ -1,0 +1,2 @@
+export const BUTTON_ACCENT_COLOR = '#FE6D36';
+export const BUTTON_ACCENT_HOVER_COLOR = '#FF5733';
