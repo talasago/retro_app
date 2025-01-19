@@ -9,6 +9,8 @@ import home_icon from 'assets/home_icon.svg';
 import {
   BUTTON_ACCENT_COLOR,
   BUTTON_ACCENT_HOVER_COLOR,
+  BASE_COLOR,
+  BUTTON_BASE_HOVER_COLOR,
 } from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -131,7 +133,8 @@ const LetsTryButton: React.FC = () => (
     variant="contained"
     sx={{
       mt: 2,
-      bgcolor: '#454545',
+      bgcolor: BASE_COLOR,
+      '&:hover': { bgcolor: BUTTON_BASE_HOVER_COLOR },
       borderRadius: '100px',
       px: 10,
       mx: 'auto',
