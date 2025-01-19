@@ -128,6 +128,9 @@ const updateTokenUseRefreshToken = async (
 
     return responseData.access_token;
   } catch (error) {
+    AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
+    UserInfo.resetUserInfo();
+
     if (!isTokenExpired(error)) {
       // MEMO:
       // 1. 500、トークン期限切れ以外の401になった時に発生する想定。
@@ -136,8 +139,6 @@ const updateTokenUseRefreshToken = async (
       throw new Error(ERROR_MESSAGES.GENERIC);
     }
 
-    AuthToken.resetTokens(); // 副作用なので、useEffect使うべきなのかもしれない
-    UserInfo.resetUserInfo();
     navigate('/login');
 
     throw new Error(ERROR_MESSAGES.EXPIRED_TOKEN);
