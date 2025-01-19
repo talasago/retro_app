@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+import { BASE_COLOR } from 'domains/internal/constants/colors';
 import type {
   RetrospectiveMethod,
   RetrospectiveSceneNames,
@@ -21,7 +22,6 @@ import VerticalAlignTopIcon from '@mui/icons-material/VerticalAlignTop';
 import RetrospectiveMethodCategoryChip from './RetrospectiveMethodCategoryChip';
 import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
-
 interface retrospectiveMethodListPresenterProps {
   retrospectiveMethods: RetrospectiveMethod[];
   retrospectiveSceneNames: RetrospectiveSceneNames;
@@ -113,7 +113,16 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
                       sx={{ width: '33%' }}
                     >
                       <FormControlLabel
-                        control={<Checkbox onChange={onChangeScenesCheckbox} />}
+                        control={
+                          <Checkbox
+                            sx={{
+                              '&.Mui-checked': {
+                                color: BASE_COLOR,
+                              },
+                            }}
+                            onChange={onChangeScenesCheckbox}
+                          />
+                        }
                         label={sceneNames}
                         value={id}
                       />
