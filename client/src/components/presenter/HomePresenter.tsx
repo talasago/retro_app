@@ -3,6 +3,8 @@ import { Typography, Button, Container, Box, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
+import backgroundImage from 'assets/home_background_image.svg';
+// eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
@@ -47,7 +49,14 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
             justifyContent: 'center',
           }}
         >
-          <Box sx={{ mx: isMobile ? 'auto' : 0 }}>
+          <Box
+            sx={{
+              mx: isMobile ? 'auto' : 0,
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: 'cover',
+              padding: isMobile ? 0 : 5,
+            }}
+          >
             <Typography sx={{ fontSize: isMobile ? '28px' : '33px' }}>
               今のチームにふさわしい
               <br />
