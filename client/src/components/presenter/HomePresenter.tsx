@@ -3,7 +3,7 @@ import { Typography, Button, Container, Box, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
-import backgroundImage from 'assets/home_background_image.svg';
+import backgroundImage from 'assets/background_image.svg';
 // eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
 import {
