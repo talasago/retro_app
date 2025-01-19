@@ -1,6 +1,13 @@
 import type { FC } from 'react';
 import React from 'react';
-import { Box, Typography, Toolbar, AppBar, Button } from '@mui/material';
+import { Box, Toolbar, AppBar, Button } from '@mui/material';
+// eslint-disable-next-line import/extensions
+import logo from 'assets/logo.svg';
+import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
+import { Link } from 'react-router-dom';
 import PersonIcon from '@mui/icons-material/Person';
 
 interface HeaderPresenterProps {
@@ -20,9 +27,11 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color="transparent" elevation={0}>
         <Toolbar sx={{ justifyContent: 'flex-end' }}>
-          <Typography variant="h4" sx={{ flexGrow: 1, ml: 3 }}>
-            LOGO
-          </Typography>
+          <Box sx={{ flexGrow: 1 }}>
+            <Link to="/">
+              <img src={logo} alt="Logo" />
+            </Link>
+          </Box>
           <Button
             color="inherit"
             startIcon={<PersonIcon />}
@@ -35,7 +44,10 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
             variant="contained"
             sx={{
               ml: 2,
-              bgcolor: '#d9d9d9', // この色でいいのか？
+              bgcolor: BUTTON_ACCENT_COLOR,
+              '&:hover': {
+                bgcolor: BUTTON_ACCENT_HOVER_COLOR,
+              },
               display: isLogined ? 'none' : 'inherit',
             }}
             onClick={onOpenSignUpModal}

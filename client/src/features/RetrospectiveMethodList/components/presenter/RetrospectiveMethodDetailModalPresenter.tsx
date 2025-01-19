@@ -14,8 +14,11 @@ import {
   Button,
 } from '@mui/material';
 import { type AxiosError, type AxiosResponse } from 'axios';
-
 import { type apiSchemas } from 'domains/internal/apiSchema';
+import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
 import { DEFAULT_ERROR_MESSAGE } from 'domains/internal/constants/errorMessage';
 import type { RetrospectiveMethod } from 'domains/internal/retrospectiveJsonType';
 import {
@@ -394,9 +397,9 @@ const NavigateLoginArea: React.FC<NavigateLoginAreaProps> = memo(
         <Button
           variant="contained"
           sx={{
-            bgcolor: '#FE6D36',
+            bgcolor: BUTTON_ACCENT_COLOR,
             '&:hover': {
-              bgcolor: '#FF5733',
+              bgcolor: BUTTON_ACCENT_HOVER_COLOR,
             },
             height: 50,
           }}

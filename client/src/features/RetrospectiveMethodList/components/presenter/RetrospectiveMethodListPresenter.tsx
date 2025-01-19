@@ -11,6 +11,9 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
+// eslint-disable-next-line import/extensions
+import backgroundImage from 'assets/background_image.svg';
+import { BASE_COLOR } from 'domains/internal/constants/colors';
 import type {
   RetrospectiveMethod,
   RetrospectiveSceneNames,
@@ -85,7 +88,15 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     return (
-      <Box sx={{ bgcolor: 'rgba(239, 249, 246, 1)', py: 8 }}>
+      <Box
+        sx={{
+          bgcolor: '#EFF9F6',
+          py: 8,
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundPosition: 'top left, bottom right',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      >
         <Container maxWidth="md">
           <Typography
             variant="h6"
@@ -113,7 +124,16 @@ const SearchArea: React.FC<SearchAreaProps> = memo(
                       sx={{ width: '33%' }}
                     >
                       <FormControlLabel
-                        control={<Checkbox onChange={onChangeScenesCheckbox} />}
+                        control={
+                          <Checkbox
+                            sx={{
+                              '&.Mui-checked': {
+                                color: BASE_COLOR,
+                              },
+                            }}
+                            onChange={onChangeScenesCheckbox}
+                          />
+                        }
                         label={sceneNames}
                         value={id}
                       />

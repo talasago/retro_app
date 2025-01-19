@@ -5,7 +5,7 @@ import { styled } from '@mui/system';
 import { Link } from 'react-router-dom';
 
 const FooterStyle = styled(Box)({
-  backgroundColor: '#aaaaaa',
+  backgroundColor: '#B2E9DA',
   height: '80px',
   display: 'flex',
   alignItems: 'center',

@@ -1,8 +1,20 @@
 import type { FC } from 'react';
 import { Typography, Button, Container, Box, Grid } from '@mui/material';
-import { styled } from '@mui/system';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
+// eslint-disable-next-line import/extensions
+import backgroundImage from 'assets/background_image.svg';
+// eslint-disable-next-line import/extensions
+import home_icon from 'assets/home_icon.svg';
+import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+  BASE_COLOR,
+  BUTTON_BASE_HOVER_COLOR,
+} from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
+
 interface FeatureSectionProps {
   title: string;
   description: string;
@@ -29,26 +41,49 @@ interface HomePresenterProps {
 }
 
 const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
-  return (
-    <Box sx={{ width: '100%', bgcolor: 'white' }}>
-      <Box sx={{ bgcolor: '#aaaaaa', py: 11 }}>
-        <Container>
-          <Typography variant="h4" gutterBottom>
-            自分に似合うふりかえり手法を、見つけよう
-          </Typography>
-          <Button
-            variant="contained"
-            sx={{ mt: 4, bgcolor: '#454545', borderRadius: '100px', px: 10 }}
-            size="large"
-            component={Link}
-            to="/retrospective_list"
-          >
-            試してみる
-          </Button>
-        </Container>
-      </Box>
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-      <Container sx={{ pt: 8 }}>
+  return (
+    <Box sx={{ width: '100%' }}>
+      <Container>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              mx: isMobile ? 'auto' : 0,
+              backgroundImage: `url(${backgroundImage})`,
+              backgroundSize: 'cover',
+              padding: isMobile ? 0 : 5,
+            }}
+          >
+            <Typography sx={{ fontSize: isMobile ? '28px' : '33px' }}>
+              今のチームにふさわしい
+              <br />
+              ふりかえり手法を
+              <br />
+              見つけよう
+            </Typography>
+            {!isMobile && <LetsTryButton />}
+          </Box>
+          <Box>
+            <img
+              src={home_icon}
+              alt="Home"
+              style={{ width: '100%', maxWidth: '100%', height: 'auto' }}
+            />
+          </Box>
+          {isMobile && <LetsTryButton />}
+        </Box>
+      </Container>
+
+      <Container sx={{ pt: 4 }}>
         <Typography variant="h4" align="center" gutterBottom>
           グリーンレンズ
           <Typography variant="h6" component="span">
@@ -76,7 +111,14 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
       </Container>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Button variant="contained" onClick={onOpenSignUpModal}>
+        <Button
+          variant="contained"
+          onClick={onOpenSignUpModal}
+          sx={{
+            bgcolor: BUTTON_ACCENT_COLOR,
+            '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
+          }}
+        >
           ユーザー登録してはじめる
         </Button>
       </Box>
@@ -85,3 +127,22 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
 };
 
 export default HomePresenter;
+
+const LetsTryButton: React.FC = () => (
+  <Button
+    variant="contained"
+    sx={{
+      mt: 2,
+      bgcolor: BASE_COLOR,
+      '&:hover': { bgcolor: BUTTON_BASE_HOVER_COLOR },
+      borderRadius: '100px',
+      px: 10,
+      mx: 'auto',
+    }}
+    size="large"
+    component={Link}
+    to="/retrospective_list"
+  >
+    試してみる
+  </Button>
+);
