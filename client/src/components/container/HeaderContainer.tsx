@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import type { AxiosResponse } from 'axios';
 import { isClientErrorResponseBody } from 'domains/internal/apiErrorUtil';
 import type { apiSchemas } from 'domains/internal/apiSchema';
@@ -30,6 +30,8 @@ const HeaderContainer: FC = () => {
     (state: RootState) => state.loginModal.isOpen,
   );
 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
   const handleOpenLoginModal = (): void => {
     dispatch(openLoginModal());
   };
@@ -52,6 +54,7 @@ const HeaderContainer: FC = () => {
 
   const handleLogout = async (): Promise<void> => {
     let message: string = '';
+    setIsSubmitting(true);
     try {
       const response = await callLogoutApi();
       message = response.data.message;
@@ -72,6 +75,7 @@ const HeaderContainer: FC = () => {
           severity: 'error',
         }),
       );
+      setIsSubmitting(false);
 
       return;
     }
@@ -86,6 +90,7 @@ const HeaderContainer: FC = () => {
         severity: 'success',
       }),
     );
+    setIsSubmitting(false);
   };
 
   const memoizedHeaderPresenter = useMemo(
@@ -95,11 +100,12 @@ const HeaderContainer: FC = () => {
         onLogout={handleLogout}
         onOpenLoginModal={handleOpenLoginModal}
         onOpenSignUpModal={handleOpenSignUpModal}
+        isSubmitting={isSubmitting}
       />
     ),
     // ログイン状態が変化したときだけ、表示が変わるので再レンダリングする
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isLogined],
+    [isLogined, isSubmitting],
   );
 
   return (

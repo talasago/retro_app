@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-import { Box, Toolbar, AppBar, Button } from '@mui/material';
+import { Box, Toolbar, AppBar, Button, CircularProgress } from '@mui/material';
 // eslint-disable-next-line import/extensions
 import logo from 'assets/logo.svg';
 import {
@@ -15,6 +15,7 @@ interface HeaderPresenterProps {
   onLogout: () => void;
   onOpenLoginModal: () => void;
   onOpenSignUpModal: () => void;
+  isSubmitting: boolean;
 }
 
 const HeaderPresenter: FC<HeaderPresenterProps> = ({
@@ -22,6 +23,7 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
   onLogout,
   onOpenLoginModal,
   onOpenSignUpModal,
+  isSubmitting,
 }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -59,7 +61,7 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
             sx={{ display: !isLogined ? 'none' : 'inherit' }}
             onClick={onLogout}
           >
-            ログアウト
+            {isSubmitting ? <CircularProgress size={24} /> : 'ログアウト'}
           </Button>
         </Toolbar>
       </AppBar>
