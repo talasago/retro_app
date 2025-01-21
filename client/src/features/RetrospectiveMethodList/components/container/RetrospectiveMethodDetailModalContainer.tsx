@@ -48,6 +48,7 @@ const RetroMethodDetailModalContainer: React.FC<
 
   const [comments, setComments] = useState<commentsType['comments']>([]);
   const { openLoginModal } = loginModalSlice.actions;
+  const [isSubmittingDelete, setIsSubmittingDelete] = useState<boolean>(false);
 
   const callCommentAddApi = async (
     retrospectiveMethodId: number,
@@ -146,6 +147,7 @@ const RetroMethodDetailModalContainer: React.FC<
   const handleDeleteCommentButtonClick = useCallback(
     async (commentId: number) => {
       if (!window.confirm('コメントを削除しますか？')) return;
+      setIsSubmittingDelete(true);
 
       let message: string = '';
       try {
@@ -171,6 +173,7 @@ const RetroMethodDetailModalContainer: React.FC<
             severity: 'error',
           }),
         );
+        setIsSubmittingDelete(false);
 
         return;
       }
@@ -187,8 +190,9 @@ const RetroMethodDetailModalContainer: React.FC<
         prevComments.filter((comment) => comment.id !== commentId),
       );
       setIsNextMutate(true);
+      setIsSubmittingDelete(false);
     },
-    [retrospectiveMethod],
+    [retrospectiveMethod, setIsSubmittingDelete],
   );
 
   const handleNavigateLoginButtonClick = useCallback(() => {
@@ -211,6 +215,7 @@ const RetroMethodDetailModalContainer: React.FC<
       setComments={setComments}
       onDeleteCommentButtonClick={handleDeleteCommentButtonClick}
       onNavigateLoginButtonClick={handleNavigateLoginButtonClick}
+      isSubmittingDelete={isSubmittingDelete}
     />
   );
 };
