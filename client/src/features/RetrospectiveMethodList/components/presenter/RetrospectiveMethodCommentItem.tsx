@@ -1,5 +1,5 @@
 import { memo, Fragment } from 'react';
-import { Box, Typography, IconButton } from '@mui/material';
+import { Box, Typography, IconButton, CircularProgress } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PersonIcon from '@mui/icons-material/Person';
 import { type commentsType } from '../container/RetrospectiveMethodDetailModalContainer';
@@ -8,11 +8,17 @@ interface RetrospectiveMethodCommentProps {
   commentData: commentsType['comments'][0];
   isDisplayDeleteButton: boolean;
   onDeleteCommentButtonClick: (commentId: number) => void;
+  isSubmittingDelete: boolean;
 }
 
 const RetrospectiveMethodCommentItem: React.FC<
   RetrospectiveMethodCommentProps
-> = ({ commentData, isDisplayDeleteButton, onDeleteCommentButtonClick }) => {
+> = ({
+  commentData,
+  isDisplayDeleteButton,
+  onDeleteCommentButtonClick,
+  isSubmittingDelete,
+}) => {
   const formatDate = (dateString: string): string => {
     return new Date(dateString)
       .toLocaleDateString('ja-JP', {
@@ -58,7 +64,14 @@ const RetrospectiveMethodCommentItem: React.FC<
                 onDeleteCommentButtonClick(commentData.id);
             }}
           >
-            <DeleteIcon sx={{ color: 'rgb(162, 162, 162)' }} fontSize="small" />
+            {isSubmittingDelete ? (
+              <CircularProgress size={24} />
+            ) : (
+              <DeleteIcon
+                sx={{ color: 'rgb(162, 162, 162)' }}
+                fontSize="small"
+              />
+            )}
           </IconButton>
         )}
       </Box>
