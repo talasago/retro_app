@@ -5,6 +5,8 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
 import backgroundImage from 'assets/background_image.svg';
 // eslint-disable-next-line import/extensions
+import eyeCatchQuestion from 'assets/eyeCatchQuestion.svg';
+// eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
 import {
   BUTTON_ACCENT_COLOR,
@@ -99,13 +101,25 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         }}
       >
         <Container sx={{ pt: 4 }}>
-          <Typography variant="h4" align="center" gutterBottom>
-            グリーンレンズ
-            <Typography variant="h6" component="span">
-              とは
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <img
+              src={eyeCatchQuestion}
+              alt="Eye Catch Question"
+              style={{ marginBottom: 80 }}
+            />
+            <Typography variant="h4" gutterBottom>
+              グリーンレンズ
+              <Typography variant="h6" component="span">
+                とは
+              </Typography>
             </Typography>
-          </Typography>
-
+          </Box>
           <FeatureSection
             title="「ふりかえり」をサポート"
             description="過去の活動を見直して、よりよい未来の活動を行うために検討するためのプロセス「ふりかえり」。
