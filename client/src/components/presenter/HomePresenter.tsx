@@ -5,7 +5,16 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
 import backgroundImage from 'assets/background_image.svg';
 // eslint-disable-next-line import/extensions
+import eyeCatchQuestion from 'assets/eyeCatchQuestion.svg';
+// eslint-disable-next-line import/extensions
+import featureSection1 from 'assets/featureSection1.svg';
+// eslint-disable-next-line import/extensions
+import featureSection2 from 'assets/featureSection2.svg';
+// eslint-disable-next-line import/extensions
+import featureSection3 from 'assets/featureSection3.svg';
+// eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
+
 import {
   BUTTON_ACCENT_COLOR,
   BUTTON_ACCENT_HOVER_COLOR,
@@ -13,17 +22,25 @@ import {
   BUTTON_BASE_HOVER_COLOR,
 } from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
-import CircleIcon from '@mui/icons-material/Circle';
 
 interface FeatureSectionProps {
   title: string;
   description: string;
+  srcFile: string;
 }
 
-const FeatureSection: FC<FeatureSectionProps> = ({ title, description }) => (
+const FeatureSection: FC<FeatureSectionProps> = ({
+  title,
+  description,
+  srcFile,
+}) => (
   <Grid container spacing={3} alignItems="center">
     <Grid item>
-      <CircleIcon color="disabled" sx={{ width: 110, height: 110 }} />
+      <img
+        src={srcFile}
+        alt="Feature Section"
+        style={{ width: 110, height: 110 }}
+      />
     </Grid>
     <Grid item>
       <Typography variant="h5" fontWeight="bold">
@@ -83,32 +100,54 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         </Box>
       </Container>
 
-      <Container sx={{ pt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          グリーンレンズ
-          <Typography variant="h6" component="span">
-            とは
-          </Typography>
-        </Typography>
-
-        <FeatureSection
-          title="ふりかえり手法のランダム抽選で、毎日新しい発見を"
-          description="毎回異なる振り返り手法を試すことで、マンネリ化を防ぎ、新鮮な視点を得ることができます。"
-        />
-        <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-        <FeatureSection
-          title="試したふりかえり手法の感想を、みんなとシェアしよう。"
-          description="同じ手法を試した人の感想を見ることで、より効果的に振り返り手法を決めることができます。
-          あなたの経験を共有することで、誰かの役に立つかも。
-          ※感想コメントを登録するには、ユーザー登録が必要です。"
-        />
-        <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-        <FeatureSection
-          title="アプリ名の由来"
-          description="ふりかえり→ふりかえる→カエルの目を通して世界を見る→緑色のレンズを通して世界を見よう
-          という意味を込めています。"
-        />
-      </Container>
+      <Box
+        sx={{
+          backgroundImage: `url(${backgroundImage}), url(${backgroundImage})`,
+          backgroundPosition: 'top right, bottom left',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      >
+        <Container sx={{ pt: 4 }}>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <img
+              src={eyeCatchQuestion}
+              alt="Eye Catch Question"
+              style={{ marginBottom: 80 }}
+            />
+            <Typography variant="h4" gutterBottom>
+              グリーンレンズ
+              <Typography variant="h6" component="span">
+                とは
+              </Typography>
+            </Typography>
+          </Box>
+          <FeatureSection
+            title="「ふりかえり」をサポート"
+            description="過去の活動を見直して、よりよい未来の活動を行うために検討するためのプロセス「ふりかえり」。
+            グリーンレンズは、「ふりかえり」をサポートするためのアプリケーションです。"
+            srcFile={featureSection1}
+          />
+          <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
+          <FeatureSection
+            title="ランダム表示で、毎日新しい発見を"
+            description="異なるふりかえり手法を試すことで、マンネリ化を防ぎ、新たな視点を得ることができます。"
+            srcFile={featureSection2}
+          />
+          <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
+          <FeatureSection
+            title="感想をみんなとシェアしよう"
+            description="みんなの感想コメントを参考にすることで、チームやあなた自身にとって、最適なふりかえり手法の選択が可能に。
+            ※感想コメントの登録はユーザー登録が必要です。"
+            srcFile={featureSection3}
+          />
+        </Container>
+      </Box>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
         <Button
