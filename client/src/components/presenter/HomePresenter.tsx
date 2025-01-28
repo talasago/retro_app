@@ -7,7 +7,14 @@ import backgroundImage from 'assets/background_image.svg';
 // eslint-disable-next-line import/extensions
 import eyeCatchQuestion from 'assets/eyeCatchQuestion.svg';
 // eslint-disable-next-line import/extensions
+import featureSection1 from 'assets/featureSection1.svg';
+// eslint-disable-next-line import/extensions
+import featureSection2 from 'assets/featureSection2.svg';
+// eslint-disable-next-line import/extensions
+import featureSection3 from 'assets/featureSection3.svg';
+// eslint-disable-next-line import/extensions
 import home_icon from 'assets/home_icon.svg';
+
 import {
   BUTTON_ACCENT_COLOR,
   BUTTON_ACCENT_HOVER_COLOR,
@@ -19,18 +26,18 @@ import { Link } from 'react-router-dom';
 interface FeatureSectionProps {
   title: string;
   description: string;
-  fileName: string;
+  srcFile: string;
 }
 
 const FeatureSection: FC<FeatureSectionProps> = ({
   title,
   description,
-  fileName,
+  srcFile,
 }) => (
   <Grid container spacing={3} alignItems="center">
     <Grid item>
       <img
-        src={`/src/assets/${fileName}`}
+        src={srcFile}
         alt="Feature Section"
         style={{ width: 110, height: 110 }}
       />
@@ -124,20 +131,20 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
             title="「ふりかえり」をサポート"
             description="過去の活動を見直して、よりよい未来の活動を行うために検討するためのプロセス「ふりかえり」。
             グリーンレンズは、「ふりかえり」をサポートするためのアプリケーションです。"
-            fileName="featureSection1.svg"
+            srcFile={featureSection1}
           />
           <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
           <FeatureSection
             title="ランダム表示で、毎日新しい発見を"
             description="異なるふりかえり手法を試すことで、マンネリ化を防ぎ、新たな視点を得ることができます。"
-            fileName="featureSection2.svg"
+            srcFile={featureSection2}
           />
           <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
           <FeatureSection
             title="感想をみんなとシェアしよう"
             description="みんなの感想コメントを参考にすることで、チームやあなた自身にとって、最適なふりかえり手法の選択が可能に。
             ※感想コメントの登録はユーザー登録が必要です。"
-            fileName="featureSection3.svg"
+            srcFile={featureSection3}
           />
         </Container>
       </Box>
