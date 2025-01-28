@@ -91,34 +91,42 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         </Box>
       </Container>
 
-      <Container sx={{ pt: 4 }}>
-        <Typography variant="h4" align="center" gutterBottom>
-          グリーンレンズ
-          <Typography variant="h6" component="span">
-            とは
+      <Box
+        sx={{
+          backgroundImage: `url(${backgroundImage}), url(${backgroundImage})`,
+          backgroundPosition: 'top right, bottom left',
+          backgroundRepeat: 'no-repeat, no-repeat',
+        }}
+      >
+        <Container sx={{ pt: 4 }}>
+          <Typography variant="h4" align="center" gutterBottom>
+            グリーンレンズ
+            <Typography variant="h6" component="span">
+              とは
+            </Typography>
           </Typography>
-        </Typography>
 
-        <FeatureSection
-          title="「ふりかえり」をサポート"
-          description="過去の活動を見直して、よりよい未来の活動を行うために検討するためのプロセス「ふりかえり」。
+          <FeatureSection
+            title="「ふりかえり」をサポート"
+            description="過去の活動を見直して、よりよい未来の活動を行うために検討するためのプロセス「ふりかえり」。
             グリーンレンズは、「ふりかえり」をサポートするためのアプリケーションです。"
-          fileName="featureSection1.svg"
-        />
-        <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-        <FeatureSection
-          title="ランダム表示で、毎日新しい発見を"
-          description="異なるふりかえり手法を試すことで、マンネリ化を防ぎ、新たな視点を得ることができます。"
-          fileName="featureSection2.svg"
-        />
-        <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
-        <FeatureSection
-          title="感想をみんなとシェアしよう"
-          description="みんなの感想コメントを参考にすることで、チームやあなた自身にとって、最適なふりかえり手法の選択が可能に。
+            fileName="featureSection1.svg"
+          />
+          <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
+          <FeatureSection
+            title="ランダム表示で、毎日新しい発見を"
+            description="異なるふりかえり手法を試すことで、マンネリ化を防ぎ、新たな視点を得ることができます。"
+            fileName="featureSection2.svg"
+          />
+          <Box sx={{ my: 2, borderBottom: 1, borderColor: 'divider' }} />
+          <FeatureSection
+            title="感想をみんなとシェアしよう"
+            description="みんなの感想コメントを参考にすることで、チームやあなた自身にとって、最適なふりかえり手法の選択が可能に。
             ※感想コメントの登録はユーザー登録が必要です。"
-          fileName="featureSection3.svg"
-        />
-      </Container>
+            fileName="featureSection3.svg"
+          />
+        </Container>
+      </Box>
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
         <Button
