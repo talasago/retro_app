@@ -138,7 +138,7 @@ functions:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment/{comment_id}
           method: ANY
   send_line_message:
-    handler: app.functions.send_line_message.lambda_handler
+    handler: app.functions.lambda_handlers.send_line_message.lambda_handler
     events:
       - cloudwatchLog:
           logGroup: /aws/lambda/${self:service}-${self:provider.stage}-comment_function
