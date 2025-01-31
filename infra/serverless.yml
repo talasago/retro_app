@@ -80,6 +80,9 @@ provider:
         - ec2:DeleteNetworkInterface # VPC設定のために必要
         - ssm:GetParameter # SSMから環境変数を取得するために必要
         - kms:DecryptSecureString # SSMから環境変数を取得するために必要
+        - "logs:PutSubscriptionFilter" # サブスクリプションフィルターを使ってLambdaを起動するために必要
+        - "logs:DeleteSubscriptionFilter" # サブスクリプションフィルターを使ってLambdaを起動するために必要
+        - "lambda:InvokeFunction" # サブスクリプションフィルターを使ってLambdaを起動するために必要
       Resource: "*"
   environment:
     POSTGRES_HOST: ${ssm:postgres_host}
@@ -137,6 +140,12 @@ functions:
       - http:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment/{comment_id}
           method: ANY
+  send_line_message:
+    handler: app.functions.send_line_message.lambda_handler
+    events:
+      - cloudwatchLog:
+          logGroup: /aws/lambda/${self:service}-${self:provider.stage}-comment_function
+          filterPattern: '"comment_data"'
 
 resources:
   Resources:
