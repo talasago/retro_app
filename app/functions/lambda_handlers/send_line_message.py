@@ -11,6 +11,5 @@ def lambda_handler(event, context):
 
     # 2回以上同じログの入力があるかわかっていない。一応配列なのでforで回す
     for log in json_data["logEvents"]:
-        message = log["message"]["comment_data"]
-
-        NotificationService.send_message_admin(message)
+        # comment_dataが入る。それはsls.ymlでフィルタリングされている
+        NotificationService.send_message_admin(log["message"])
