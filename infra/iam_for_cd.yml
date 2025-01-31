@@ -136,6 +136,8 @@ Resources:
           - "logs:PutRetentionPolicy"
           - "logs:TagLogGroup"
           - "logs:UntagLogGroup"
+          - "logs:PutSubscriptionFilter" 
+          - "logs:DeleteSubscriptionFilter" 
           - "s3:CreateBucket"
           - "s3:DeleteBucket"
           - "s3:DeleteBucketPolicy"
