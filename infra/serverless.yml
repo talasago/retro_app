@@ -142,7 +142,7 @@ functions:
     events:
       - cloudwatchLog:
           logGroup: /aws/lambda/${self:service}-${self:provider.stage}-comment_function
-          filterPattern: '"comment_data"'
+          filter: '%comment_data%'
 
 resources:
   Resources:
