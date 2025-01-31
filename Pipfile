@@ -15,6 +15,7 @@ boto3 = "*"
 pyjwt = "*"
 cryptography = "*"
 fastapi = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
