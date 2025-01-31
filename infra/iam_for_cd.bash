@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 # 起動条件：環境変数にAWS_PROFILEが設定されていること
 # $ export AWS_PROFILE='[YOUR PROFILE NAME]'
 
