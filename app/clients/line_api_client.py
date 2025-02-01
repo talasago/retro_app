@@ -1,6 +1,6 @@
 import os
 import uuid
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -28,10 +28,9 @@ class LineApiClient:
         to: str,
         message: str,
         notification_disabled=False,
-        custom_aggregation_units: list[str] = [],
     ):
         payload = self.__generate_payload(
-            to, message, notification_disabled, custom_aggregation_units
+            to, message, notification_disabled
         )
 
         return self.__send_request(
@@ -56,14 +55,12 @@ class LineApiClient:
         to: str,
         message: str,
         notification_disabled: bool,
-        custom_aggregation_units: list[str],
     ) -> dict:
         line_message = LineTextMessage(text=message)
         payload = LineSendPushMessage(
             to=to,
             messages=[line_message],
             notification_disabled=notification_disabled,
-            custom_aggregation_units=custom_aggregation_units,
         )
         return payload.to_dict()
 
@@ -96,12 +93,10 @@ class LineSendPushMessage:
     to: str
     messages: list[LineTextMessage]
     notification_disabled: bool = False
-    custom_aggregation_units: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
             "to": self.to,
             "messages": [message.to_dict() for message in self.messages],
             "notificationDisabled": self.notification_disabled,
-            "customAggregationUnits": self.custom_aggregation_units,
         }

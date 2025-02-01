@@ -16,13 +16,11 @@ class TestSendTextMessage:
             to = "test_user_id"
             message = "Hello, World!"
             notification_disabled = False
-            custom_aggregation_units = ["unit1", "unit2"]
 
             sut.send_text_message(
                 to=to,
                 message=message,
-                notification_disabled=notification_disabled,
-                custom_aggregation_units=custom_aggregation_units,
+                notification_disabled=notification_disabled
             )
             actual_headers = mock_post.call_args[1]["headers"]
             actual_json = mock_post.call_args[1]["json"]
@@ -39,7 +37,6 @@ class TestSendTextMessage:
                 "to": to,
                 "messages": [{"type": "text", "text": message}],
                 "notificationDisabled": notification_disabled,
-                "customAggregationUnits": custom_aggregation_units,
             }
 
     # 他のテスト観点：500, 502, 503, 504、409ステータスコードが返ってきた場合のリトライ処理のテスト
