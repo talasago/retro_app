@@ -15,6 +15,7 @@ boto3 = "*"
 pyjwt = "*"
 cryptography = "*"
 fastapi = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -31,6 +32,7 @@ pydeps = "*"
 python-dotenv = "*"
 boto3-stubs = {version = "*", extras = ["ssm"]}
 pytest-asyncio = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.10"
