@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING, TypedDict
+from typing import TYPE_CHECKING, List, TypedDict
 
 from sqlalchemy import and_, select
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 
 from app.models.retrospective_method.comment_model import CommentModel
 
@@ -48,7 +49,12 @@ class CommentRepository(RepositoryBase):
             self.__db.rollback()
             raise e
 
-    def find_all(self, conditions: CommentConditions = {}) -> list[CommentModel]:
+    def find_all(
+        self,
+        conditions: CommentConditions = {},
+        order_by_cols: List[InstrumentedAttribute] = [],
+    ) -> list[CommentModel]:
+
         if not isinstance(conditions, dict):
             raise TypeError("conditions must be of type dict")
 
@@ -61,7 +67,11 @@ class CommentRepository(RepositoryBase):
         ]
 
         # MEMO: ここではまだクエリの発行ではない
-        query: "Query" = self.__db.query(CommentModel).filter(and_(*filters))
+        query: "Query" = (
+            self.__db.query(CommentModel)
+            .filter(and_(*filters))
+            .order_by(*order_by_cols)
+        )
 
         # ここでクエリ発行
         return query.all()

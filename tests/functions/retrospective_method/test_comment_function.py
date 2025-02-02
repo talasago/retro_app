@@ -93,8 +93,8 @@ class TestCommentFunction:
         @pytest.fixture(scope="class", autouse=True)
         def create_comment(self, add_comment_api, tokens_of_logged_in_api_common_user):
             comments = [
-                {"comment": "test comment"},
-                {"comment": "test comment2"},
+                {"comment": "test commenttttttttttttt"},
+                {"comment": "test commentt2"},
                 {"comment": "test comment3"},
             ]
 
@@ -111,11 +111,19 @@ class TestCommentFunction:
 
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
-                assert comments[0]["comment"] == "test comment"
-                assert comments[1]["comment"] == "test comment2"
-                assert comments[2]["comment"] == "test comment3"
+
+                sorted_comments = sorted(comments, key=lambda x: x["created_at"])
+                assert comments == sorted_comments
+
+                assert sorted_comments[0]["comment"] == "test commenttttttttttttt"
+                assert sorted_comments[1]["comment"] == "test commentt2"
+                assert sorted_comments[2]["comment"] == "test comment3"
+
                 for comment in comments:
                     assert "user" not in comment
+                    assert "user_id" not in comment
+                    assert "user_uuid" in comment
+                    assert "user_name" in comment
                     assert comment["retrospective_method_id"] == 5
 
         class TestWhenNotLogin:
@@ -127,9 +135,14 @@ class TestCommentFunction:
 
                 assert_cors_headers(response)
                 comments = response.json()["comments"]
-                assert comments[0]["comment"] == "test comment"
-                assert comments[1]["comment"] == "test comment2"
-                assert comments[2]["comment"] == "test comment3"
+
+                sorted_comments = sorted(comments, key=lambda x: x["created_at"])
+                assert comments == sorted_comments
+
+                assert sorted_comments[0]["comment"] == "test commenttttttttttttt"
+                assert sorted_comments[1]["comment"] == "test commentt2"
+                assert sorted_comments[2]["comment"] == "test comment3"
+
                 for comment in comments:
                     assert "user" not in comment
                     assert comment["retrospective_method_id"] == 5

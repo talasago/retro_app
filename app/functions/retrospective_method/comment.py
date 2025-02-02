@@ -49,6 +49,9 @@ def add_comment(
     )
     comment_repo.save(CommentModel(**comment.model_dump()))
 
+    print(
+        f"comment_data: {comment_params.comment}, retrospective_method_id: {retrospective_method_id}"
+    )
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content=AddCommentApiResponseBody().model_dump(),
@@ -68,7 +71,8 @@ def get_comment(
     """コメント取得のエンドポイント。"""
 
     comments = comment_repo.find_all(
-        conditions={"retrospective_method_id": retrospective_method_id}
+        conditions={"retrospective_method_id": retrospective_method_id},
+        order_by_cols=[CommentModel.created_at],
     )
 
     result_comments: list[dict] = []

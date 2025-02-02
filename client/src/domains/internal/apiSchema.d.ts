@@ -118,6 +118,14 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface apiSchemas {
   schemas: {
+    DeleteCommentApiResponseBody: {
+      /**
+       * Message
+       * @description 処理メッセージ
+       * @default コメントを削除しました。
+       */
+      message: string;
+    };
     /** AddCommentApiResponseBody */
     AddCommentApiResponseBody: {
       /**
@@ -170,7 +178,17 @@ export interface apiSchemas {
        * Comments
        * @description コメントデータ
        */
-      comments: unknown[];
+      comments: [
+        {
+          comment: string;
+          id: number;
+          created_at: string;
+          retrospective_method_id: number;
+          updated_at: string;
+          user_uuid: string;
+          user_name: string;
+        },
+      ];
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -247,6 +265,11 @@ export interface apiSchemas {
        * @description リフレッシュトークン
        */
       refresh_token: string;
+      /**
+       * uid
+       * @description uid
+       */
+      uuid: string;
     };
     /** UserCreate */
     UserCreate: {

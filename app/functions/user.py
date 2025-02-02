@@ -100,14 +100,14 @@ def sign_in(
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
             content=ClientErrorResponseBody(
-                message="メールアドレスまたはパスワードが間違っています。"
+                message="ユーザー名またはパスワードが間違っています。"
             ).model_dump(),
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     tokens = auth_service.create_tokens(user=user)
 
-    res_body = TokenApiResponseBody(name=user.name, **tokens)
+    res_body = TokenApiResponseBody(name=user.name, uuid=str(user.uuid), **tokens)
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 
 
@@ -164,7 +164,9 @@ def refresh_token(
         )
 
     tokens = auth_service.create_tokens(user=current_user)
-    res_body = RefreshTokenApiResponseBody(**tokens)
+    res_body = RefreshTokenApiResponseBody(
+        name=current_user.name, uuid=str(current_user.uuid), **tokens
+    )
 
     return JSONResponse(status_code=status.HTTP_200_OK, content=res_body.model_dump())
 

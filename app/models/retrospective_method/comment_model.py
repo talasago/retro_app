@@ -25,14 +25,16 @@ class CommentModel(Base):
     comment: Mapped[str] = mapped_column(String, nullable=False)
 
     # TODO: 他のモデルが出た時のことを考えて、共通化したい気持ち。
+    # MEMO: lambdaを使うことで、datetime.now()を呼び出すタイミングで値が確定する。
+    # lambdaを使わないと、クラス定義が読み込まれた時点で一度だけdatetime.now()が呼び出されるので、同じ日付が入ってしまう。
     created_at: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, default=datetime.now(timezone.utc)
+        DateTime, nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
-        default=datetime.now(timezone.utc),
-        onupdate=datetime.now(timezone.utc),
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
     # 外部キーのデータ
@@ -44,7 +46,8 @@ class CommentModel(Base):
         return {
             "id": self.id,
             "retrospective_method_id": self.retrospective_method_id,
-            "user_id": self.user_id,
+            "user_uuid": str(self.user.uuid),
+            "user_name": self.user.name,
             "comment": self.comment,
             "created_at": str(self.created_at),
             "updated_at": str(self.updated_at),

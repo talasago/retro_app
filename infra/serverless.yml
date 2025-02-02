@@ -89,6 +89,8 @@ provider:
     ORIGINS: ${self:custom.stages.${self:provider.stage}.ORIGINS}
     SECRET_KEY: ${ssm:jwt_secret_key}
     ALGORITHM: ${ssm:jwt_algorithm}
+    LINE_ACCESS_TOKEN: ${ssm:line_access_token}
+    LINE_ADMIN_USER_ID: ${ssm:line_admin_user_id}
   logs:
     # Enable REST API logs
     # This can either be set to `restApi: true` to use defaults, or configured via subproperties
@@ -137,6 +139,12 @@ functions:
       - http:
           path: ${self:custom.apiPrefix}/retrospective_method/{retrospective_id}/comment/{comment_id}
           method: ANY
+  send_line_message:
+    handler: app.functions.lambda_handlers.send_line_message.lambda_handler
+    events:
+      - cloudwatchLog:
+          logGroup: /aws/lambda/${self:service}-${self:provider.stage}-comment_function
+          filter: '%comment_data%'
 
 resources:
   Resources:

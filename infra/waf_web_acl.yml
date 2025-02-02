@@ -49,44 +49,8 @@ resources:
               CloudWatchMetricsEnabled: true
               MetricName: "AWSManagedRulesCommonRuleSet"
               SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
-            Priority: 2
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesKnownBadInputsRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesKnownBadInputsRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesSQLiRuleSet"
-            Priority: 3
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesSQLiRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesSQLiRuleSet"
-              SampledRequestsEnabled: true
-          - Name: "AWS-AWSManagedRulesLinuxRuleSet"
-            Priority: 4
-            OverrideAction:
-              None: {}
-            Statement:
-              ManagedRuleGroupStatement:
-                VendorName: "AWS"
-                Name: "AWSManagedRulesLinuxRuleSet"
-            VisibilityConfig:
-              CloudWatchMetricsEnabled: true
-              MetricName: "AWSManagedRulesLinuxRuleSet"
-              SampledRequestsEnabled: true
           - Name: "AWS-AWSManagedRulesAnonymousIpList"
-            Priority: 5
+            Priority: 2
             OverrideAction:
               None: {}
             Statement:
@@ -97,6 +61,20 @@ resources:
               CloudWatchMetricsEnabled: true
               MetricName: "AnonymousIPList"
               SampledRequestsEnabled: true
+
+    WAFLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties: 
+        LogGroupName: aws-waf-logs-retro-app
+        RetentionInDays: 30
+
+    WAFLogConfig:
+      Type: AWS::WAFv2::LoggingConfiguration
+      Properties:
+        LogDestinationConfigs: 
+          - !GetAtt WAFLogGroup.Arn
+        ResourceArn: !GetAtt WAFWebACL.Arn
+  
   Outputs:
     WebACLArn:
       Description: "WebACL Arn"

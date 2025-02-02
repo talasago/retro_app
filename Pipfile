@@ -4,7 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = "*"
 mangum = "*"
 sqlalchemy = "*"
 alembic = "*" # これはlambdaにデプロイする必要ないからdevでもいいかもな
@@ -15,6 +14,8 @@ pydantic-i18n = "*"
 boto3 = "*"
 pyjwt = "*"
 cryptography = "*"
+fastapi = "*"
+requests = "*"
 
 [dev-packages]
 flake8 = "*"
@@ -31,6 +32,7 @@ pydeps = "*"
 python-dotenv = "*"
 boto3-stubs = {version = "*", extras = ["ssm"]}
 pytest-asyncio = "*"
+types-requests = "*"
 
 [requires]
 python_version = "3.10"

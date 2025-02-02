@@ -13,6 +13,11 @@ import {
   IconButton,
 } from '@mui/material';
 import {
+  BUTTON_ACCENT_COLOR,
+  BUTTON_ACCENT_HOVER_COLOR,
+  BASE_COLOR,
+} from 'domains/internal/constants/colors';
+import {
   type FieldErrors,
   type UseFormRegister,
   type UseFormHandleSubmit,
@@ -92,7 +97,7 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
             </Box>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-                <Avatar sx={{ bgcolor: 'grey.800', width: 90, height: 90 }}>
+                <Avatar sx={{ bgcolor: BASE_COLOR, width: 90, height: 90 }}>
                   <LockIcon sx={{ fontSize: 50 }} />
                 </Avatar>
               </Box>
@@ -135,8 +140,14 @@ const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
-                sx={{ mb: 2, bgcolor: 'grey.800', height: 50 }}
+                sx={{
+                  mb: 2,
+                  height: 50,
+                  bgcolor: BUTTON_ACCENT_COLOR,
+                  '&:hover': {
+                    bgcolor: BUTTON_ACCENT_HOVER_COLOR,
+                  },
+                }}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? <CircularProgress size={24} /> : 'ログインする'}
