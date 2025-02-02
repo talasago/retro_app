@@ -158,12 +158,12 @@ $ pipenv run uvicorn app.functions.main:app --reload
 随時追加予定
 ### 単体テスト
 - pytestで実施
-- schemas/とmodels/に対して実行するテスト
+- 主にschemas/とmodels/に対して実行するテスト
   - DBに接続せずに実施できるため一番早い
 
-### コンポーネント結合テスト
+### 結合テスト
 - pytestで実施
-  - repository/とfunctions/とservices/に対して実行するテスト
+  - 主にrepository/とfunctions/とservices/に対して実行するテスト
     - DBアクセスが必要なのでやや遅い
   
 ### システム結合テスト

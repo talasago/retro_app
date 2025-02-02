@@ -120,7 +120,7 @@ jobs:
           url=$(echo "https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}")
           gh pr comment ${PR_NUMBER} -b "Linterがコードの違反を見つけたで！詳細をチェックや！！${url}"
 
-  unit_tests_and_component_integration_test: # TODO:後で名前変更
+  unit_tests_and_integration_test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ !cancelled() }}
@@ -162,7 +162,7 @@ jobs:
         run: |
           pipenv run alembic upgrade head
 
-      - name: Execute unit tests and component integration tests
+      - name: Execute unit tests and integration tests
         if: ${{ !cancelled() }}
         run: |
           pipenv run pytest
