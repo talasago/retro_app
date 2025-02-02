@@ -29,9 +29,7 @@ class LineApiClient:
         message: str,
         notification_disabled=False,
     ):
-        payload = self.__generate_payload(
-            to, message, notification_disabled
-        )
+        payload = self.__generate_payload(to, message, notification_disabled)
 
         return self.__send_request(
             url=self.API_SEND_PUSH_MESSAGE_URL,

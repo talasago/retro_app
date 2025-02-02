@@ -18,9 +18,7 @@ class TestSendTextMessage:
             notification_disabled = False
 
             sut.send_text_message(
-                to=to,
-                message=message,
-                notification_disabled=notification_disabled
+                to=to, message=message, notification_disabled=notification_disabled
             )
             actual_headers = mock_post.call_args[1]["headers"]
             actual_json = mock_post.call_args[1]["json"]

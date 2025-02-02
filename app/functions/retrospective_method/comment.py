@@ -49,7 +49,9 @@ def add_comment(
     )
     comment_repo.save(CommentModel(**comment.model_dump()))
 
-    print(f"comment_data: {comment_params.comment}, retrospective_method_id: {retrospective_method_id}")
+    print(
+        f"comment_data: {comment_params.comment}, retrospective_method_id: {retrospective_method_id}"
+    )
     return JSONResponse(
         status_code=status.HTTP_201_CREATED,
         content=AddCommentApiResponseBody().model_dump(),
