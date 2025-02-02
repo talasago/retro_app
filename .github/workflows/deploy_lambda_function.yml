@@ -77,7 +77,7 @@ jobs:
     - name: Assume role
       uses: aws-actions/configure-aws-credentials@v4
       with:
-        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DEPLOY_LAMBDA_IAM_ROLE_NAME }}
+        role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.DEPLOY_LAMBDA_IAM_ROLE_NAME }}
         aws-region: ap-northeast-1
 
     - name: sls deploy
