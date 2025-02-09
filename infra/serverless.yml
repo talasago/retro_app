@@ -71,6 +71,12 @@ provider:
   timeout: 30 # seconds
   apiGateway:
     disableDefaultEndpoint: true
+    quota:
+      limit: 1000
+      period: DAY
+    throttle:
+      rateLimit: 10
+      burstLimit: 10
   iamRoleStatements:
     - Effect: Allow
       Action:
