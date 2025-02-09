@@ -63,6 +63,7 @@ class LineApiClient:
         return payload.to_dict()
 
     def __send_request(self, url: str, headers: dict[str, str], payload: dict):
+        # 今postメソッドしか受け付けていない。それ以外のメソッドが必要なときにリファクタリングするかもしれない。
         response = self.session.post(
             url,
             headers=headers,

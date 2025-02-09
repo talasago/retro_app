@@ -46,11 +46,11 @@ jobs:
       - name: Assume role
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ vars.DB_MIGRATE_IAM_ROLE_NAME }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ secrets.DB_MIGRATE_IAM_ROLE_NAME }}
           aws-region: ap-northeast-1
 
       - name: Get firewall JSON
-        run: aws lightsail get-instance-port-states --instance-name ${{ vars.DB_INSTANCE_NAME }} --output json |
+        run: aws lightsail get-instance-port-states --instance-name ${{ secrets.DB_INSTANCE_NAME }} --output json |
              jq -r '.portStates' | sed '/state/d' > org_firewall.json
              # stateとportStatesを消さないと更新用のjsonにならない
 
@@ -64,7 +64,7 @@ jobs:
             # 5432のものを新たに追加
             jq '. += [{"protocol": "tcp", "fromPort": 5432, "toPort": 5432, "cidrs": ["'"${current_ip}"'/32"]}]' org_firewall.json
           fi > firewall.json
-          aws lightsail put-instance-public-ports --instance-name ${{ vars.DB_INSTANCE_NAME }} --port-infos file://firewall.json
+          aws lightsail put-instance-public-ports --instance-name ${{ secrets.DB_INSTANCE_NAME }} --port-infos file://firewall.json
 
       - name: migrate database
         run: pipenv run alembic upgrade head
@@ -78,4 +78,4 @@ jobs:
       # migrate失敗してもportは閉じる
       - name: Put original firewall configuration
         if: always()
-        run: aws lightsail put-instance-public-ports --instance-name  ${{ vars.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
+        run: aws lightsail put-instance-public-ports --instance-name  ${{ secrets.DB_INSTANCE_NAME }}  --port-infos file://org_firewall.json
