@@ -33,6 +33,7 @@ python-dotenv = "*"
 boto3-stubs = {version = "*", extras = ["ssm"]}
 pytest-asyncio = "*"
 types-requests = "*"
+pytest-cov = "*"
 
 [requires]
 python_version = "3.10"
