@@ -5,7 +5,7 @@ Resources:
     Type: "AWS::IAM::Role"
     Properties:
       Path: "/"
-      RoleName: "github_actions_migrate_database"
+      RoleName: "${MIGRATE_ROLE_NAME}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement: 
@@ -28,7 +28,7 @@ Resources:
     Type: "AWS::IAM::Role"
     Properties:
       Path: "/"
-      RoleName: "github_actions_deploy_lambda_function"
+      RoleName: "${DEPLOY_ROLE_NAME}"
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement: 
@@ -65,7 +65,7 @@ Resources:
     Properties:
       Roles: 
         - !Ref IAMRoleGithubActionsDeployLambdaFunction
-      PolicyName: "github_actions_deploy_lambda_function"
+      PolicyName: "${POLICY_NAME}"
       PolicyDocument: 
         Version: "2012-10-17"
         Statement: 
