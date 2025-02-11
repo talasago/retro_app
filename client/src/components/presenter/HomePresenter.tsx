@@ -22,6 +22,7 @@ import {
   BUTTON_BASE_HOVER_COLOR,
 } from 'domains/internal/constants/colors';
 import { Link } from 'react-router-dom';
+import { useAuthTokenObserver } from 'domains/AuthToken';
 
 interface FeatureSectionProps {
   title: string;
@@ -60,6 +61,7 @@ interface HomePresenterProps {
 const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isLogined: boolean = useAuthTokenObserver();
 
   return (
     <Box sx={{ width: '100%' }}>
@@ -149,18 +151,20 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         </Container>
       </Box>
 
-      <Box sx={{ textAlign: 'center', py: 5 }}>
-        <Button
-          variant="contained"
-          onClick={onOpenSignUpModal}
-          sx={{
-            bgcolor: BUTTON_ACCENT_COLOR,
-            '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
-          }}
-        >
-          ユーザー登録してはじめる
-        </Button>
-      </Box>
+      {!isLogined && (
+        <Box sx={{ textAlign: 'center', py: 5 }}>
+          <Button
+            variant="contained"
+            onClick={onOpenSignUpModal}
+            sx={{
+              bgcolor: BUTTON_ACCENT_COLOR,
+              '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
+            }}
+          >
+            ユーザー登録してはじめる
+          </Button>
+        </Box>
+      )}
     </Box>
   );
 };
