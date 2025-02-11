@@ -151,8 +151,8 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
         </Container>
       </Box>
 
-      {!isLogined && (
-        <Box sx={{ textAlign: 'center', py: 5 }}>
+      <Box sx={{ textAlign: 'center', py: 5 }}>
+        {!isLogined && (
           <Button
             variant="contained"
             onClick={onOpenSignUpModal}
@@ -163,8 +163,8 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
           >
             ユーザー登録してはじめる
           </Button>
-        </Box>
-      )}
+        )}
+      </Box>
     </Box>
   );
 };
