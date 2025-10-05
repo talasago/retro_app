@@ -22,7 +22,7 @@ jobs:
       run: echo "node_version=$(cat .nvmrc)" >> $GITHUB_OUTPUT
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ steps.nvmrc.outputs.node_version }}
 
