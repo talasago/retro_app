@@ -1,3 +1,5 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: talasago
 service: retro-app
 frameworkVersion: '>=4.0.0 <5.0.0'
 
@@ -165,13 +167,13 @@ resources:
               Principal:
                 Service: states.amazonaws.com
               Action: sts:AssumeRole
-    WebACLAssociation:
-      Type: "AWS::WAFv2::WebACLAssociation"
-      Properties:
-        ResourceArn: !Sub
-          - arn:aws:apigateway:${self:provider.region}::/restapis/${ApiGatewayId}/stages/${self:provider.stage}
-          - ApiGatewayId: !ImportValue retro-app-${self:provider.stage}-ApiGatewayRestApiId
-        WebACLArn: !ImportValue "retro-app-waf-web-acl-WebACLArn"
+    #WebACLAssociation:
+    #  Type: "AWS::WAFv2::WebACLAssociation"
+    #  Properties:
+    #    ResourceArn: !Sub
+    #      - arn:aws:apigateway:${self:provider.region}::/restapis/${ApiGatewayId}/stages/${self:provider.stage}
+    #      - ApiGatewayId: !ImportValue retro-app-${self:provider.stage}-ApiGatewayRestApiId
+    #    WebACLArn: !ImportValue "retro-app-waf-web-acl-WebACLArn"
   Outputs:
     ApiGatewayRestApiId:
       Description: "API Gateway RestApi Id"
