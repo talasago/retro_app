@@ -5,6 +5,7 @@ import IndexRoutes from 'routes';
 import Alert from 'components/container/Alert';
 import Footer from 'components/container/Footer';
 import HeaderContainer from 'components/container/HeaderContainer';
+import ServiceEndedBanner from 'components/presenter/ServiceEndedBanner';
 import Providers from './Providers';
 
 const appTitle = import.meta.env.VITE_APP_TITLE;
@@ -23,6 +24,7 @@ const App: FC = () => (
     >
       <Box sx={{ flexShrink: 0 }}>
         <HeaderContainer />
+        <ServiceEndedBanner />
       </Box>
       <Box sx={{ flex: '1 0 auto' }}>
         <IndexRoutes />

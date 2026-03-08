@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { Typography, Button, Container, Box, Grid } from '@mui/material';
+import { Typography, Button, Container, Box, Grid, Tooltip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 // eslint-disable-next-line import/extensions
@@ -153,16 +153,20 @@ const HomePresenter: FC<HomePresenterProps> = ({ onOpenSignUpModal }) => {
 
       <Box sx={{ textAlign: 'center', py: 5 }}>
         {!isLogined && (
-          <Button
-            variant="contained"
-            onClick={onOpenSignUpModal}
-            sx={{
-              bgcolor: BUTTON_ACCENT_COLOR,
-              '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
-            }}
-          >
-            ユーザー登録してはじめる
-          </Button>
+          <Tooltip title="サービス終了のため利用できません">
+            <span>
+              <Button
+                variant="contained"
+                disabled
+                sx={{
+                  bgcolor: BUTTON_ACCENT_COLOR,
+                  '&:hover': { bgcolor: BUTTON_ACCENT_HOVER_COLOR },
+                }}
+              >
+                ユーザー登録してはじめる
+              </Button>
+            </span>
+          </Tooltip>
         )}
       </Box>
     </Box>

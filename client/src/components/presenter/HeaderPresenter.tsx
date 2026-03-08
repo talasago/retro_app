@@ -1,6 +1,6 @@
 import type { FC } from 'react';
 import React from 'react';
-import { Box, Toolbar, AppBar, Button, CircularProgress } from '@mui/material';
+import { Box, Toolbar, AppBar, Button, CircularProgress, Tooltip } from '@mui/material';
 // eslint-disable-next-line import/extensions
 import logo from 'assets/logo.svg';
 import {
@@ -34,28 +34,35 @@ const HeaderPresenter: FC<HeaderPresenterProps> = ({
               <img src={logo} alt="Logo" />
             </Link>
           </Box>
-          <Button
-            color="inherit"
-            startIcon={<PersonIcon />}
-            sx={{ display: isLogined ? 'none' : 'inherit' }}
-            onClick={onOpenLoginModal}
-          >
-            ログイン
-          </Button>
-          <Button
-            variant="contained"
-            sx={{
-              ml: 2,
-              bgcolor: BUTTON_ACCENT_COLOR,
-              '&:hover': {
-                bgcolor: BUTTON_ACCENT_HOVER_COLOR,
-              },
-              display: isLogined ? 'none' : 'inherit',
-            }}
-            onClick={onOpenSignUpModal}
-          >
-            ユーザー登録
-          </Button>
+          <Box sx={{ display: isLogined ? 'none' : 'flex', gap: 2 }}>
+            <Tooltip title="サービス終了のため利用できません">
+              <span>
+                <Button
+                  color="inherit"
+                  startIcon={<PersonIcon />}
+                  disabled
+                >
+                  ログイン
+                </Button>
+              </span>
+            </Tooltip>
+            <Tooltip title="サービス終了のため利用できません">
+              <span>
+                <Button
+                  variant="contained"
+                  sx={{
+                    bgcolor: BUTTON_ACCENT_COLOR,
+                    '&:hover': {
+                      bgcolor: BUTTON_ACCENT_HOVER_COLOR,
+                    },
+                  }}
+                  disabled
+                >
+                  ユーザー登録
+                </Button>
+              </span>
+            </Tooltip>
+          </Box>
           <Button
             color="inherit"
             sx={{ display: !isLogined ? 'none' : 'inherit' }}
