@@ -27,9 +27,7 @@ import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import CloseIcon from '@mui/icons-material/Close';
 import { type RegistrationFormSchema } from '../schemas/registrationFormSchema';
 
-interface SignUpModalPresenterProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface SignUpFormProps {
   register: UseFormRegister<RegistrationFormSchema>;
   handleSubmit: UseFormHandleSubmit<RegistrationFormSchema>;
   onSubmit: SubmitHandler<RegistrationFormSchema>;
@@ -37,14 +35,16 @@ interface SignUpModalPresenterProps {
   isSubmitting: boolean;
 }
 
+interface SignUpModalPresenterProps {
+  isOpen: boolean;
+  onClose: () => void;
+  form: SignUpFormProps;
+}
+
 const SignUpModalPresenter: FC<SignUpModalPresenterProps> = ({
   isOpen,
   onClose,
-  register,
-  handleSubmit,
-  onSubmit,
-  errors,
-  isSubmitting,
+  form: { register, handleSubmit, onSubmit, errors, isSubmitting },
 }) => {
   return (
     <div>
