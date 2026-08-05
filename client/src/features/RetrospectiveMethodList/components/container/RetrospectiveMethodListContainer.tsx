@@ -101,15 +101,21 @@ const RetrospectiveMethodListContainer: React.FC = () => {
   const memorizedPresenter = useMemo(
     () => (
       <RetrospectiveMethodListPresenter
-        retrospectiveMethods={retrospectiveMethods}
-        retrospectiveSceneNames={retrospectiveSceneName}
-        isShowScrollToTop={isShowScrollToTop}
-        isShowRetrospectiveMethodList={isShowRetrospectiveMethodList}
-        onClickScrollToButton={handleClickScrollToButton}
-        onClickRetrospectiveMethodPaper={handleClickRetrospectiveMethodPaper}
-        onClickRetroMethodListShowButton={handleClickRetroMethodListShowButton}
-        onClickRandomButton={handleClickRandomButton}
-        onChangeScenesCheckbox={handleChangeScenesCheckbox}
+        searchArea={{
+          retrospectiveSceneName,
+          onClickRetroMethodListShowButton: handleClickRetroMethodListShowButton,
+          onClickRandomButton: handleClickRandomButton,
+          onChangeScenesCheckbox: handleChangeScenesCheckbox,
+        }}
+        paperArea={{
+          retrospectiveMethods,
+          onClickRetrospectiveMethodPaper: handleClickRetrospectiveMethodPaper,
+          isShow: isShowRetrospectiveMethodList,
+        }}
+        scrollTop={{
+          isShow: isShowScrollToTop,
+          onClick: handleClickScrollToButton,
+        }}
       />
     ),
     [

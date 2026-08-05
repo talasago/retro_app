@@ -26,44 +26,25 @@ import RetrospectiveMethodPaper from './RetrospectiveMethodPaper';
 import RetrospectiveMethodSearchButton from './RetrospectiveMethodSearchButton';
 
 interface retrospectiveMethodListPresenterProps {
-  retrospectiveMethods: RetrospectiveMethod[];
-  retrospectiveSceneNames: RetrospectiveSceneNames;
-  isShowScrollToTop: boolean;
-  isShowRetrospectiveMethodList: boolean;
-  onClickScrollToButton: () => void;
-  onClickRetrospectiveMethodPaper: (method: RetrospectiveMethod) => void;
-  onClickRetroMethodListShowButton: () => void;
-  onClickRandomButton: () => void;
-  onChangeScenesCheckbox: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  searchArea: SearchAreaProps;
+  paperArea: RetrospectiveMethodPaperAreaProps & { isShow: boolean };
+  scrollTop: ScrollToTopProps;
 }
 const RetrospectiveMethodListPresenter: React.FC<
   retrospectiveMethodListPresenterProps
-> = ({
-  retrospectiveMethods,
-  retrospectiveSceneNames,
-  isShowScrollToTop,
-  isShowRetrospectiveMethodList,
-  onClickScrollToButton,
-  onClickRetrospectiveMethodPaper,
-  onClickRetroMethodListShowButton,
-  onClickRandomButton,
-  onChangeScenesCheckbox,
-}) => {
+> = ({ searchArea, paperArea, scrollTop }) => {
   return (
     <Box>
-      <SearchArea
-        retrospectiveSceneName={retrospectiveSceneNames}
-        onClickRetroMethodListShowButton={onClickRetroMethodListShowButton}
-        onClickRandomButton={onClickRandomButton}
-        onChangeScenesCheckbox={onChangeScenesCheckbox}
-      />
-      {isShowRetrospectiveMethodList && (
+      <SearchArea {...searchArea} />
+      {paperArea.isShow && (
         <RetrospectiveMethodPaperArea
-          retrospectiveMethods={retrospectiveMethods}
-          onClickRetrospectiveMethodPaper={onClickRetrospectiveMethodPaper}
+          retrospectiveMethods={paperArea.retrospectiveMethods}
+          onClickRetrospectiveMethodPaper={
+            paperArea.onClickRetrospectiveMethodPaper
+          }
         />
       )}
-      <ScrollToTop isShow={isShowScrollToTop} onClick={onClickScrollToButton} />
+      <ScrollToTop {...scrollTop} />
     </Box>
   );
 };
