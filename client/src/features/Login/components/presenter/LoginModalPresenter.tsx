@@ -27,9 +27,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import LockIcon from '@mui/icons-material/Lock';
 import { type LoginFormSchema } from '../schemas/loginFormSchema';
 
-interface LoginModalPresenterProps {
-  isOpen: boolean;
-  onClose: () => void;
+interface LoginFormProps {
   register: UseFormRegister<LoginFormSchema>;
   handleSubmit: UseFormHandleSubmit<LoginFormSchema>;
   onSubmit: SubmitHandler<LoginFormSchema>;
@@ -37,14 +35,16 @@ interface LoginModalPresenterProps {
   isSubmitting: boolean;
 }
 
+interface LoginModalPresenterProps {
+  isOpen: boolean;
+  onClose: () => void;
+  form: LoginFormProps;
+}
+
 const LoginModalPresenter: FC<LoginModalPresenterProps> = ({
   isOpen,
   onClose,
-  register,
-  handleSubmit,
-  onSubmit,
-  errors,
-  isSubmitting,
+  form: { register, handleSubmit, onSubmit, errors, isSubmitting },
 }) => {
   return (
     <div>

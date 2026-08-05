@@ -93,11 +93,7 @@ const LoginModalContainer: FC<LoginModalProps> = ({ isOpen, onCloseModal }) => {
       <LoginModalPresenter
         isOpen={isOpen}
         onClose={onCloseModal}
-        register={register}
-        handleSubmit={handleSubmit}
-        onSubmit={onSubmit}
-        errors={errors}
-        isSubmitting={isSubmitting}
+        form={{ register, handleSubmit, onSubmit, errors, isSubmitting }}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
